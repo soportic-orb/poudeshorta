@@ -15,7 +15,7 @@
             impagada: '⛔', desconeguda: '❓', buit: '❓', error: '⚠️'
         };
 
-        function render(data, ok) {
+        window.pdshMostraResultat = function (data, ok) {
             var state = data.estat || 'error';
             result.className = 'scan-result ' + (ok ? 'is-ok' : (state === 'repetida' ? 'is-warning' : 'is-error'));
             result.hidden = false;
@@ -33,7 +33,7 @@
             if (ok && counter) {
                 counter.textContent = String((parseInt(counter.textContent, 10) || 0) + 1);
             }
-        }
+        };
 
         function escapeHtml(value) {
             return String(value).replace(/[&<>"']/g, function (c) {
@@ -65,16 +65,22 @@
                         return { data: data, ok: response.ok && data.ok };
                     });
                 })
-                .then(function (payload) { render(payload.data, payload.ok); })
+                .then(function (payload) { window.pdshMostraResultat(payload.data, payload.ok); })
                 .catch(function () {
-                    render({ estat: 'error', missatge: 'No s\'ha pogut connectar amb el servidor.' }, false);
+                    window.pdshMostraResultat({ estat: 'error', missatge: 'No s\'ha pogut connectar amb el servidor.' }, false);
                 })
                 .finally(function () {
                     input.value = '';
-                    input.focus();
+                    if (window.matchMedia('(min-width: 700px)').matches) {
+                        input.focus();
+                    }
                 });
         });
 
-        input.focus();
+        // Al mòbil, enfocar el camp obre el teclat i tapa mitja pantalla:
+        // només ho fem en pantalles grans.
+        if (window.matchMedia('(min-width: 700px)').matches) {
+            input.focus();
+        }
     });
 })();

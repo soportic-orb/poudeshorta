@@ -9,6 +9,39 @@ Actualitzacions i a la barra lateral.
 
 ---
 
+## [1.8.0] — 2026-09-04
+
+### Afegit
+
+- **Escàner de codis QR amb la càmera al control d'accés.** Des del mòbil (o
+  qualsevol dispositiu amb càmera) ja no cal escriure el codi a mà: hi ha un
+  botó «Escanejar amb la càmera» que obre la càmera del darrere dins la mateixa
+  pàgina i valida les entrades una rere l'altra, sense recarregar res.
+  - Llegeix indistintament el QR del PDF imprès, el de la pantalla del mòbil i
+    el dels passis d'Apple Wallet i Google Wallet: tots porten el mateix codi.
+  - Fa servir l'API `BarcodeDetector` del navegador quan hi és (Chrome a
+    Android), que no descarrega res. Quan no hi és (Safari a l'iPhone) carrega
+    jsQR, que va allotjat al mateix servidor i només es baixa en obrir la
+    càmera.
+  - Avisa amb un so i una vibració curta si l'entrada és correcta, i amb un so
+    greu i una vibració doble si no ho és.
+  - No repeteix la mateixa entrada mentre s'enfoca, i el resultat es col·loca
+    sol a la pantalla perquè es vegin alhora el missatge i la càmera.
+  - La càmera es tanca sola en canviar de pestanya i en prémer «Tancar la
+    càmera»; el llum de la càmera s'apaga de debò.
+  - Si el navegador no pot obrir la càmera (per exemple sense HTTPS), el botó
+    no surt i s'explica que cal escriure el codi a mà.
+
+### Corregit
+
+- **L'atribut `hidden` no amagava els botons ni els avisos.** Com que `.btn` i
+  `.alert` defineixen `display`, guanyaven a la regla del navegador i els
+  elements marcats com a amagats es veien igualment.
+- Al mòbil, el camp del codi ja no s'enfoca sol en obrir el control d'accés: el
+  teclat tapava mitja pantalla.
+
+---
+
 ## [1.7.2] — 2026-09-04
 
 ### Corregit

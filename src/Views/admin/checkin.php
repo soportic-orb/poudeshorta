@@ -26,17 +26,39 @@
     <div class="panel__head">
         <div>
             <h2>Validar una entrada</h2>
-            <p>Escanegeu el codi QR amb la càmera del mòbil (us portarà a la pàgina de l'entrada)
-               o escriviu el codi de 8 caràcters aquí sota.</p>
+            <p>Obriu la càmera i apunteu al codi QR de l'entrada: serveix igual el PDF imprès,
+               la pantalla del mòbil o el passi del wallet. També podeu escriure'n el codi a mà.</p>
         </div>
     </div>
     <div class="panel__body">
         <div class="scan-result" id="scan-result" hidden></div>
 
+        <button type="button" class="btn btn--primary btn--block btn--lg" id="scanner-obre" hidden>
+            📷 Escanejar amb la càmera
+        </button>
+
+        <p class="alert alert--info" id="scanner-no-disponible" hidden>
+            <span aria-hidden="true">ℹ️</span>
+            <span>Aquest navegador no pot obrir la càmera (cal una connexió segura amb HTTPS).
+                  Podeu validar les entrades escrivint-ne el codi aquí sota.</span>
+        </p>
+
+        <div class="scanner" id="scanner" hidden
+             data-jsqr="<?= e(url('/assets/vendor/jsqr.min.js')) ?>">
+            <div class="scanner__marc">
+                <video id="scanner-video" playsinline muted></video>
+                <div class="scanner__mira" aria-hidden="true"></div>
+            </div>
+            <p class="scanner__estat" id="scanner-estat"></p>
+            <button type="button" class="btn btn--light btn--block" id="scanner-tanca">Tancar la càmera</button>
+        </div>
+
         <form id="scan-form" method="post" action="<?= e(url('/admin/control-acces/validar')) ?>">
             <?= Csrf::field() ?>
             <div class="field">
-                <label class="visually-hidden" for="scan-code">Codi de l'entrada</label>
+                <label for="scan-code" style="font-size:.9rem;color:var(--pdsh-muted);font-weight:600;">
+                    O escriviu el codi de l'entrada
+                </label>
                 <input class="input" type="text" id="scan-code" name="code"
                        placeholder="ABCD1234" autocomplete="off" autocapitalize="characters"
                        spellcheck="false" maxlength="80">

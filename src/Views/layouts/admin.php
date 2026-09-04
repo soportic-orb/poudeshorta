@@ -111,6 +111,7 @@ try {
 <script src="<?= e(asset('js/app.js')) ?>" defer></script>
 <?php if (str_starts_with($path, '/admin/control-acces')): ?>
     <script src="<?= e(asset('js/checkin.js')) ?>" defer></script>
+    <script src="<?= e(asset('js/scanner.js')) ?>" defer></script>
 <?php endif; ?>
 </body>
 </html>

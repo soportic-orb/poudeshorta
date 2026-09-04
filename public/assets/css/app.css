@@ -8,6 +8,10 @@
 *::before,
 *::after { box-sizing: border-box; }
 
+/* L'atribut «hidden» ha de guanyar sempre: components com .btn o .alert
+   defineixen display i, si no, el deixarien visible. */
+[hidden] { display: none !important; }
+
 :root {
     --pdsh-primary: #8C1027;
     --pdsh-secondary: #E8621E;
