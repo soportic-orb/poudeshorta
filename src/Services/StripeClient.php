@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Core\Logger;
+use App\Core\Money;
 use App\Core\Settings;
 use RuntimeException;
 
@@ -40,6 +41,36 @@ final class StripeClient
     {
         $currency = strtoupper((string) Settings::get('currency', 'EUR'));
         return self::MINIMS[$currency] ?? 50;
+    }
+
+    /**
+     * Despeses que la passarel·la reté d'un cobrament, segons les tarifes
+     * configurades al panell.
+     *
+     * És només informatiu, per dir-ho a qui s'inscriu: a Stripe se li continua
+     * enviant l'import total i qui paga no té cap càrrec addicional.
+     */
+    public static function estimatedFee(int $totalCents): int
+    {
+        if ($totalCents <= 0) {
+            return 0;
+        }
+
+        $percent = max(0.0, min(100.0, (float) Settings::get('stripe_fee_percent', '1.5')));
+        $fixed   = max(0, Settings::int('stripe_fee_fixed_cents', 25));
+
+        return min($totalCents, (int) round($totalCents * $percent / 100) + $fixed);
+    }
+
+    /** Text que descriu la tarifa aplicada, per mostrar-lo al costat de l'import. */
+    public static function feeDescription(): string
+    {
+        $percent = (float) Settings::get('stripe_fee_percent', '1.5');
+        $fixed   = Settings::int('stripe_fee_fixed_cents', 25);
+
+        $percentText = rtrim(rtrim(number_format($percent, 2, ',', '.'), '0'), ',');
+
+        return $percentText . '% + ' . Money::format($fixed) . ' per transacció';
     }
 
     /** Idioma configurat, validat: un valor incorrecte no ha de tombar el pagament. */

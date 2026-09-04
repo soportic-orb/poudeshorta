@@ -2,6 +2,7 @@
 use App\Controllers\Web\HomeController;
 use App\Core\Csrf;
 use App\Core\Settings;
+use App\Services\StripeClient;
 
 $errors = $errors ?? [];
 ?>
@@ -165,6 +166,19 @@ $errors = $errors ?? [];
                             <td class="is-total" style="text-align:right;"><?= money((int) $subtotal) ?></td>
                         </tr>
                     </table>
+
+                    <?php
+                    $comissio = (int) $subtotal > 0 && Settings::bool('show_stripe_fee', true)
+                        ? StripeClient::estimatedFee((int) $subtotal)
+                        : 0;
+                    ?>
+                    <?php if ($comissio > 0): ?>
+                        <p class="fee-note">
+                            D'aquest import, <strong><?= money($comissio) ?></strong> són despeses de la
+                            passarel·la de pagament (<?= e(StripeClient::feeDescription()) ?>).
+                            No és cap càrrec addicional: pagareu <?= money((int) $subtotal) ?>.
+                        </p>
+                    <?php endif; ?>
 
                     <?php if (Settings::bool('require_terms', true)): ?>
                         <div class="field" style="margin:18px 0 0;">

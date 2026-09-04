@@ -7,6 +7,7 @@ use App\Core\Auth;
 use App\Core\Db;
 use App\Core\Flash;
 use App\Core\Logger;
+use App\Core\Money;
 use App\Core\Request;
 use App\Core\Response;
 use App\Core\Settings;
@@ -103,6 +104,11 @@ final class SettingsController
 
         $locale = (string) Request::post('stripe_locale', 'auto');
         Settings::set('stripe_locale', in_array($locale, StripeClient::LOCALES, true) ? $locale : 'auto');
+
+        $percent = (float) str_replace(',', '.', (string) Request::post('stripe_fee_percent', '1.5'));
+        Settings::set('stripe_fee_percent', (string) max(0, min(100, $percent)));
+        Settings::set('stripe_fee_fixed_cents', (string) max(0, Money::toCents((string) Request::post('stripe_fee_fixed', '0,25'))));
+        Settings::set('show_stripe_fee', Request::post('show_stripe_fee') ? '1' : '0');
 
         foreach ([
             'stripe_test_pk', 'stripe_test_sk', 'stripe_test_wh_secret',

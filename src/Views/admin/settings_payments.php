@@ -72,6 +72,39 @@ $live = $s['stripe_mode'] === 'live';
     <div class="panel">
         <div class="panel__head">
             <div>
+                <h2>Despeses de la passarel·la</h2>
+                <p>Es mostren a qui s'inscriu, sota el total, a títol informatiu. No s'afegeixen
+                   al que paga: Stripe cobra l'import total i reté la seva comissió.</p>
+            </div>
+        </div>
+        <div class="panel__body">
+            <div class="form-grid">
+                <div class="field">
+                    <label for="stripe_fee_percent">Percentatge per transacció</label>
+                    <input class="input" type="text" inputmode="decimal" id="stripe_fee_percent"
+                           name="stripe_fee_percent" value="<?= e($s['stripe_fee_percent']) ?>">
+                    <span class="field__hint">Per a targetes europees, Stripe aplica un 1,5%.</span>
+                </div>
+                <div class="field">
+                    <label for="stripe_fee_fixed">Import fix per transacció (€)</label>
+                    <input class="input" type="text" inputmode="decimal" id="stripe_fee_fixed"
+                           name="stripe_fee_fixed"
+                           value="<?= e(\App\Core\Money::toDecimal((int) $s['stripe_fee_fixed_cents'])) ?>">
+                    <span class="field__hint">Habitualment 0,25 €. Reviseu-ho al vostre tauler de Stripe.</span>
+                </div>
+            </div>
+            <div class="field" style="margin-bottom:0;">
+                <label class="check">
+                    <input type="checkbox" name="show_stripe_fee" value="1"<?= checkedIf($s['show_stripe_fee'] === '1') ?>>
+                    <span>Mostrar aquesta informació a la pantalla de pagament</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel__head">
+            <div>
                 <h2>Claus de proves</h2>
                 <p>Les trobareu al tauler de Stripe amb el mode de proves activat.</p>
             </div>

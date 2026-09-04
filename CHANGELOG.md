@@ -9,6 +9,21 @@ Actualitzacions i a la barra lateral.
 
 ---
 
+## [1.5.0] — 2026-09-04
+
+### Afegit
+
+- Sota el total de la pantalla de pagament s'indica, a títol informatiu, quina
+  part de l'import correspon a les despeses de la passarel·la, deixant clar
+  que no és cap càrrec addicional. El percentatge i l'import fix es
+  configuren a Pagaments (per defecte 1,5% + 0,25 €, la tarifa de Stripe per a
+  targetes europees) i la nota es pot amagar.
+
+  A Stripe se li continua enviant l'import total: la comissió no es descompta
+  de res, només s'explica.
+
+---
+
 ## [1.4.1] — 2026-09-04
 
 ### Corregit

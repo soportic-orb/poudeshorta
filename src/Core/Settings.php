@@ -66,6 +66,9 @@ final class Settings
         'stripe_live_sk'         => '',
         'stripe_live_wh_secret'  => '',
         'stripe_locale'          => 'auto',
+        'stripe_fee_percent'     => '1.5',
+        'stripe_fee_fixed_cents' => '25',
+        'show_stripe_fee'        => '1',
 
         // SMTP
         'smtp_host'       => '',
