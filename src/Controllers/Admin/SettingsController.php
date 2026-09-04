@@ -324,12 +324,28 @@ final class SettingsController
     /** Genera un passi de prova per validar el certificat d'Apple Wallet. */
     public function testWallet(): void
     {
-        $result = AppleWallet::selfTest();
+        foreach ([
+            'Apple Wallet'  => AppleWallet::selfTest(),
+            'Google Wallet' => GoogleWallet::selfTest(),
+        ] as $nom => $resultat) {
+            $resultat['ok']
+                ? Flash::success($nom . ': ' . $resultat['message'])
+                : Flash::error($nom . ': ' . $resultat['message']);
+        }
 
-        $result['ok']
-            ? Flash::success('Apple Wallet: ' . $result['message'])
-            : Flash::error('Apple Wallet: ' . $result['message']);
+        Response::redirect(Url::to('/admin/configuracio/wallet'));
+    }
 
+    /** Crea o actualitza la classe de l'esdeveniment al compte de Google. */
+    public function googleClass(): void
+    {
+        $resultat = (new GoogleWallet())->ensureClass();
+
+        $resultat['ok']
+            ? Flash::success($resultat['message'])
+            : Flash::error('Google Wallet: ' . $resultat['message']);
+
+        Logger::audit('crea_classe_google_wallet', null, ['ok' => $resultat['ok']]);
         Response::redirect(Url::to('/admin/configuracio/wallet'));
     }
 

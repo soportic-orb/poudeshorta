@@ -9,6 +9,27 @@ Actualitzacions i a la barra lateral.
 
 ---
 
+## [1.7.0] — 2026-09-04
+
+### Corregit
+
+- **Els passis del Google Wallet no s'haurien desat.** L'enllaç portava les
+  dades de l'esdeveniment a dins i sortien 2123 caràcters, quan Google trunca
+  els enllaços de més de 1800 i llavors no es desa res, sense avisar.
+- El missatge d'estat de l'Apple Wallet deia «Configurat» encara que els
+  fitxers dels certificats haguessin desaparegut del disc.
+
+### Afegit
+
+- Botó **Crear la classe al Google Wallet**: crea al compte de Google les
+  dades comunes a totes les entrades, de manera que l'enllaç de cada entrada
+  passa de 2123 a 1306 caràcters i queda amb marge sota el límit.
+- La comprovació de configuració dels passis ara prova també el Google Wallet
+  i informa de la mida de l'enllaç.
+- Guia pas a pas del Google Wallet a `DEPLOY.md`, amb els errors habituals.
+
+---
+
 ## [1.6.0] — 2026-09-04
 
 ### Afegit

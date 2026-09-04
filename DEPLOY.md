@@ -307,17 +307,88 @@ El certificat del pass **caduca al cap d'un any**. Quan caduqui, els passis ja
 descarregats continuen al mòbil, però no se'n poden signar de nous i la prova
 del pas 7 començarà a fallar. Apunteu-vos la data i repetiu els passos 3 a 7.
 
-### 11.2 Google Wallet
+### 11.2 Google Wallet, pas a pas
 
 No té cost, però l'alta d'emissor l'ha d'aprovar Google i pot trigar uns dies.
+Aquesta guia dona per fet que ja teniu el compte aprovat.
 
-1. Demaneu accés a la **Google Wallet Console**
-   (`pay.google.com/business/console`) i anoteu-ne l'*Issuer ID*.
-2. Al Google Cloud Console, creeu un **compte de servei**, activeu-hi l'API de
-   Google Wallet i descarregueu-ne la clau en format JSON.
-3. A la Wallet Console, autoritzeu l'adreça del compte de servei
-   (`...@....iam.gserviceaccount.com`) com a usuari.
-4. Al panell, a **Configuració → Wallet**, poseu-hi l'Issuer ID i pugeu el JSON.
+#### Pas 1 · Anotar l'Issuer ID
+
+A la **Google Wallet Console** (`pay.google.com/business/console`), a
+**Google Wallet API → Configuració**, hi trobareu l'**Issuer ID**: un número
+llarg, del tipus `3388000000012345678`. Anoteu-lo.
+
+#### Pas 2 · Crear el compte de servei
+
+El compte de servei és qui signarà els passis en nom vostre.
+
+1. Aneu al **Google Cloud Console** (`console.cloud.google.com`) amb el mateix
+   compte i trieu (o creeu) un projecte.
+2. **APIs i serveis → Biblioteca**, cerqueu **Google Wallet API** i premeu
+   **Habilita**.
+3. **IAM i administració → Comptes de servei → Crea un compte de servei**.
+   Poseu-hi un nom com `wallet-poudeshorta`. No cal assignar-li cap rol del
+   projecte.
+4. Obriu el compte de servei acabat de crear → pestanya **Claus** →
+   **Afegeix una clau → Crea una clau nova → JSON**. Es descarregarà un fitxer.
+
+   Aquest fitxer és una credencial: tracteu-lo com una contrasenya.
+
+#### Pas 3 · Autoritzar el compte de servei a la Wallet Console
+
+Aquest pas és el que més es passa per alt, i sense ell tot falla amb un 403.
+
+1. Torneu a la **Google Wallet Console** → **Users**.
+2. **Invite a user** i poseu-hi l'adreça del compte de servei, que és el camp
+   `client_email` del JSON i acaba en `.iam.gserviceaccount.com`.
+3. Doneu-li el rol **Developer** (o Admin).
+
+#### Pas 4 · Configurar-ho al Panell de Gestió
+
+A **Configuració → Wallet**:
+
+| Camp | Valor |
+|---|---|
+| Activar els passis | marcat |
+| Issuer ID | el número del pas 1 |
+| Identificador de la classe | un nom curt sense espais, per exemple `sopar_2026` |
+| Fitxer JSON del compte de servei | el fitxer del pas 2 |
+
+Premeu **Desar la configuració dels passis**.
+
+#### Pas 5 · Crear la classe de l'esdeveniment
+
+A sota de tot hi ha el botó **Crear la classe al Google Wallet**. Premeu-lo.
+
+La classe conté el que és igual per a totes les entrades: nom de
+l'esdeveniment, data, lloc i colors. **Aquest pas no és opcional**: Google
+trunca els enllaços «Save to Wallet» que superen els 1800 caràcters, i si les
+dades de l'esdeveniment han de viatjar dins de cada enllaç, se superen. Amb la
+classe creada, l'enllaç només porta les dades de la persona i queda per sota
+del límit amb marge.
+
+Si canvieu el nom, la data o el lloc de l'esdeveniment, torneu a prémer el
+botó perquè la classe s'actualitzi.
+
+#### Pas 6 · Comprovar-ho
+
+A **Comprovar la configuració dels passis**, premeu **Comprovar la
+configuració**. Us dirà si l'enllaç es genera, si està ben signat i quants
+caràcters ocupa dels 1800 permesos.
+
+#### Pas 7 · Provar-ho en un Android de veritat
+
+Amb Stripe en mode de proves, feu una compra, obriu la pantalla de confirmació
+des d'un mòbil Android i premeu **Afegir al Google Wallet**.
+
+#### Si alguna cosa falla
+
+| Missatge | Què vol dir |
+|---|---|
+| El compte de servei no té permís sobre aquest emissor | Falta el pas 3: autoritzar-lo a la Wallet Console |
+| Google no ha acceptat el compte de servei | El JSON no és correcte o falta habilitar la Google Wallet API (pas 2.2) |
+| Google no troba l'emissor indicat | L'Issuer ID no és correcte |
+| L'enllaç és massa llarg | Falta el pas 5: crear la classe |
 
 ## 12. Actualitzacions OTA
 

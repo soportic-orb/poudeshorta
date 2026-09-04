@@ -18,12 +18,35 @@ use RuntimeException;
 final class GoogleWallet
 {
     private const SAVE_URL = 'https://pay.google.com/gp/v/save/';
+    private const API_BASE  = 'https://walletobjects.googleapis.com/walletobjects/v1/';
+    private const TOKEN_URL = 'https://oauth2.googleapis.com/token';
+    private const SCOPE     = 'https://www.googleapis.com/auth/wallet_object.issuer';
+
+    /**
+     * Google trunca els enllaços «Save to Wallet» amb un JWT de més de 1800
+     * caràcters i llavors no es desa res, sense avisar. Ho comprovem abans de
+     * donar l'enllaç per no lliurar-ne un de trencat.
+     */
+    private const MAX_JWT = 1800;
 
     public static function isConfigured(): bool
     {
         return Settings::bool('wallet_enabled', false)
             && trim((string) Settings::get('google_issuer_id')) !== ''
             && self::serviceAccount() !== null;
+    }
+
+    /** Identificador de la classe d'aquest esdeveniment. */
+    public static function classId(): string
+    {
+        $issuerId = trim((string) Settings::get('google_issuer_id'));
+        return $issuerId . '.' . Str::slug((string) Settings::get('google_class_suffix', 'esdeveniment'), '_');
+    }
+
+    /** La classe ja s'ha creat al compte de Google? */
+    public static function classRegistered(): bool
+    {
+        return trim((string) Settings::get('google_class_registered')) === self::classId();
     }
 
     public function saveUrl(array $order, array $ticket, array $type): string
@@ -40,19 +63,37 @@ final class GoogleWallet
         $attendee = trim((string) ($ticket['attendee_name'] ?? ''))
             ?: trim((string) $order['name'] . ' ' . (string) ($order['surname'] ?? ''));
 
+        $payload = [
+            'eventTicketObjects' => [$this->objectPayload($objectId, $classId, $order, $ticket, $type, $attendee)],
+        ];
+
+        // Si la classe encara no existeix al compte de Google, l'hem d'enviar
+        // dins del JWT perquè la creï. Ocupa molt, i per això val més crear-la
+        // una sola vegada des del panell.
+        if (!self::classRegistered()) {
+            $payload = ['eventTicketClasses' => [$this->classPayload($classId, $issuerId)]] + $payload;
+        }
+
         $claims = [
             'iss'     => $account['client_email'],
             'aud'     => 'google',
             'typ'     => 'savetowallet',
             'iat'     => time(),
             'origins' => [Url::base()],
-            'payload' => [
-                'eventTicketClasses' => [$this->classPayload($classId, $issuerId)],
-                'eventTicketObjects' => [$this->objectPayload($objectId, $classId, $order, $ticket, $type, $attendee)],
-            ],
+            'payload' => $payload,
         ];
 
-        return self::SAVE_URL . $this->signJwt($claims, (string) $account['private_key']);
+        $jwt = $this->signJwt($claims, (string) $account['private_key']);
+
+        if (strlen($jwt) > self::MAX_JWT) {
+            throw new RuntimeException(
+                'L\'enllaç del Google Wallet és massa llarg (' . strlen($jwt) . ' caràcters, el màxim segur '
+                . 'són ' . self::MAX_JWT . '). Creeu la classe des de Configuració → Wallet: així l\'enllaç '
+                . 'només ha de portar l\'entrada i queda molt més curt.'
+            );
+        }
+
+        return self::SAVE_URL . $jwt;
     }
 
     private function classPayload(string $classId, string $issuerId): array
@@ -104,7 +145,6 @@ final class GoogleWallet
                 'value'        => Url::full('/e/' . $ticket['code']),
                 'alternateText' => (string) $ticket['code'],
             ],
-            'hexBackgroundColor' => (string) Settings::get('brand_primary'),
             'textModulesData' => [
                 [
                     'header' => 'Referència',
@@ -118,7 +158,7 @@ final class GoogleWallet
         if ($includes !== '') {
             $object['textModulesData'][] = [
                 'header' => 'Què inclou',
-                'body'   => Str::limit(str_replace(["\r\n", "\n"], ' · ', $includes), 400),
+                'body'   => Str::limit(str_replace(["\r\n", "\n"], ' · ', $includes), 150),
                 'id'     => 'includes',
             ];
         }
@@ -145,6 +185,168 @@ final class GoogleWallet
         }
 
         return $signingInput . '.' . rtrim(strtr(base64_encode($signature), '+/', '-_'), '=');
+    }
+
+    // ------------------------------------------------------- API de Google
+
+    /**
+     * Crea la classe de l'esdeveniment al compte de Google, o l'actualitza si
+     * ja hi és. Fent-ho una sola vegada, els enllaços de cada entrada queden
+     * molt més curts i no arriben al límit que Google trunca.
+     *
+     * @return array{ok:bool, message:string}
+     */
+    public function ensureClass(): array
+    {
+        $account = self::serviceAccount();
+        if ($account === null || trim((string) Settings::get('google_issuer_id')) === '') {
+            return ['ok' => false, 'message' => self::configurationHint()];
+        }
+
+        $classId = self::classId();
+
+        try {
+            $token = $this->accessToken($account);
+            $class = $this->classPayload($classId, trim((string) Settings::get('google_issuer_id')));
+
+            [$status] = $this->api('GET', 'eventTicketClass/' . rawurlencode($classId), null, $token);
+
+            if ($status === 404) {
+                [$status, $body] = $this->api('POST', 'eventTicketClass', $class, $token);
+                $accio = 'creada';
+            } else {
+                [$status, $body] = $this->api('PUT', 'eventTicketClass/' . rawurlencode($classId), $class, $token);
+                $accio = 'actualitzada';
+            }
+
+            if ($status >= 400) {
+                return ['ok' => false, 'message' => $this->describeApiError($status, $body)];
+            }
+        } catch (\Throwable $e) {
+            return ['ok' => false, 'message' => $e->getMessage()];
+        }
+
+        Settings::set('google_class_registered', $classId);
+        Settings::flush();
+
+        return ['ok' => true, 'message' => 'Classe ' . $accio . ' correctament al Google Wallet (' . $classId . ').'];
+    }
+
+    /** Obté un testimoni d'accés amb el compte de servei (flux JWT bearer). */
+    private function accessToken(array $account): string
+    {
+        $now = time();
+        $assertion = $this->signJwt([
+            'iss'   => $account['client_email'],
+            'scope' => self::SCOPE,
+            'aud'   => self::TOKEN_URL,
+            'iat'   => $now,
+            'exp'   => $now + 3600,
+        ], $account['private_key']);
+
+        $ch = curl_init(self::TOKEN_URL);
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 30,
+            CURLOPT_POSTFIELDS     => http_build_query([
+                'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                'assertion'  => $assertion,
+            ]),
+        ]);
+        $response = curl_exec($ch);
+        $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        if ($response === false) {
+            throw new RuntimeException('No s\'ha pogut contactar amb Google: ' . $error);
+        }
+
+        $decoded = json_decode((string) $response, true);
+        if ($status >= 400 || empty($decoded['access_token'])) {
+            $motiu = (string) ($decoded['error_description'] ?? $decoded['error'] ?? 'resposta inesperada');
+            throw new RuntimeException(
+                'Google no ha acceptat el compte de servei (' . $motiu . '). Comproveu que el JSON és el correcte '
+                . 'i que teniu activada l\'API de Google Wallet al projecte de Google Cloud.'
+            );
+        }
+
+        return (string) $decoded['access_token'];
+    }
+
+    /** @return array{0:int, 1:array} */
+    private function api(string $method, string $path, ?array $payload, string $token): array
+    {
+        $ch = curl_init(self::API_BASE . $path);
+        curl_setopt_array($ch, [
+            CURLOPT_CUSTOMREQUEST  => $method,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 30,
+            CURLOPT_HTTPHEADER     => [
+                'Authorization: Bearer ' . $token,
+                'Content-Type: application/json',
+            ],
+            CURLOPT_POSTFIELDS     => $payload !== null
+                ? json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+                : null,
+        ]);
+
+        $response = curl_exec($ch);
+        $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        if ($response === false) {
+            throw new RuntimeException('No s\'ha pogut contactar amb l\'API del Google Wallet: ' . $error);
+        }
+
+        return [$status, (array) (json_decode((string) $response, true) ?? [])];
+    }
+
+    private function describeApiError(int $status, array $body): string
+    {
+        $detall = (string) ($body['error']['message'] ?? 'sense detall');
+
+        return match (true) {
+            $status === 401 => 'Google ha rebutjat les credencials del compte de servei.',
+            $status === 403 => 'El compte de servei no té permís sobre aquest emissor. A la Google Wallet Console, '
+                . 'aneu a «Users» i doneu-li accés a l\'adreça del compte de servei. (' . $detall . ')',
+            $status === 404 => 'Google no troba l\'emissor indicat. Reviseu l\'Issuer ID. (' . $detall . ')',
+            default         => 'Google ha respost amb el codi ' . $status . ': ' . $detall,
+        };
+    }
+
+    /**
+     * Prova de configuració: genera un enllaç amb dades fictícies i en
+     * comprova la mida, sense crear res al compte de Google.
+     *
+     * @return array{ok:bool, message:string}
+     */
+    public static function selfTest(): array
+    {
+        if (!self::isConfigured()) {
+            return ['ok' => false, 'message' => self::configurationHint()];
+        }
+
+        try {
+            $url = (new self())->saveUrl(
+                ['reference' => 'PDSH-PROVA', 'name' => 'Entrada', 'surname' => 'de prova'],
+                ['code' => 'PROVA123', 'attendee_name' => 'Entrada de prova', 'status' => 'valid'],
+                ['name' => 'Prova de configuració', 'includes' => '']
+            );
+        } catch (\Throwable $e) {
+            return ['ok' => false, 'message' => $e->getMessage()];
+        }
+
+        $jwt = substr($url, strlen(self::SAVE_URL));
+
+        return [
+            'ok'      => true,
+            'message' => 'Enllaç generat correctament i signat amb el compte de servei. Mida: '
+                . strlen($jwt) . ' de ' . self::MAX_JWT . ' caràcters permesos'
+                . (self::classRegistered() ? '.' : ' (creeu la classe per escurçar-lo).'),
+        ];
     }
 
     /** @return array{client_email:string, private_key:string}|null */

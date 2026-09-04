@@ -121,6 +121,23 @@ $s = $settings;
                               placeholder='{"type":"service_account", ...}'></textarea>
                 </div>
             </details>
+
+            <div class="alert <?= \App\Services\GoogleWallet::classRegistered() ? 'alert--success' : 'alert--warning' ?>"
+                 style="margin:18px 0 0;">
+                <span aria-hidden="true"><?= \App\Services\GoogleWallet::classRegistered() ? '✅' : '⚠️' ?></span>
+                <span>
+                    <?php if (\App\Services\GoogleWallet::classRegistered()): ?>
+                        <strong>La classe de l'esdeveniment ja està creada</strong>
+                        (<code><?= e(\App\Services\GoogleWallet::classId()) ?></code>).
+                        Els enllaços de cada entrada són curts i no arriben al límit de Google.
+                    <?php else: ?>
+                        <strong>Encara no heu creat la classe de l'esdeveniment.</strong>
+                        Fins que no ho feu, cada enllaç ha de portar-hi totes les dades i pot superar
+                        el màxim de 1800 caràcters que admet Google, amb la qual cosa el passi no es desaria.
+                        Deseu la configuració i premeu el botó de sota.
+                    <?php endif; ?>
+                </span>
+            </div>
         </div>
         <div class="panel__foot">
             <button type="submit" class="btn btn--primary">Desar la configuració dels passis</button>
@@ -133,17 +150,39 @@ $s = $settings;
     <div class="panel">
         <div class="panel__head">
             <div>
-                <h2>Comprovar el certificat d'Apple</h2>
-                <p>Genera un passi de prova amb dades fictícies. Feu-ho abans d'obrir les inscripcions.</p>
+                <h2>Comprovar la configuració dels passis</h2>
+                <p>Prova l'Apple Wallet i el Google Wallet amb dades fictícies. Feu-ho abans d'obrir les inscripcions.</p>
             </div>
         </div>
         <div class="panel__body">
             <p style="margin:0 0 16px;color:var(--pdsh-muted);font-size:.92rem;">
-                Si la prova passa, vol dir que el certificat, la clau i el certificat WWDR són correctes
-                i que el servidor pot signar passis. No es crea cap entrada ni s'envia res a ningú.
+                Comprova que l'Apple Wallet pot signar passis amb els vostres certificats i que l'enllaç del
+                Google Wallet es genera i cap dins del límit de Google. No es crea cap entrada ni s'envia res.
             </p>
-            <button type="submit" class="btn btn--light" data-loading="Signant el passi de prova…">
-                Generar un passi de prova
+            <button type="submit" class="btn btn--light" data-loading="Comprovant…">
+                Comprovar la configuració
+            </button>
+        </div>
+    </div>
+</form>
+
+<form method="post" action="<?= e(url('/admin/configuracio/wallet/classe-google')) ?>">
+    <?= Csrf::field() ?>
+    <div class="panel">
+        <div class="panel__head">
+            <div>
+                <h2>Classe de l'esdeveniment al Google Wallet</h2>
+                <p>Es crea una sola vegada. Torneu-hi si canvieu el nom, la data o el lloc de l'esdeveniment.</p>
+            </div>
+        </div>
+        <div class="panel__body">
+            <p style="margin:0 0 16px;color:var(--pdsh-muted);font-size:.92rem;">
+                La classe conté les dades comunes a totes les entrades (nom de l'esdeveniment, data, lloc i colors).
+                Creant-la al vostre compte, l'enllaç de cada entrada només ha de portar les dades de la persona
+                i queda ben per sota del límit que Google admet.
+            </p>
+            <button type="submit" class="btn btn--light" data-loading="Parlant amb Google…">
+                <?= \App\Services\GoogleWallet::classRegistered() ? 'Actualitzar la classe' : 'Crear la classe al Google Wallet' ?>
             </button>
         </div>
     </div>

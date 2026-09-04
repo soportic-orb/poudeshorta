@@ -103,6 +103,7 @@ final class Settings
         'google_issuer_id'          => '',
         'google_class_suffix'       => 'poudeshorta_event',
         'google_service_account_json' => '',
+        'google_class_registered' => '',
 
         // OTA
         'ota_repo'          => 'soportic-orb/poudeshorta',

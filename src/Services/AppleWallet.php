@@ -469,6 +469,7 @@ final class AppleWallet
         if (!Settings::bool('wallet_enabled', false)) {
             return 'Els passis de wallet estan desactivats.';
         }
+
         foreach ([
             'apple_pass_type_id' => 'Falta el Pass Type ID.',
             'apple_team_id'      => 'Falta el Team ID d\'Apple.',
@@ -479,6 +480,20 @@ final class AppleWallet
                 return $message;
             }
         }
+
+        // Els camps poden estar plens i el fitxer haver desaparegut del disc,
+        // per exemple si s'ha restaurat una còpia sense storage/.
+        foreach ([
+            'apple_cert_path' => 'el certificat del pass',
+            'apple_key_path'  => 'la clau privada',
+            'apple_wwdr_path' => 'el certificat WWDR',
+        ] as $key => $nom) {
+            $path = trim((string) Settings::get($key));
+            if ($path !== '' && !is_file($path)) {
+                return 'No es troba el fitxer amb ' . $nom . ' (' . basename($path) . '). Torneu-lo a pujar.';
+            }
+        }
+
         return 'Configurat.';
     }
 }
