@@ -93,6 +93,7 @@ final class Settings
 
         // Apple / Google Wallet
         'wallet_enabled'            => '0',
+        'wallet_expire_hours'       => '48',
         'apple_pass_type_id'        => '',
         'apple_team_id'             => '',
         'apple_organization'        => 'Pou de s\'Horta',

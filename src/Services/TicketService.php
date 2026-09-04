@@ -361,6 +361,31 @@ final class TicketService
         ];
     }
 
+    /**
+     * Moment en què els passis de wallet han de deixar de ser vàlids.
+     *
+     * Ni l'Apple Wallet ni el Google Wallet permeten esborrar un passi del
+     * telèfon de ningú: el que sí que es pot és marcar-los com a caducats, i
+     * llavors el mòbil els treu de la llista de passis actius i els arracona
+     * als caducats. Es compta a partir de la data de l'esdeveniment.
+     *
+     * @return int|null Marca de temps unix, o null si no se sap la data.
+     */
+    public static function walletExpiry(): ?int
+    {
+        $date = trim((string) Settings::get('event_date'));
+        if ($date === '') {
+            return null;
+        }
+
+        $ts = strtotime($date);
+        if ($ts === false) {
+            return null;
+        }
+
+        return $ts + max(0, Settings::int('wallet_expire_hours', 48)) * 3600;
+    }
+
     /** Data límit per anul·lar (marca de temps unix) o null si no n'hi ha. */
     public static function cancellationDeadline(): ?int
     {

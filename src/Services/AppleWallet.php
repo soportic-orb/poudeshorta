@@ -178,6 +178,13 @@ final class AppleWallet
             ],
         ];
 
+        // Passada aquesta hora, l'iPhone marca el passi com a caducat i el
+        // treu de la llista de passis actius.
+        $expira = TicketService::walletExpiry();
+        if ($expira !== null) {
+            $pass['expirationDate'] = date('c', $expira);
+        }
+
         $eventDate = trim((string) Settings::get('event_date'));
         if ($eventDate !== '' && ($ts = strtotime($eventDate)) !== false) {
             $pass['relevantDate'] = date('c', $ts);

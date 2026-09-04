@@ -1,6 +1,7 @@
 <?php
 use App\Core\Csrf;
 use App\Core\View;
+use App\Services\TicketService;
 
 $s = $settings;
 ?>
@@ -22,6 +23,32 @@ $s = $settings;
                 <input type="checkbox" name="wallet_enabled" value="1"<?= checkedIf($s['wallet_enabled'] === '1') ?>>
                 <span><strong>Activar els passis per a Apple Wallet i Google Wallet</strong></span>
             </label>
+
+            <div class="field" style="margin-top:18px;max-width:340px;">
+                <label for="wallet_expire_hours">Els passis caduquen al cap de</label>
+                <input class="input" type="number" id="wallet_expire_hours" name="wallet_expire_hours"
+                       min="0" max="8760" step="1" value="<?= e($s['wallet_expire_hours']) ?>">
+                <p class="field__hint">
+                    Hores a comptar des de la data de l'esdeveniment.
+                    <?php if (($caduca = TicketService::walletExpiry()) !== null): ?>
+                        Amb la data actual, els passis caducaran el
+                        <strong><?= date('d/m/Y', $caduca) ?> a les <?= date('H:i', $caduca) ?></strong>.
+                    <?php else: ?>
+                        Cal omplir la data de l'esdeveniment a Configuració → Esdeveniment
+                        perquè els passis puguin caducar.
+                    <?php endif; ?>
+                </p>
+            </div>
+
+            <div class="alert alert--info" style="margin:16px 0 0;">
+                <span aria-hidden="true">ℹ️</span>
+                <span>
+                    Ni l'Apple Wallet ni el Google Wallet deixen esborrar un passi del telèfon
+                    de ningú: això només ho pot fer la persona que el té. El que sí que fem és
+                    marcar-los com a <strong>caducats</strong> passat aquest temps, i llavors el
+                    mòbil els treu de la llista de passis actius i els arracona als caducats.
+                </span>
+            </div>
         </div>
     </div>
 

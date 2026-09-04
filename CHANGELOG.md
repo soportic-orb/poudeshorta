@@ -9,6 +9,28 @@ Actualitzacions i a la barra lateral.
 
 ---
 
+## [1.12.0] — 2026-09-04
+
+### Afegit
+
+- **Els passis de wallet caduquen sols passat l'esdeveniment.** Per defecte, al
+  cap de **48 hores** de la data de l'esdeveniment; el termini es pot canviar a
+  *Configuració → Wallet*, que mostra la data i l'hora exactes en què
+  caducaran.
+  - Als passis d'Apple s'hi posa la data de caducitat, i l'iPhone els marca
+    com a caducats i els treu de la llista de passis actius.
+  - Als del Google Wallet s'hi posa el final del període de validesa, i el
+    mòbil els arracona als caducats.
+  - Si no hi ha data d'esdeveniment, els passis es generen igual però sense
+    caducitat.
+
+  Cal tenir present que **ni Apple ni Google permeten esborrar un passi del
+  telèfon de ningú**: això només ho pot fer qui el té. El que sí que es pot
+  fer, i és el que fem, és marcar-lo com a caducat perquè desaparegui de la
+  llista de passis actius.
+
+---
+
 ## [1.11.2] — 2026-09-04
 
 ### Canviat

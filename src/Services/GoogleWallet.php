@@ -284,6 +284,12 @@ final class GoogleWallet
             ],
         ];
 
+        // Passat aquest moment, el Google Wallet arracona el passi als caducats.
+        $expira = TicketService::walletExpiry();
+        if ($expira !== null) {
+            $object['validTimeInterval'] = ['end' => ['date' => date('c', $expira)]];
+        }
+
         $includes = trim((string) ($type['includes'] ?? ''));
         if ($includes !== '') {
             $object['textModulesData'][] = [

@@ -205,6 +205,13 @@ Si voleu unes imatges diferents només per als passis d'Apple, deixeu-les a
 `icon.png` (29 × 29), `icon@2x.png` (58 × 58), `icon@3x.png` (87 × 87),
 `logo.png` (160 × 50), `logo@2x.png` (320 × 100) i `logo@3x.png` (480 × 150).
 
+> **Caducitat dels passis.** A *Configuració → Wallet* podeu indicar al cap de
+> quantes hores de l'esdeveniment han de caducar els passis (48 per defecte).
+> Ni Apple ni Google permeten esborrar un passi del telèfon de ningú —això
+> només ho pot fer qui el té—, però sí marcar-lo com a caducat: llavors el
+> mòbil el treu de la llista de passis actius i l'arracona als caducats. Cal
+> tenir omplerta la data de l'esdeveniment; si no, els passis no caduquen mai.
+
 > **Google Wallet i el nombre d'entrades.** L'enllaç «Add to Google Wallet»
 > porta les dades dins de l'URL i té un límit de mida. Amb **una sola entrada**
 > l'enllaç es basta tot sol. **A partir de dues**, la plataforma desa abans les

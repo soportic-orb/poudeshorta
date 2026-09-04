@@ -223,7 +223,8 @@ final class SettingsController
             'apple_pass_type_id', 'apple_team_id', 'apple_organization',
             'google_issuer_id', 'google_class_suffix',
         ], [
-            'wallet_enabled' => 'bool',
+            'wallet_enabled'      => 'bool',
+            'wallet_expire_hours' => 'int',
         ]);
 
         // La contrasenya primer: la necessitem per obrir el .p12 que puguin pujar.
