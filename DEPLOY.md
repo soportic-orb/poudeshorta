@@ -374,6 +374,12 @@ en vermell el que falla.
 | No es pot contactar amb GitHub | El servidor no té sortida cap a `api.github.com:443` |
 | Sense permisos d'escriptura | `chmod -R u+w` al directori del projecte |
 
+> **Nota**: «Comprovar si hi ha novetats» consulta l'API de GitHub, però
+> «Actualitzar ara» **no la fa servir** quan el desplegament és un clon de git:
+> treballa directament amb `git fetch` i `git reset`. Si la comprovació falla
+> però l'actualització funciona, la causa és a l'API (token, límit de consultes
+> o nom de la branca), no al desplegament.
+
 ## Canviar el domini més endavant
 
 El domini no està escrit enlloc del codi: tot (correus, codis QR de les

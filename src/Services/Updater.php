@@ -143,12 +143,26 @@ final class Updater
             throw new RuntimeException('Cal indicar la branca del repositori.');
         }
 
-        $commits = self::api("repos/{$repo}/commits", ['sha' => $branch, 'per_page' => 1]);
+        try {
+            $commits = self::api("repos/{$repo}/commits", ['sha' => $branch, 'per_page' => 1]);
+        } catch (RuntimeException $e) {
+            // Amb aquests codis el repositori sol ser accessible i el que falla
+            // és la branca; ho diem així en comptes de parlar del repositori.
+            if (in_array($e->getCode(), [404, 422], true)) {
+                throw new RuntimeException(
+                    'No s\'ha trobat la branca «' . $branch . '» a ' . $repo . '. '
+                    . 'Comproveu que el nom sigui exacte, incloses majúscules i barres.',
+                    $e->getCode()
+                );
+            }
+            throw $e;
+        }
+
         $commit = $commits[0] ?? null;
 
         if (!is_array($commit) || empty($commit['sha'])) {
             throw new RuntimeException(
-                'La branca «' . $branch . '» no existeix al repositori ' . $repo . ', o no té cap commit.'
+                'La branca «' . $branch . '» existeix però no té cap commit.'
             );
         }
 
@@ -684,7 +698,9 @@ final class Updater
         }
 
         if ($status >= 400) {
-            throw new RuntimeException(self::describeHttpError($status, $responseHeaders));
+            // El codi HTTP viatja dins de l'excepció perquè qui la rep pugui
+            // distingir «no existeix la branca» de «no existeix el repositori».
+            throw new RuntimeException(self::describeHttpError($status, $responseHeaders), $status);
         }
 
         return $saveTo !== null ? '' : (string) $result;
@@ -712,6 +728,8 @@ final class Updater
                 . ($hasToken
                     ? 'si el repositori és privat, que el token hi tingui accés.'
                     : 'si és privat, configureu un token d\'accés: sense token GitHub respon 404 als repositoris privats.'),
+            $status === 422 => 'GitHub no ha pogut resoldre la referència demanada (422). Normalment vol dir que '
+                . 'el nom de la branca no és exacte o que la branca ja no existeix.',
             $status >= 500  => 'GitHub està tenint problemes (codi ' . $status . '). Torneu-ho a provar més tard.',
             default         => 'GitHub ha respost amb el codi ' . $status . '.',
         };
