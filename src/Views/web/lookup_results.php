@@ -40,12 +40,20 @@ use App\Services\TicketService;
 
                         <div class="ticket-list" style="margin-top:16px;">
                             <?php foreach ($order['tickets'] as $ticket): ?>
-                                <div class="ticket-row <?= $ticket['status'] === 'valid' ? '' : 'is-cancelled' ?>">
+                                <?php $rowClass = match ((string) $ticket['status']) {
+                                    'cancelled', 'refunded' => 'is-cancelled',
+                                    'used' => 'is-used',
+                                    default => '',
+                                }; ?>
+                                <div class="ticket-row <?= $rowClass ?>">
+                                    <?php if ($rowClass === 'is-cancelled'): ?>
+                                        <span class="ticket-row__ribbon"><?= e(TicketService::statusLabel((string) $ticket['status'])) ?></span>
+                                    <?php endif; ?>
                                     <div class="ticket-row__main">
                                         <p class="ticket-row__name"><?= e($ticket['attendee_name'] ?: $order['name']) ?></p>
                                         <span class="ticket-row__type">
                                             <?= e($ticket['type_name']) ?>
-                                            <?php if ($ticket['status'] !== 'valid'): ?>
+                                            <?php if ($ticket['status'] !== 'valid' && $rowClass !== 'is-cancelled'): ?>
                                                 · <strong><?= e(TicketService::statusLabel((string) $ticket['status'])) ?></strong>
                                             <?php endif; ?>
                                         </span>
@@ -56,17 +64,13 @@ use App\Services\TicketService;
                         </div>
 
                         <?php if ($paid): ?>
+                            <?php /* Un sol botó: porta a la inscripció, que és on es descarreguen
+                                    les entrades, s'afegeixen als wallets i es gestionen. */ ?>
                             <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
                                 <a class="btn btn--primary btn--sm"
                                    href="<?= e(url('/comanda/' . $order['reference']) . '?t=' . $order['manage_token']) ?>">
-                                    Gestionar aquesta inscripció
+                                    <?= $valid !== [] ? 'Descarregar les entrades' : 'Gestionar aquesta inscripció' ?>
                                 </a>
-                                <?php if ($valid !== []): ?>
-                                    <a class="btn btn--light btn--sm"
-                                       href="<?= e(url('/comanda/' . $order['reference'] . '/pdf') . '?t=' . $order['manage_token']) ?>">
-                                        Descarregar el PDF
-                                    </a>
-                                <?php endif; ?>
                             </div>
                         <?php endif; ?>
                     </div>

@@ -9,6 +9,28 @@ Actualitzacions i a la barra lateral.
 
 ---
 
+## [1.11.2] — 2026-09-04
+
+### Canviat
+
+- A «Les meves entrades», el botó **«Descarregar el PDF»** passa a ser
+  **«Descarregar les entrades»** i porta a la pàgina de la inscripció, que és
+  on es poden veure les entrades, baixar-les en PDF, afegir-les als wallets,
+  reenviar-les per correu i anul·lar-les. Abans baixava el PDF directament i
+  no es veia la resta d'opcions.
+- Com que hi havia dos botons i tots dos haurien portat al mateix lloc, s'han
+  unificat en un. Quan la inscripció no té cap entrada vàlida, el botó
+  continua dient «Gestionar aquesta inscripció».
+
+### Corregit
+
+- A «Les meves entrades», les entrades **ja validades a la porta** sortien amb
+  la banda vermella d'anul·lades. Ara segueixen el mateix criteri que a la
+  fitxa de la inscripció: verda si són bones, verd oliva si ja s'han fet
+  servir i vermella només si estan anul·lades.
+
+---
+
 ## [1.11.1] — 2026-09-04
 
 ### Canviat
