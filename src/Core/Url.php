@@ -30,6 +30,20 @@ final class Url
         return self::base() . ('/' . ltrim($path, '/'));
     }
 
+    /**
+     * Domini del lloc tal com es mostra a les entrades, els correus i el peu
+     * de pàgina (sense esquema ni «www.»). Es deriva de base_url, de manera
+     * que un canvi de domini no deixa cap text desfasat.
+     */
+    public static function host(): string
+    {
+        $host = (string) parse_url(self::base(), PHP_URL_HOST);
+        if ($host === '') {
+            $host = (string) ($_SERVER['HTTP_HOST'] ?? '');
+        }
+        return preg_replace('/^www\./i', '', strtolower($host)) ?: '';
+    }
+
     public static function asset(string $path): string
     {
         $rel = '/assets/' . ltrim($path, '/');

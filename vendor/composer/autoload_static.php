@@ -6,6 +6,10 @@ namespace Composer\Autoload;
 
 class ComposerStaticInit30ccd068a87120d59592a08290ad1575
 {
+    public static $files = array (
+        'e8581d41ac2ae476c678b16c98ca7845' => __DIR__ . '/../..' . '/src/helpers.php',
+    );
+
     public static $prefixLengthsPsr4 = array (
         'P' => 
         array (
@@ -45,6 +49,53 @@ class ComposerStaticInit30ccd068a87120d59592a08290ad1575
     );
 
     public static $classMap = array (
+        'App\\Controllers\\Admin\\AuthController' => __DIR__ . '/../..' . '/src/Controllers/Admin/AuthController.php',
+        'App\\Controllers\\Admin\\CampaignController' => __DIR__ . '/../..' . '/src/Controllers/Admin/CampaignController.php',
+        'App\\Controllers\\Admin\\CheckinController' => __DIR__ . '/../..' . '/src/Controllers/Admin/CheckinController.php',
+        'App\\Controllers\\Admin\\DashboardController' => __DIR__ . '/../..' . '/src/Controllers/Admin/DashboardController.php',
+        'App\\Controllers\\Admin\\RegistrationController' => __DIR__ . '/../..' . '/src/Controllers/Admin/RegistrationController.php',
+        'App\\Controllers\\Admin\\SettingsController' => __DIR__ . '/../..' . '/src/Controllers/Admin/SettingsController.php',
+        'App\\Controllers\\Admin\\TicketTypeController' => __DIR__ . '/../..' . '/src/Controllers/Admin/TicketTypeController.php',
+        'App\\Controllers\\Admin\\UpdateController' => __DIR__ . '/../..' . '/src/Controllers/Admin/UpdateController.php',
+        'App\\Controllers\\Admin\\UserController' => __DIR__ . '/../..' . '/src/Controllers/Admin/UserController.php',
+        'App\\Controllers\\Web\\CheckoutController' => __DIR__ . '/../..' . '/src/Controllers/Web/CheckoutController.php',
+        'App\\Controllers\\Web\\CronController' => __DIR__ . '/../..' . '/src/Controllers/Web/CronController.php',
+        'App\\Controllers\\Web\\HomeController' => __DIR__ . '/../..' . '/src/Controllers/Web/HomeController.php',
+        'App\\Controllers\\Web\\InstallController' => __DIR__ . '/../..' . '/src/Controllers/Web/InstallController.php',
+        'App\\Controllers\\Web\\OrderController' => __DIR__ . '/../..' . '/src/Controllers/Web/OrderController.php',
+        'App\\Controllers\\Web\\TicketController' => __DIR__ . '/../..' . '/src/Controllers/Web/TicketController.php',
+        'App\\Controllers\\Web\\WalletController' => __DIR__ . '/../..' . '/src/Controllers/Web/WalletController.php',
+        'App\\Controllers\\Web\\WebhookController' => __DIR__ . '/../..' . '/src/Controllers/Web/WebhookController.php',
+        'App\\Core\\Auth' => __DIR__ . '/../..' . '/src/Core/Auth.php',
+        'App\\Core\\Config' => __DIR__ . '/../..' . '/src/Core/Config.php',
+        'App\\Core\\Csrf' => __DIR__ . '/../..' . '/src/Core/Csrf.php',
+        'App\\Core\\Db' => __DIR__ . '/../..' . '/src/Core/Db.php',
+        'App\\Core\\Flash' => __DIR__ . '/../..' . '/src/Core/Flash.php',
+        'App\\Core\\Logger' => __DIR__ . '/../..' . '/src/Core/Logger.php',
+        'App\\Core\\Money' => __DIR__ . '/../..' . '/src/Core/Money.php',
+        'App\\Core\\RateLimit' => __DIR__ . '/../..' . '/src/Core/RateLimit.php',
+        'App\\Core\\Request' => __DIR__ . '/../..' . '/src/Core/Request.php',
+        'App\\Core\\Response' => __DIR__ . '/../..' . '/src/Core/Response.php',
+        'App\\Core\\Router' => __DIR__ . '/../..' . '/src/Core/Router.php',
+        'App\\Core\\Session' => __DIR__ . '/../..' . '/src/Core/Session.php',
+        'App\\Core\\Settings' => __DIR__ . '/../..' . '/src/Core/Settings.php',
+        'App\\Core\\Str' => __DIR__ . '/../..' . '/src/Core/Str.php',
+        'App\\Core\\Url' => __DIR__ . '/../..' . '/src/Core/Url.php',
+        'App\\Core\\Validator' => __DIR__ . '/../..' . '/src/Core/Validator.php',
+        'App\\Core\\View' => __DIR__ . '/../..' . '/src/Core/View.php',
+        'App\\Services\\AppleWallet' => __DIR__ . '/../..' . '/src/Services/AppleWallet.php',
+        'App\\Services\\GoogleWallet' => __DIR__ . '/../..' . '/src/Services/GoogleWallet.php',
+        'App\\Services\\MailQueue' => __DIR__ . '/../..' . '/src/Services/MailQueue.php',
+        'App\\Services\\Mailer' => __DIR__ . '/../..' . '/src/Services/Mailer.php',
+        'App\\Services\\Migrator' => __DIR__ . '/../..' . '/src/Services/Migrator.php',
+        'App\\Services\\Pdf' => __DIR__ . '/../..' . '/src/Services/Pdf.php',
+        'App\\Services\\QrCode' => __DIR__ . '/../..' . '/src/Services/QrCode.php',
+        'App\\Services\\RegistrationListPdf' => __DIR__ . '/../..' . '/src/Services/RegistrationListPdf.php',
+        'App\\Services\\StripeClient' => __DIR__ . '/../..' . '/src/Services/StripeClient.php',
+        'App\\Services\\Tasks' => __DIR__ . '/../..' . '/src/Services/Tasks.php',
+        'App\\Services\\TicketPdf' => __DIR__ . '/../..' . '/src/Services/TicketPdf.php',
+        'App\\Services\\TicketService' => __DIR__ . '/../..' . '/src/Services/TicketService.php',
+        'App\\Services\\Updater' => __DIR__ . '/../..' . '/src/Services/Updater.php',
         'BaconQrCode\\Common\\BitArray' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Common/BitArray.php',
         'BaconQrCode\\Common\\BitMatrix' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Common/BitMatrix.php',
         'BaconQrCode\\Common\\BitUtils' => __DIR__ . '/..' . '/bacon/bacon-qr-code/src/Common/BitUtils.php',

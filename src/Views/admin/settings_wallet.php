@@ -38,7 +38,7 @@ $s = $settings;
                 <div class="field">
                     <label for="apple_pass_type_id">Pass Type ID</label>
                     <input class="input" type="text" id="apple_pass_type_id" name="apple_pass_type_id"
-                           value="<?= e($s['apple_pass_type_id']) ?>" placeholder="pass.cat.poudeshorta.entrada">
+                           value="<?= e($s['apple_pass_type_id']) ?>" placeholder="pass.online.poudeshorta.entrada">
                 </div>
                 <div class="field">
                     <label for="apple_team_id">Team ID</label>

@@ -22,7 +22,7 @@ return [
 
     // Adreça pública del lloc, sense barra final.
     // S'utilitza als correus, als codis QR de les entrades i al webhook de Stripe.
-    'base_url' => 'https://poudeshorta.cat',
+    'base_url' => 'https://poudeshorta.online',
 
     // Poseu-ho a true només mentre depureu: mostra els errors pel navegador.
     'debug'    => false,

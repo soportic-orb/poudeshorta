@@ -8,8 +8,8 @@ use App\Core\Settings;
 define('APP_ROOT', dirname(__DIR__));
 define('APP_START', microtime(true));
 
+// L'autoloader també carrega src/helpers.php (autoload.files del composer.json).
 require APP_ROOT . '/vendor/autoload.php';
-require APP_ROOT . '/src/helpers.php';
 
 Config::load(APP_ROOT . '/config/config.php');
 

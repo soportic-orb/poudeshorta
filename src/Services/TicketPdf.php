@@ -30,7 +30,7 @@ final class TicketPdf
         $pdf = new Pdf('P', 'mm', 'A4');
         $pdf->SetTitle('Entrada ' . ($order['reference'] ?? ''), true);
         $pdf->SetAuthor((string) Settings::get('event_organizer'), true);
-        $pdf->SetCreator('poudeshorta.cat', true);
+        $pdf->SetCreator(Url::host(), true);
         $pdf->SetSubject((string) Settings::get('event_name'), true);
         $pdf->SetAutoPageBreak(false);
         $pdf->SetMargins(self::MARGIN, self::MARGIN, self::MARGIN);
@@ -219,10 +219,12 @@ final class TicketPdf
         $pdf->textHex('#7A7268');
         $pdf->SetFont('Helvetica', '', 8.5);
         $pdf->SetXY(self::MARGIN, $footY + 4);
-        $pdf->MultiCell($contentW, 4.4, $pdf->t(
-            "Aquesta entrada és personal i intransferible. Cal presentar-la, impresa o al mòbil, a l'accés de l'esdeveniment.\n"
-            . 'Organitza: ' . Settings::get('event_organizer') . '  ·  Consultes: ' . Settings::get('event_contact_email')
-        ), 0, 'L');
+        $peu = "Aquesta entrada és personal i intransferible. Cal presentar-la, impresa o al mòbil, a l'accés de l'esdeveniment.\n"
+            . 'Organitza: ' . Settings::get('event_organizer');
+        if (($contacte = trim((string) Settings::get('event_contact_email'))) !== '') {
+            $peu .= '  ·  Consultes: ' . $contacte;
+        }
+        $pdf->MultiCell($contentW, 4.4, $pdf->t($peu), 0, 'L');
 
         // Franja inferior de marca, per equilibrar la pàgina.
         $pdf->fillHex($accent);
@@ -236,7 +238,7 @@ final class TicketPdf
         $pdf->Cell($contentW / 2, 5, $pdf->t('Emesa el ' . date('d/m/Y H:i')), 0, 0, 'L');
         $pdf->SetFont('Helvetica', 'B', 8);
         $pdf->SetXY(self::MARGIN + $contentW / 2, 289.5);
-        $pdf->Cell($contentW / 2, 5, $pdf->t('poudeshorta.cat'), 0, 0, 'R');
+        $pdf->Cell($contentW / 2, 5, $pdf->t(Url::host()), 0, 0, 'R');
     }
 
     private function cleanup(): void

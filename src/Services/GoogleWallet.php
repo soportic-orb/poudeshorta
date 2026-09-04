@@ -78,7 +78,7 @@ final class GoogleWallet
 
         $homepage = Url::base();
         if ($homepage !== '') {
-            $class['homepageUri'] = ['uri' => $homepage, 'description' => 'poudeshorta.cat'];
+            $class['homepageUri'] = ['uri' => $homepage, 'description' => Url::host()];
         }
 
         return $class;

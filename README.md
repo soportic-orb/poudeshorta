@@ -2,7 +2,7 @@
 
 Plataforma web d'inscripcions i venda d'entrades per a esdeveniments populars,
 feta en **PHP 8.1+ i MySQL** i pensada per allotjar-se en un VPS compartit amb
-**CloudPanel** al domini `poudeshorta.cat`.
+**CloudPanel** al domini `poudeshorta.online`.
 
 Els colors de la interfície, del PDF de l'entrada i dels correus estan extrets
 del cartell de l'esdeveniment i es poden canviar des del Panell de Gestió.
@@ -67,7 +67,7 @@ Composer al servidor**.
 
 1. Pugeu el projecte al servidor i apunteu l'arrel del lloc a la carpeta `public/`.
 2. Doneu permisos d'escriptura a `config/`, `storage/` i `public/uploads/`.
-3. Obriu `https://poudeshorta.cat` amb el navegador: apareixerà l'instal·lador.
+3. Obriu `https://poudeshorta.online` amb el navegador: apareixerà l'instal·lador.
 4. Introduïu les dades de la base de dades i creeu l'usuari administrador.
 5. Entreu al Panell de Gestió i completeu la llista de comprovació del resum.
 

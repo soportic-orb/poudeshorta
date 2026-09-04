@@ -1,6 +1,7 @@
 <?php
 /** Plantilla HTML dels correus transaccionals i dels comunicats. */
 use App\Core\Settings;
+use App\Core\Url;
 
 $primary = (string) Settings::get('brand_primary');
 $accent  = (string) Settings::get('brand_accent');
@@ -67,7 +68,7 @@ $ink     = (string) Settings::get('brand_ink');
 
             </table>
             <div style="max-width:600px;margin:14px auto 0;font-size:11px;color:#9A9188;text-align:center;">
-                poudeshorta.cat
+                <?= e(Url::host()) ?>
             </div>
         </td>
     </tr>

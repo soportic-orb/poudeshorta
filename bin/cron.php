@@ -5,7 +5,7 @@ declare(strict_types=1);
 // Tasques programades de la plataforma d'inscripcions.
 //
 // Afegiu aquesta línia al cron de CloudPanel (amb l'usuari del lloc), cada 5 minuts:
-//   */5 * * * * /usr/bin/php /home/USUARI/htdocs/poudeshorta.cat/bin/cron.php >> /home/USUARI/htdocs/poudeshorta.cat/storage/logs/cron.log 2>&1
+//   */5 * * * * /usr/bin/php /home/USUARI/htdocs/poudeshorta.online/bin/cron.php >> /home/USUARI/htdocs/poudeshorta.online/storage/logs/cron.log 2>&1
 
 if (PHP_SAPI !== 'cli') {
     fwrite(STDERR, "Aquest script només es pot executar des de la línia d'ordres.\n");

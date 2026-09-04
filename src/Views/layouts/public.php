@@ -73,7 +73,7 @@ use App\Core\View;
         </div>
         <div class="site-footer__bottom">
             <span>© <?= date('Y') ?> · <?= e(Settings::get('event_organizer')) ?></span>
-            <span>Pagaments segurs amb Stripe · poudeshorta.cat</span>
+            <span>Pagaments segurs amb Stripe · <?= e(\App\Core\Url::host()) ?></span>
         </div>
     </div>
 </footer>

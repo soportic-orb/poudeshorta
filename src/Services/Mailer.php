@@ -5,6 +5,7 @@ namespace App\Services;
 
 use App\Core\Logger;
 use App\Core\Settings;
+use App\Core\Url;
 use App\Core\View;
 use PHPMailer\PHPMailer\Exception as MailException;
 use PHPMailer\PHPMailer\PHPMailer;
@@ -112,7 +113,7 @@ final class Mailer
         }
 
         $fromEmail = (string) Settings::get('smtp_from_email');
-        $mail->setFrom($fromEmail !== '' ? $fromEmail : 'no-reply@poudeshorta.cat', (string) Settings::get('smtp_from_name'));
+        $mail->setFrom($fromEmail !== '' ? $fromEmail : 'no-reply@' . Url::host(), (string) Settings::get('smtp_from_name'));
 
         $replyTo = trim((string) Settings::get('smtp_reply_to'));
         if ($replyTo !== '' && filter_var($replyTo, FILTER_VALIDATE_EMAIL)) {

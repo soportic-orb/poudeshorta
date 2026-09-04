@@ -1,4 +1,4 @@
-# Desplegament a CloudPanel · poudeshorta.cat
+# Desplegament a CloudPanel · poudeshorta.online
 
 Guia pas a pas per posar la plataforma en marxa en un VPS compartit amb
 CloudPanel. Compteu-hi uns 30 minuts la primera vegada.
@@ -9,12 +9,12 @@ CloudPanel. Compteu-hi uns 30 minuts la primera vegada.
 
 1. **Sites → Add Site → Create a PHP Site**
 2. Ompliu:
-   - *Domain Name*: `poudeshorta.cat`
+   - *Domain Name*: `poudeshorta.online`
    - *Site Title*: Inscripcions Pou de s'Horta
    - *PHP Version*: **8.2** o superior
    - *Site User*: per exemple `poudeshorta`
 3. Un cop creat, entreu al lloc → **Settings** i canvieu:
-   - *Root Directory*: `/home/poudeshorta/htdocs/poudeshorta.cat/public`
+   - *Root Directory*: `/home/poudeshorta/htdocs/poudeshorta.online/public`
 
 > **Important**: l'arrel ha d'apuntar a `public/`. Si apunta al directori del
 > projecte, quedarien exposats la configuració i els registres.
@@ -23,9 +23,9 @@ CloudPanel. Compteu-hi uns 30 minuts la primera vegada.
 
 ## 2. Certificat SSL
 
-**Sites → poudeshorta.cat → SSL/TLS → Actions → New Let's Encrypt Certificate**
+**Sites → poudeshorta.online → SSL/TLS → Actions → New Let's Encrypt Certificate**
 
-Afegiu-hi `poudeshorta.cat` i `www.poudeshorta.cat`. Stripe exigeix HTTPS per al
+Afegiu-hi `poudeshorta.online` i `www.poudeshorta.online`. Stripe exigeix HTTPS per al
 webhook, i les entrades i els correus també han d'anar per HTTPS.
 
 ---
@@ -49,7 +49,7 @@ Anoteu les dades: us les demanarà l'instal·lador.
 Connecteu-vos per SSH amb l'usuari del lloc:
 
 ```bash
-cd /home/poudeshorta/htdocs/poudeshorta.cat
+cd /home/poudeshorta/htdocs/poudeshorta.online
 rm -rf ./*                 # el directori ha de quedar buit
 git clone https://github.com/soportic-orb/poudeshorta.git .
 ```
@@ -57,7 +57,7 @@ git clone https://github.com/soportic-orb/poudeshorta.git .
 ### Opció B · pujar-ho per SFTP
 
 Descarregueu el ZIP del repositori, descomprimiu-lo i pugeu-ne el contingut
-(no la carpeta que l'embolcalla) a `/home/poudeshorta/htdocs/poudeshorta.cat`.
+(no la carpeta que l'embolcalla) a `/home/poudeshorta/htdocs/poudeshorta.online`.
 
 En tots dos casos, la carpeta `vendor/` ja ve inclosa: **no cal executar
 Composer al servidor**.
@@ -67,7 +67,7 @@ Composer al servidor**.
 ## 5. Permisos
 
 ```bash
-cd /home/poudeshorta/htdocs/poudeshorta.cat
+cd /home/poudeshorta/htdocs/poudeshorta.online
 chmod -R 775 config storage public/uploads
 chown -R poudeshorta:poudeshorta .
 ```
@@ -76,7 +76,7 @@ chown -R poudeshorta:poudeshorta .
 
 ## 6. Instal·lador web
 
-Obriu `https://poudeshorta.cat` amb el navegador. Us apareixerà l'instal·lador:
+Obriu `https://poudeshorta.online` amb el navegador. Us apareixerà l'instal·lador:
 
 1. Comprova els requisits del servidor (extensions i permisos).
 2. Demana les dades de la base de dades del pas 3.
@@ -99,7 +99,7 @@ Al tauler de Stripe → **Developers → API keys**. Copieu-les al panell, a
 
 **Developers → Webhooks → Add endpoint**
 
-- *Endpoint URL*: `https://poudeshorta.cat/webhook/stripe`
+- *Endpoint URL*: `https://poudeshorta.online/webhook/stripe`
 - Esdeveniments a escoltar:
   - `checkout.session.completed`
   - `checkout.session.expired`
@@ -138,7 +138,7 @@ Valors habituals:
 | Servidor  | `smtp.elvostreproveidor.cat` |
 | Port      | 587                       |
 | Xifratge  | STARTTLS                  |
-| Usuari    | `info@poudeshorta.cat`    |
+| Usuari    | `info@poudeshorta.online`    |
 
 Per millorar l'entregabilitat, configureu els registres **SPF**, **DKIM** i
 **DMARC** del domini al vostre proveïdor de DNS.
@@ -147,10 +147,10 @@ Per millorar l'entregabilitat, configureu els registres **SPF**, **DKIM** i
 
 ## 9. Tasques programades
 
-**Sites → poudeshorta.cat → Cron Jobs → Add Cron Job**
+**Sites → poudeshorta.online → Cron Jobs → Add Cron Job**
 
 ```
-*/5 * * * * /usr/bin/php8.2 /home/poudeshorta/htdocs/poudeshorta.cat/bin/cron.php >> /home/poudeshorta/htdocs/poudeshorta.cat/storage/logs/cron.log 2>&1
+*/5 * * * * /usr/bin/php8.2 /home/poudeshorta/htdocs/poudeshorta.online/bin/cron.php >> /home/poudeshorta/htdocs/poudeshorta.online/storage/logs/cron.log 2>&1
 ```
 
 S'encarrega d'enviar la cua de comunicats, alliberar les reserves caducades,
@@ -214,6 +214,24 @@ cosa falla, es restaura automàticament la còpia anterior.
 Si el desplegament és un clon de git, s'utilitza `git fetch` + `git reset`; si
 no, es descarrega el paquet ZIP del repositori. Per a un repositori privat,
 indiqueu un token d'accés de GitHub amb permís de lectura.
+
+---
+
+## Canviar el domini més endavant
+
+El domini no està escrit enlloc del codi: tot (correus, codis QR de les
+entrades, peus de pàgina i webhook) surt de `base_url`, a `config/config.php`.
+Si algun dia canvia:
+
+1. Editeu `config/config.php` i poseu-hi el domini nou a `base_url`, sense
+   barra final. Si el deixeu buit, el sistema el dedueix de cada petició.
+2. Genereu el certificat SSL del domini nou a CloudPanel.
+3. Canvieu l'URL del webhook al tauler de Stripe.
+4. Reviseu l'adreça del remitent a **Configuració → Correu** i els registres
+   SPF, DKIM i DMARC del domini nou.
+5. Si ja s'havien venut entrades, **manteniu el domini antic apuntant al nou**
+   amb una redirecció permanent: els codis QR que ja circulen contenen l'adreça
+   antiga i han de continuar funcionant.
 
 ---
 
