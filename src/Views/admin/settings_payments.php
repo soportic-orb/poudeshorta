@@ -41,11 +41,30 @@ $live = $s['stripe_mode'] === 'live';
                     </select>
                 </div>
                 <div class="field">
-                    <label for="stripe_statement_descriptor">Concepte a l'extracte bancari</label>
-                    <input class="input" type="text" id="stripe_statement_descriptor" name="stripe_statement_descriptor"
-                           value="<?= e($s['stripe_statement_descriptor']) ?>" maxlength="22">
-                    <span class="field__hint">Màxim 22 caràcters.</span>
+                    <label for="stripe_locale">Idioma de la passarel·la</label>
+                    <select class="select" id="stripe_locale" name="stripe_locale">
+                        <?php
+                        $idiomes = [
+                            'auto'   => 'Automàtic segons el navegador (recomanat)',
+                            'es'     => 'Castellà',
+                            'en'     => 'Anglès',
+                            'fr'     => 'Francès',
+                            'it'     => 'Italià',
+                            'de'     => 'Alemany',
+                            'pt'     => 'Portuguès',
+                        ];
+                        foreach ($idiomes as $codi => $nom): ?>
+                            <option value="<?= e($codi) ?>"<?= selectedIf(($s['stripe_locale'] ?? 'auto') === $codi) ?>>
+                                <?= e($nom) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <span class="field__hint">
+                        Stripe no ofereix la passarel·la en català. Amb «automàtic», qui pagui la veurà
+                        en l'idioma del seu navegador; als navegadors en català sol sortir en castellà.
+                    </span>
                 </div>
+
             </div>
         </div>
     </div>

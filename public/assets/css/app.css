@@ -83,7 +83,6 @@ p  { margin: 0 0 1em; }
 .section__head h2 { font-size: clamp(1.9rem, 4.4vw, 2.6rem); }
 .success-hero h1 { font-size: clamp(2.3rem, 7vw, 3.4rem); }
 .state-banner__title { font-size: clamp(2.1rem, 8vw, 3.2rem); }
-.ticket-card__name { font-size: 1.55rem; line-height: 1.1; }
 
 .wrap { width: 100%; max-width: var(--pdsh-max); margin: 0 auto; padding: 0 20px; }
 .wrap--narrow { max-width: 720px; }
@@ -373,8 +372,8 @@ p  { margin: 0 0 1em; }
 .ticket-card.is-unavailable { opacity: .62; }
 
 .ticket-card__top { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
-.ticket-card__name { font-size: 1.22rem; font-weight: 800; margin: 0; }
-.ticket-card__price { font-size: 1.5rem; font-weight: 900; color: var(--pdsh-primary); white-space: nowrap; }
+.ticket-card__name { font-size: clamp(1.75rem, 2.4vw, 2.05rem); line-height: 1.05; margin: 0; }
+.ticket-card__price { font-size: 1.65rem; font-weight: 900; color: var(--pdsh-primary); white-space: nowrap; }
 .ticket-card__price small { display: block; font-size: .7rem; font-weight: 600; color: var(--pdsh-muted); text-align: right; }
 .ticket-card__desc { color: var(--pdsh-muted); margin: 0; font-size: .96rem; }
 

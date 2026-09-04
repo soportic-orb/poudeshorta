@@ -16,6 +16,7 @@ use App\Core\View;
 use App\Services\AppleWallet;
 use App\Services\GoogleWallet;
 use App\Services\Mailer;
+use App\Services\StripeClient;
 
 final class SettingsController
 {
@@ -99,7 +100,9 @@ final class SettingsController
         $mode = (string) Request::post('stripe_mode', 'test');
         Settings::set('stripe_mode', $mode === 'live' ? 'live' : 'test');
         Settings::set('currency', strtoupper(substr((string) Request::post('currency', 'EUR'), 0, 3)));
-        Settings::set('stripe_statement_descriptor', mb_substr((string) Request::post('stripe_statement_descriptor', ''), 0, 22));
+
+        $locale = (string) Request::post('stripe_locale', 'auto');
+        Settings::set('stripe_locale', in_array($locale, StripeClient::LOCALES, true) ? $locale : 'auto');
 
         foreach ([
             'stripe_test_pk', 'stripe_test_sk', 'stripe_test_wh_secret',

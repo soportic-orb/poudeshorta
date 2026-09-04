@@ -65,7 +65,7 @@ final class Settings
         'stripe_live_pk'         => '',
         'stripe_live_sk'         => '',
         'stripe_live_wh_secret'  => '',
-        'stripe_statement_descriptor' => 'POUDESHORTA',
+        'stripe_locale'          => 'auto',
 
         // SMTP
         'smtp_host'       => '',

@@ -16,6 +16,39 @@ final class StripeClient
     private const API_BASE = 'https://api.stripe.com/v1/';
     private const API_VERSION = '2024-06-20';
 
+    /**
+     * Idiomes que admet la passarel·la de Stripe.
+     *
+     * El català no hi és. Amb «auto», Stripe tria a partir de l'idioma del
+     * navegador de qui paga: un navegador en català sol demanar també el
+     * castellà, de manera que la passarel·la li surt en castellà.
+     */
+    public const LOCALES = [
+        'auto', 'bg', 'cs', 'da', 'de', 'el', 'en', 'en-GB', 'es', 'es-419', 'et', 'fi',
+        'fil', 'fr', 'fr-CA', 'hr', 'hu', 'id', 'it', 'ja', 'ko', 'lt', 'lv', 'ms', 'mt',
+        'nb', 'nl', 'pl', 'pt', 'pt-BR', 'ro', 'ru', 'sk', 'sl', 'sv', 'th', 'tr', 'vi',
+        'zh', 'zh-HK', 'zh-TW',
+    ];
+
+    /**
+     * Import mínim que accepta Stripe, en cèntims de la moneda del compte.
+     * Per sota, la passarel·la rebutja el cobrament.
+     */
+    public const MINIMS = ['EUR' => 50, 'USD' => 50, 'GBP' => 30];
+
+    public static function minimumAmount(): int
+    {
+        $currency = strtoupper((string) Settings::get('currency', 'EUR'));
+        return self::MINIMS[$currency] ?? 50;
+    }
+
+    /** Idioma configurat, validat: un valor incorrecte no ha de tombar el pagament. */
+    public static function locale(): string
+    {
+        $locale = trim((string) Settings::get('stripe_locale', 'auto'));
+        return in_array($locale, self::LOCALES, true) ? $locale : 'auto';
+    }
+
     public function __construct(private ?string $secretKey = null)
     {
         $this->secretKey = $secretKey ?? Settings::stripeSecret();
@@ -39,15 +72,43 @@ final class StripeClient
         array $metadata = [],
         int $expiresInMinutes = 30
     ): array {
+        return $this->request('POST', 'checkout/sessions', $this->buildCheckoutPayload(
+            $items,
+            $customerEmail,
+            $successUrl,
+            $cancelUrl,
+            $metadata,
+            $expiresInMinutes
+        ));
+    }
+
+    /**
+     * Munta els paràmetres de la sessió de Checkout.
+     *
+     * Va a part de l'enviament perquè es pugui revisar sense trucar a Stripe.
+     *
+     * @param array<int, array{name:string, description?:string, amount_cents:int, quantity:int}> $items
+     */
+    public function buildCheckoutPayload(
+        array $items,
+        string $customerEmail,
+        string $successUrl,
+        string $cancelUrl,
+        array $metadata = [],
+        int $expiresInMinutes = 30
+    ): array {
         $currency = strtolower((string) Settings::get('currency', 'EUR'));
         $payload = [
             'mode'                        => 'payment',
             'success_url'                 => $successUrl,
             'cancel_url'                  => $cancelUrl,
             'customer_email'              => $customerEmail,
-            'locale'                      => 'ca',
+            'locale'                      => self::locale(),
             'billing_address_collection'  => 'auto',
-            'expires_at'                  => time() + max(30, $expiresInMinutes) * 60,
+            // Stripe exigeix entre 30 minuts i 24 hores. Demanem-ne 35 com a
+            // mínim: amb 30 justos, el temps que triga la petició a arribar
+            // ja el deixaria per sota i la rebutjaria.
+            'expires_at'                  => time() + min(1440, max(35, $expiresInMinutes)) * 60,
             'payment_intent_data'         => array_filter([
                 'description' => mb_substr((string) Settings::get('event_name'), 0, 200),
                 'metadata'    => $metadata ?: null,
@@ -71,7 +132,7 @@ final class StripeClient
             ];
         }
 
-        return $this->request('POST', 'checkout/sessions', $payload);
+        return $payload;
     }
 
     public function retrieveSession(string $sessionId): array

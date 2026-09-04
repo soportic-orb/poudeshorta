@@ -9,6 +9,32 @@ Actualitzacions i a la barra lateral.
 
 ---
 
+## [1.4.1] — 2026-09-04
+
+### Corregit
+
+- **El pagament amb targeta no arrencava.** La sessió de Stripe demanava la
+  passarel·la en català i Stripe no ofereix aquest idioma, de manera que
+  rebutjava totes les peticions. Ara l'idioma és configurable
+  (Pagaments → Idioma de la passarel·la), per defecte automàtic segons el
+  navegador de qui paga, i sempre es valida contra la llista d'idiomes que
+  Stripe admet: un valor incorrecte no pot tornar a bloquejar cap pagament.
+- La caducitat de la sessió de pagament es demanava de 30 minuts justos, el
+  mínim que Stripe accepta; el temps que triga la petició a arribar la deixava
+  per sota i la podia rebutjar. Ara se'n demanen 35.
+- Les comandes per sota de l'import mínim de Stripe (0,50 € en euros) es
+  detecten abans d'anar a la passarel·la i s'explica el motiu, en comptes de
+  rebre un error de Stripe.
+
+### Canviat
+
+- El nom dels tipus d'inscripció es veu molt més gran a la portada. Hi havia
+  dues regles d'estil per al mateix element i manava la petita.
+- S'ha tret el camp «Concepte a l'extracte bancari» de la configuració de
+  pagaments: no s'enviava enlloc.
+
+---
+
 ## [1.4.0] — 2026-09-04
 
 ### Canviat

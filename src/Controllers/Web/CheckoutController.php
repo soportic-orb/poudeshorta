@@ -160,6 +160,17 @@ final class CheckoutController
             Response::redirect(Url::to('/'));
         }
 
+        // Stripe rebutja els cobraments per sota d'un import mínim.
+        $minim = StripeClient::minimumAmount();
+        if ((int) $order['total_cents'] < $minim) {
+            Db::update('orders', ['status' => 'failed'], '`id` = :id', ['id' => $order['id']]);
+            Flash::error(
+                'L\'import mínim per pagar amb targeta és de ' . Money::format($minim)
+                . '. Afegiu alguna inscripció més o poseu-vos en contacte amb l\'organització.'
+            );
+            Response::redirect(Url::to('/') . '#inscripcions');
+        }
+
         try {
             $items = [];
             foreach ($cart['items'] as $item) {
