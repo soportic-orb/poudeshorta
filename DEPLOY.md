@@ -314,14 +314,15 @@ Premeu **Desar la configuració dels passis**.
 
 #### Pas 7 · Comprovar-ho
 
-A la mateixa pàgina, al final, premeu **Generar un passi de prova**. Ha de dir
+A la mateixa pàgina, a **Comprovar la configuració dels passis**, premeu
+**Comprovar la configuració**. Ha de dir
 *«Passi de prova generat correctament»*. Si dona error, el missatge us indica
 quin dels tres fitxers falla.
 
 #### Pas 8 · Provar-ho en un iPhone de veritat
 
 Amb Stripe en mode de proves, feu una compra, obriu la pantalla de confirmació
-des d'un iPhone i premeu **Afegir a l'Apple Wallet**.
+des d'un iPhone i premeu **Add to Apple Wallet**.
 
 Si l'iPhone diu que no pot afegir el passi però la prova del pas 7 passava, la
 causa gairebé sempre és que el **Pass Type ID o el Team ID del panell no
@@ -420,7 +421,7 @@ caràcters ocupa dels 1800 permesos.
 #### Pas 7 · Provar-ho en un Android de veritat
 
 Amb Stripe en mode de proves, feu una compra, obriu la pantalla de confirmació
-des d'un mòbil Android i premeu **Afegir al Google Wallet**.
+des d'un mòbil Android i premeu **Add to Google Wallet**.
 
 #### Si alguna cosa falla
 
