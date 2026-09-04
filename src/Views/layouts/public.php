@@ -24,7 +24,7 @@ use App\Core\View;
         </a>
 
         <nav class="site-nav" aria-label="Navegació principal">
-            <a href="<?= e(url('/')) ?>#informacio">Informació</a>
+            <a data-nav="info" href="<?= e(url('/')) ?>#informacio">Informació</a>
             <a href="<?= e(url('/les-meves-entrades')) ?>">Les meves entrades</a>
             <?php if (\App\Services\TicketService::salesOpen()): ?>
                 <a class="is-cta" href="<?= e(url('/')) ?>#inscripcions">Inscriure's</a>

@@ -25,6 +25,10 @@ final class Settings
         'event_contact_email' => '',
         'event_contact_phone' => '',
         'event_poster'        => '',
+        'hero_image'          => '',
+        'hero_overlay'        => '55',
+        'hero_focus'          => 'center',
+        'hero_show_poster'    => '1',
         'event_logo'          => '',
 
         // Marca / colors (extrets del cartell)

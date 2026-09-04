@@ -5,9 +5,29 @@ use App\Services\TicketService;
 
 $poster = (string) Settings::get('event_poster');
 $maxTotal = (int) Settings::get('max_tickets_order', 10);
+
+// Imatge de fons de la capçalera, si se n'ha configurat cap.
+$heroImage = trim((string) Settings::get('hero_image'));
+$heroStyle = '';
+if ($heroImage !== '') {
+    $overlay = max(0, min(90, (int) Settings::get('hero_overlay', 55)));
+    $focus   = in_array((string) Settings::get('hero_focus'), ['top', 'center', 'bottom'], true)
+        ? (string) Settings::get('hero_focus')
+        : 'center';
+
+    $heroStyle = sprintf(
+        'style="--hero-image:url(%s);--hero-overlay:%d%%;--hero-focus:center %s;"',
+        "'" . e(url($heroImage)) . "'",
+        $overlay,
+        $focus
+    );
+}
+
+// El cartell es pot amagar quan ja hi ha fotografia de fons.
+$showPoster = $poster !== '' && (Settings::bool('hero_show_poster', true) || $heroImage === '');
 ?>
 
-<section class="hero">
+<section class="hero <?= $heroImage !== '' ? 'hero--image' : '' ?>" <?= $heroStyle ?>>
     <div class="wrap hero__grid">
         <div>
             <span class="hero__eyebrow">Inscripcions obertes<?= $salesOpen && $anyOnSale ? '' : ' · properament' ?></span>
@@ -28,7 +48,7 @@ $maxTotal = (int) Settings::get('max_tickets_order', 10);
         </div>
 
         <div>
-            <?php if ($poster !== ''): ?>
+            <?php if ($showPoster): ?>
                 <img class="hero__poster" src="<?= e(url($poster)) ?>" alt="Cartell de <?= e(Settings::get('event_name')) ?>">
             <?php elseif ($highlights !== []): ?>
                 <div class="hero__highlights">
@@ -44,7 +64,7 @@ $maxTotal = (int) Settings::get('max_tickets_order', 10);
     </div>
 </section>
 
-<?php if ($poster !== '' && $highlights !== []): ?>
+<?php if ($showPoster && $highlights !== []): ?>
     <section class="section section--tight" id="informacio">
         <div class="wrap">
             <div class="ticket-grid">

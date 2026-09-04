@@ -101,6 +101,39 @@ p  { margin: 0 0 1em; }
 .site-nav a.is-cta { background: var(--pdsh-accent); color: var(--pdsh-ink); }
 .site-nav a.is-cta:hover { background: #fff; }
 
+/* Al mòbil els enllaços es partien en dues línies i la capçalera creixia massa.
+   Aquí ocupen una sola fila que es pot desplaçar amb el dit. */
+@media (max-width: 680px) {
+    .site-header__inner { padding-block: 10px; gap: 10px; }
+    .site-header__logo { height: 34px; }
+    .site-header__mark { width: 34px; height: 34px; font-size: 1rem; }
+    .site-header__title { font-size: .92rem; }
+    .site-header__title small { font-size: .72rem; }
+
+    .site-nav {
+        width: 100%;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 2px;
+    }
+    .site-nav::-webkit-scrollbar { display: none; }
+    .site-nav a { font-size: .86rem; padding: 7px 13px; white-space: nowrap; }
+}
+
+/* En pantalles estretes amaguem «Informació», que porta a una secció de la
+   mateixa pàgina i també és al peu, perquè el botó d'inscriure's hi càpiga
+   sencer: és l'acció que importa. */
+@media (max-width: 560px) {
+    .site-nav a[data-nav="info"] { display: none; }
+}
+
+@media (max-width: 380px) {
+    .site-header__title { font-size: .86rem; }
+    .site-nav a { font-size: .8rem; padding: 6px 11px; }
+}
+
 /* --------------------------------------------------------------- Heroi */
 
 .hero {
@@ -110,6 +143,49 @@ p  { margin: 0 0 1em; }
     color: var(--pdsh-cream);
     padding: clamp(40px, 8vw, 76px) 0;
     position: relative; overflow: hidden;
+}
+
+/* ---------- Capçalera amb imatge de fons ----------
+   La imatge va en una capa pròpia i el vel de color, en una altra: així el
+   text conserva sempre el contrast encara que la fotografia sigui clara. */
+
+.hero--image { background: var(--pdsh-primary); }
+
+.hero--image::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: var(--hero-image);
+    background-size: cover;
+    background-position: var(--hero-focus, center);
+    background-repeat: no-repeat;
+}
+
+.hero--image::after {
+    content: ""; position: absolute; inset: 0;
+    background:
+        linear-gradient(180deg, rgba(0, 0, 0, .35) 0%, rgba(0, 0, 0, 0) 38%),
+        linear-gradient(160deg,
+            color-mix(in srgb, var(--pdsh-primary) var(--hero-overlay, 55%), transparent) 0%,
+            color-mix(in srgb, #4C0715 calc(var(--hero-overlay, 55%) + 12%), transparent) 100%);
+}
+
+/* Els navegadors sense color-mix reben un vel sòlid equivalent. */
+@supports not (background: color-mix(in srgb, red 50%, transparent)) {
+    .hero--image::after {
+        background: linear-gradient(160deg, rgba(140, 16, 39, .72) 0%, rgba(76, 7, 21, .86) 100%);
+    }
+}
+
+.hero--image > .wrap { position: relative; z-index: 1; }
+
+/* Amb fotografia al darrere, el text necessita una ombra que el separi. */
+.hero--image h1,
+.hero--image .hero__tagline,
+.hero--image .hero__lead { text-shadow: 0 1px 14px rgba(0, 0, 0, .45); }
+
+.hero--image .hero__meta span {
+    background: rgba(20, 6, 10, .38);
+    border-color: rgba(251, 244, 230, .34);
+    backdrop-filter: blur(3px);
 }
 
 .hero__grid {

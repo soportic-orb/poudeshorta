@@ -62,7 +62,13 @@ final class SettingsController
             }
         }
 
-        foreach (['event_poster' => 'poster', 'event_logo' => 'logo'] as $setting => $field) {
+        Settings::set('hero_overlay', (string) max(0, min(90, (int) Request::post('hero_overlay', 55))));
+        Settings::set('hero_focus', in_array((string) Request::post('hero_focus'), ['top', 'center', 'bottom'], true)
+            ? (string) Request::post('hero_focus')
+            : 'center');
+        Settings::set('hero_show_poster', Request::post('hero_show_poster') ? '1' : '0');
+
+        foreach (['event_poster' => 'poster', 'event_logo' => 'logo', 'hero_image' => 'hero'] as $setting => $field) {
             if (!empty($_FILES[$field]['tmp_name'])) {
                 $path = $this->storeUpload($field, ['jpg', 'jpeg', 'png', 'webp']);
                 if ($path !== null) {

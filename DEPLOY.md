@@ -166,8 +166,11 @@ testimoni que fa la mateixa feina i que podeu cridar des d'un servei extern.
 Al Panell de Gestió, seguiu la llista de comprovació del resum:
 
 1. **Configuració → Esdeveniment**: nom, data, lloc, descripció i atractius.
-2. **Configuració → Aparença**: colors i cartell (els colors per defecte ja són
-   els del cartell del sopar).
+2. **Configuració → Aparença**: colors, imatge de fons de la capçalera i
+   cartell (els colors per defecte ja són els del cartell del sopar). Per al
+   fons de la capçalera va bé una fotografia horitzontal de 1920 × 1080 px o
+   més, sense text; el control «Intensitat del vel de color» decideix quant es
+   tapa perquè el títol es llegeixi.
 3. **Tipus d'inscripció**: preus, aforament i què inclou cada inscripció.
 4. **Configuració → Anul·lacions**: termini, devolucions i despeses de gestió.
 5. Quan tot estigui a punt, activeu **Inscripcions obertes**.

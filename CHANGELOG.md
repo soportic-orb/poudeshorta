@@ -9,6 +9,24 @@ Actualitzacions i a la barra lateral.
 
 ---
 
+## [1.2.0] — 2026-09-04
+
+### Afegit
+
+- **Imatge de fons a la capçalera del web públic**, configurable des de
+  Aparença: pujada de la fotografia, intensitat del vel de color (0–90),
+  part de la imatge que es conserva en escapçar-la i opció de continuar
+  mostrant el cartell al costat del títol o substituir-lo pels atractius de
+  l'esdeveniment. Sense imatge es manté el degradat de la marca.
+
+### Canviat
+
+- La capçalera del web públic ja no es parteix en dues línies als mòbils: els
+  enllaços ocupen una sola fila i, en pantalles estretes, «Informació» s'amaga
+  perquè el botó d'inscriure's hi càpiga sencer.
+
+---
+
 ## [1.1.0] — 2026-09-04
 
 ### Afegit
