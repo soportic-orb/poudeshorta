@@ -9,6 +9,31 @@ Actualitzacions i a la barra lateral.
 
 ---
 
+## [1.11.0] — 2026-09-04
+
+### Corregit
+
+- **No es podien anul·lar la resta d'entrades un cop se n'havia anul·lat una.**
+  En anul·lar-ne una amb devolució, la inscripció passa a l'estat «retornada
+  parcialment», i la comprovació només acceptava l'estat «pagada»: la web
+  responia «Només es poden anul·lar inscripcions pagades» i bloquejava les
+  entrades que encara eren bones. Ara es poden anul·lar mentre quedi termini,
+  n'hi hagi hagut cap d'anul·lada abans o no.
+
+### Canviat
+
+- Al detall de la inscripció, la banda de l'esquerra de cada entrada és
+  **verda quan l'entrada és bona** i **vermella quan està anul·lada**.
+- Les entrades anul·lades porten una **banda diagonal a la cantonada superior
+  dreta** amb el text «Anul·lada», en comptes d'indicar-ho amb text al costat
+  del preu.
+- **El PDF de l'entrada porta el logotip a l'esquerra de la capçalera.** Es
+  reescala sol dins de l'espai que hi ha, sense deformar-lo, i es compon sobre
+  el color de la capçalera perquè els logotips amb fons transparent es vegin
+  bé. Si no n'hi ha cap de configurat, la capçalera queda com abans.
+
+---
+
 ## [1.10.0] — 2026-09-04
 
 ### Afegit

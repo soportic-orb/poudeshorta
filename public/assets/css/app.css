@@ -592,13 +592,29 @@ legend { font-weight: 800; font-size: 1.05rem; padding: 0; margin-bottom: 4px; }
 .ticket-list { display: grid; gap: 14px; }
 
 .ticket-row {
+    position: relative; overflow: hidden;
     display: flex; gap: 18px; align-items: center; flex-wrap: wrap;
     background: var(--pdsh-surface); border: 1px solid var(--pdsh-line);
-    border-left: 6px solid var(--pdsh-secondary);
+    border-left: 6px solid var(--pdsh-success);
     border-radius: var(--pdsh-radius-sm); padding: 16px 20px;
 }
-.ticket-row.is-cancelled { border-left-color: var(--pdsh-danger); opacity: .68; }
+
+/* Verda si l'entrada és bona, vermella si s'ha anul·lat. */
 .ticket-row.is-used { border-left-color: var(--pdsh-olive); }
+.ticket-row.is-cancelled { border-left-color: var(--pdsh-danger); opacity: .68; }
+
+/* L'anul·lació es marca amb una banda a la cantonada de dalt a la dreta. */
+.ticket-row.is-cancelled { padding-right: 74px; }
+
+.ticket-row__ribbon {
+    position: absolute; top: 18px; right: -46px; width: 164px;
+    transform: rotate(45deg);
+    background: var(--pdsh-danger); color: #fff;
+    text-align: center; padding: 3px 0;
+    font-size: .66rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .2);
+    pointer-events: none;
+}
 .ticket-row__main { flex: 1 1 220px; min-width: 0; }
 .ticket-row__name { font-weight: 800; margin: 0; }
 .ticket-row__type { color: var(--pdsh-muted); font-size: .9rem; }

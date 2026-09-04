@@ -66,13 +66,16 @@ $paid = in_array((string) $order['status'], ['paid', 'partially_refunded'], true
                         };
                     ?>
                         <div class="ticket-row <?= $class ?>">
+                            <?php if ($class === 'is-cancelled'): ?>
+                                <span class="ticket-row__ribbon"><?= e(TicketService::statusLabel((string) $ticket['status'])) ?></span>
+                            <?php endif; ?>
                             <div class="ticket-row__main">
                                 <p class="ticket-row__name">
                                     <?= e($ticket['attendee_name'] ?: trim((string) $order['name'] . ' ' . (string) $order['surname'])) ?>
                                 </p>
                                 <span class="ticket-row__type">
                                     <?= e($ticket['type_name']) ?> · <?= money((int) $ticket['price_cents']) ?>
-                                    <?php if ($ticket['status'] !== 'valid'): ?>
+                                    <?php if ($ticket['status'] !== 'valid' && $class !== 'is-cancelled'): ?>
                                         · <strong><?= e(TicketService::statusLabel((string) $ticket['status'])) ?></strong>
                                     <?php endif; ?>
                                 </span>

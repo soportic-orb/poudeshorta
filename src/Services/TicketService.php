@@ -320,7 +320,10 @@ final class TicketService
         if (!Settings::bool('cancellation_enabled', true)) {
             return $deny('Les anul·lacions no estan habilitades per a aquest esdeveniment.');
         }
-        if (($order['status'] ?? '') !== 'paid') {
+        // Una comanda amb una entrada ja anul·lada i retornada queda en
+        // «partially_refunded», i les entrades que hi queden s'han de poder
+        // anul·lar igualment mentre no s'acabi el termini.
+        if (!in_array((string) ($order['status'] ?? ''), ['paid', 'partially_refunded'], true)) {
             return $deny('Només es poden anul·lar inscripcions pagades.');
         }
 

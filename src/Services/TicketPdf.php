@@ -66,19 +66,31 @@ final class TicketPdf
         $pdf->fillHex($accent);
         $pdf->Rect(0, 40, self::PAGE_W, 2.5, 'F');
 
+        // El logotip de la web, a l'esquerra del tot. Si no n'hi ha, el text
+        // comença al marge com sempre.
+        $textX = self::MARGIN;
+        $logo = $this->logoFile($primary);
+        if ($logo !== null) {
+            [$logoPath, $logoW, $logoH] = $logo;
+            $pdf->Image($logoPath, self::MARGIN, (40 - $logoH) / 2, $logoW, $logoH, 'PNG');
+            $textX = self::MARGIN + $logoW + 6.0;
+        }
+
+        $textW = (self::PAGE_W - self::MARGIN - 40) - $textX;
+
         $pdf->textHex($cream);
         $pdf->SetFont('Helvetica', 'B', 19);
-        $pdf->SetXY(self::MARGIN, 10);
-        $pdf->fitCell($contentW - 40, 9, (string) Settings::get('event_name'), 19, 12);
+        $pdf->SetXY($textX, 10);
+        $pdf->fitCell($textW, 9, (string) Settings::get('event_name'), 19, 12);
 
         $pdf->SetFont('Helvetica', '', 11);
-        $pdf->SetXY(self::MARGIN, 21);
-        $pdf->fitCell($contentW - 40, 6, (string) Settings::get('event_tagline'), 11, 8);
+        $pdf->SetXY($textX, 21);
+        $pdf->fitCell($textW, 6, (string) Settings::get('event_tagline'), 11, 8);
 
         $pdf->SetFont('Helvetica', 'B', 8);
         $pdf->textHex($accent);
-        $pdf->SetXY(self::MARGIN, 29.5);
-        $pdf->Cell($contentW - 40, 5, $pdf->t('ENTRADA · INSCRIPCIÓ'), 0, 0, 'L');
+        $pdf->SetXY($textX, 29.5);
+        $pdf->Cell($textW, 5, $pdf->t('ENTRADA · INSCRIPCIÓ'), 0, 0, 'L');
 
         // Numeració de l'entrada dins la comanda.
         if ($total > 1) {
@@ -239,6 +251,63 @@ final class TicketPdf
         $pdf->SetFont('Helvetica', 'B', 8);
         $pdf->SetXY(self::MARGIN + $contentW / 2, 289.5);
         $pdf->Cell($contentW / 2, 5, $pdf->t(Url::host()), 0, 0, 'R');
+    }
+
+    /**
+     * El logotip configurat, preparat per posar-lo a la capçalera.
+     *
+     * FPDF no sap tractar la transparència dels PNG, i el logotip sol tenir
+     * fons transparent: el compostem sobre el color de la capçalera i el
+     * desem com a PNG opac. Retorna [ruta, amplada, alçada] en mil·límetres,
+     * o null si no hi ha logotip o no es pot llegir.
+     *
+     * @return array{0:string,1:float,2:float}|null
+     */
+    private function logoFile(string $headerHex): ?array
+    {
+        $ruta = trim((string) Settings::get('event_logo'));
+        if ($ruta === '') {
+            return null;
+        }
+
+        $fitxer = dirname(__DIR__, 2) . '/public/' . ltrim($ruta, '/');
+        if (!is_file($fitxer)) {
+            return null;
+        }
+
+        $origen = @imagecreatefromstring((string) file_get_contents($fitxer));
+        if ($origen === false) {
+            return null;
+        }
+
+        // Espai reservat a la capçalera, en mil·límetres.
+        $maxW = 30.0;
+        $maxH = 22.0;
+
+        $ampleOrig = imagesx($origen);
+        $altOrig = imagesy($origen);
+        $factor = min($maxW / $ampleOrig, $maxH / $altOrig);
+        $ampleMm = round($ampleOrig * $factor, 2);
+        $altMm = round($altOrig * $factor, 2);
+
+        // A 300 ppp perquè es vegi net imprès (1 polzada = 25,4 mm).
+        $px = static fn (float $mm): int => max(1, (int) round($mm / 25.4 * 300));
+        $amplePx = $px($ampleMm);
+        $altPx = $px($altMm);
+
+        $llenc = imagecreatetruecolor($amplePx, $altPx);
+        [$r, $g, $b] = Pdf::rgb($headerHex);
+        imagefilledrectangle($llenc, 0, 0, $amplePx, $altPx, imagecolorallocate($llenc, $r, $g, $b));
+        imagecopyresampled($llenc, $origen, 0, 0, 0, 0, $amplePx, $altPx, $ampleOrig, $altOrig);
+        imagedestroy($origen);
+
+        $desti = sys_get_temp_dir() . '/pdsh_logo_' . bin2hex(random_bytes(8)) . '.png';
+        imagepng($llenc, $desti, 9);
+        imagedestroy($llenc);
+
+        $this->tempFiles[] = $desti;
+
+        return [$desti, $ampleMm, $altMm];
     }
 
     private function cleanup(): void
