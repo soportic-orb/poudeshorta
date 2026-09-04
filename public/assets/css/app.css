@@ -210,9 +210,10 @@ p  { margin: 0 0 1em; }
     background-repeat: no-repeat;
 }
 
-.hero--image::after {
-    content: ""; position: absolute; inset: 0;
-    background:
+/* El vel de color va en una variable perquè les banderoles s'hi puguin posar
+   a sobre sense haver de repetir els degradats ni perdre el color-mix. */
+.hero--image {
+    --hero-veil:
         linear-gradient(180deg, rgba(0, 0, 0, .35) 0%, rgba(0, 0, 0, 0) 38%),
         linear-gradient(160deg,
             color-mix(in srgb, var(--pdsh-primary) var(--hero-overlay, 55%), transparent) 0%,
@@ -221,8 +222,26 @@ p  { margin: 0 0 1em; }
 
 /* Els navegadors sense color-mix reben un vel sòlid equivalent. */
 @supports not (background: color-mix(in srgb, red 50%, transparent)) {
+    .hero--image {
+        --hero-veil: linear-gradient(160deg, rgba(140, 16, 39, .72) 0%, rgba(76, 7, 21, .86) 100%);
+    }
+}
+
+.hero--image::after {
+    content: ""; position: absolute; inset: 0;
+    background: var(--hero-veil);
+}
+
+/* Amb fotografia, les banderoles pengen de la línia groga per damunt de la
+   imatge i del vel, i la tira independent sobra: així la fotografia arriba
+   fins a dalt de tot. Ho condicionem al suport de :has() perquè els
+   navegadors que no el tenen conservin el disseny anterior i no les vegin
+   duplicades. */
+@supports selector(:has(*)) {
+    body:has(.hero--image) > .bunting { display: none; }
+
     .hero--image::after {
-        background: linear-gradient(160deg, rgba(140, 16, 39, .72) 0%, rgba(76, 7, 21, .86) 100%);
+        background: var(--pdsh-bunting) repeat-x top center / auto 22px, var(--hero-veil);
     }
 }
 

@@ -9,6 +9,19 @@ Actualitzacions i a la barra lateral.
 
 ---
 
+## [1.11.1] — 2026-09-04
+
+### Canviat
+
+- **Les banderoles de dalt van ara damunt de la fotografia de la capçalera.**
+  Abans anaven en una tira pròpia amb fons de color, i la fotografia començava
+  per sota. Ara la fotografia arriba fins a la línia groga que separa el menú,
+  i les banderoles hi pengen a sobre.
+- A les pàgines sense fotografia de capçalera, les banderoles continuen com
+  fins ara, amb el seu fons: sense ell, les banderoles clares no es veurien.
+
+---
+
 ## [1.11.0] — 2026-09-04
 
 ### Corregit
