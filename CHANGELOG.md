@@ -9,6 +9,19 @@ Actualitzacions i a la barra lateral.
 
 ---
 
+## [1.7.1] — 2026-09-04
+
+### Canviat
+
+- Si la classe del Google Wallet ja existeix però el compte de servei no la pot
+  actualitzar, es dona per registrada igualment i s'avisa del motiu: per
+  escurçar els enllaços n'hi ha prou que la classe existeixi. Abans quedava
+  bloquejat i els enllaços seguien sent massa llargs.
+- Els errors en consultar la classe es reporten en comptes de continuar com si
+  res.
+
+---
+
 ## [1.7.0] — 2026-09-04
 
 ### Corregit

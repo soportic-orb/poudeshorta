@@ -360,6 +360,20 @@ Premeu **Desar la configuració dels passis**.
 
 A sota de tot hi ha el botó **Crear la classe al Google Wallet**. Premeu-lo.
 
+Abans, comproveu que teniu desats l'Issuer ID, l'identificador de la classe i
+el JSON del compte de servei: el botó els fa servir tal com estan desats, no
+com els tingueu escrits al formulari sense desar.
+
+El botó fa tres coses: demana un testimoni d'accés a Google amb el compte de
+servei, mira si la classe ja existeix i, si no hi és, la crea; si ja hi és,
+l'actualitza. Si la classe existeix però el compte de servei no la pot
+actualitzar, es dona per bona igualment, perquè amb això ja n'hi ha prou per
+escurçar els enllaços.
+
+Si la preferiu crear a mà a la consola de Google, feu servir exactament aquest
+identificador de classe (`ISSUER_ID.identificador`) i després premeu igualment
+el botó: en trobar-la, la donarà per registrada.
+
 La classe conté el que és igual per a totes les entrades: nom de
 l'esdeveniment, data, lloc i colors. **Aquest pas no és opcional**: Google
 trunca els enllaços «Save to Wallet» que superen els 1800 caràcters, i si les

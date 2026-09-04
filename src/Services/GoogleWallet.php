@@ -209,18 +209,36 @@ final class GoogleWallet
             $token = $this->accessToken($account);
             $class = $this->classPayload($classId, trim((string) Settings::get('google_issuer_id')));
 
-            [$status] = $this->api('GET', 'eventTicketClass/' . rawurlencode($classId), null, $token);
+            [$status, $body] = $this->api('GET', 'eventTicketClass/' . rawurlencode($classId), null, $token);
 
             if ($status === 404) {
                 [$status, $body] = $this->api('POST', 'eventTicketClass', $class, $token);
+                if ($status >= 400) {
+                    return ['ok' => false, 'message' => $this->describeApiError($status, $body)];
+                }
                 $accio = 'creada';
-            } else {
-                [$status, $body] = $this->api('PUT', 'eventTicketClass/' . rawurlencode($classId), $class, $token);
-                $accio = 'actualitzada';
-            }
-
-            if ($status >= 400) {
+            } elseif ($status >= 400) {
                 return ['ok' => false, 'message' => $this->describeApiError($status, $body)];
+            } else {
+                // La classe ja existeix (potser creada a mà a la consola de
+                // Google). Provem d'actualitzar-la, però encara que no
+                // poguéssim, ja n'hi ha prou per no haver-la d'enviar dins de
+                // cada enllaç, que és el que ens interessa.
+                [$putStatus, $putBody] = $this->api('PUT', 'eventTicketClass/' . rawurlencode($classId), $class, $token);
+
+                if ($putStatus >= 400) {
+                    Settings::set('google_class_registered', $classId);
+                    Settings::flush();
+
+                    return [
+                        'ok'      => true,
+                        'message' => 'La classe ja existeix al Google Wallet (' . $classId . ') i es farà servir, '
+                            . 'però no s\'ha pogut actualitzar amb les dades actuals de l\'esdeveniment: '
+                            . $this->describeApiError($putStatus, $putBody),
+                    ];
+                }
+
+                $accio = 'actualitzada';
             }
         } catch (\Throwable $e) {
             return ['ok' => false, 'message' => $e->getMessage()];
