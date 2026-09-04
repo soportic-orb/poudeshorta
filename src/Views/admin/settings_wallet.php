@@ -76,7 +76,8 @@ $s = $settings;
             <div class="alert alert--info" style="margin-bottom:0;">
                 <span aria-hidden="true">🔒</span>
                 <span>Els certificats es desen a <code>storage/certificates/</code>, fora del directori públic,
-                      amb permisos restringits.</span>
+                      amb permisos restringits. Si pugeu un <code>.p12</code>, es converteix automàticament al
+                      format que fa servir el servidor i la contrasenya deixa de ser necessària.</span>
             </div>
         </div>
     </div>
@@ -123,6 +124,27 @@ $s = $settings;
         </div>
         <div class="panel__foot">
             <button type="submit" class="btn btn--primary">Desar la configuració dels passis</button>
+        </div>
+    </div>
+</form>
+
+<form method="post" action="<?= e(url('/admin/configuracio/wallet/prova')) ?>">
+    <?= Csrf::field() ?>
+    <div class="panel">
+        <div class="panel__head">
+            <div>
+                <h2>Comprovar el certificat d'Apple</h2>
+                <p>Genera un passi de prova amb dades fictícies. Feu-ho abans d'obrir les inscripcions.</p>
+            </div>
+        </div>
+        <div class="panel__body">
+            <p style="margin:0 0 16px;color:var(--pdsh-muted);font-size:.92rem;">
+                Si la prova passa, vol dir que el certificat, la clau i el certificat WWDR són correctes
+                i que el servidor pot signar passis. No es crea cap entrada ni s'envia res a ningú.
+            </p>
+            <button type="submit" class="btn btn--light" data-loading="Signant el passi de prova…">
+                Generar un passi de prova
+            </button>
         </div>
     </div>
 </form>

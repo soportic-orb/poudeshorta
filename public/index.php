@@ -135,6 +135,7 @@ $router->group([$csrf, [Auth::class, 'requireLogin']], static function (Router $
     $r->post('/admin/configuracio/anullacions',[Admin\SettingsController::class, 'saveCancellations']);
     $r->get('/admin/configuracio/wallet',      [Admin\SettingsController::class, 'wallet']);
     $r->post('/admin/configuracio/wallet',     [Admin\SettingsController::class, 'saveWallet']);
+    $r->post('/admin/configuracio/wallet/prova', [Admin\SettingsController::class, 'testWallet']);
 
     $r->get('/admin/usuaris',                  [Admin\UserController::class, 'index']);
     $r->post('/admin/usuaris',                 [Admin\UserController::class, 'store']);

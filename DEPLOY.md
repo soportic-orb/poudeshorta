@@ -176,26 +176,141 @@ Al Panell de Gestió, seguiu la llista de comprovació del resum:
 
 ## 11. Passis de wallet (opcional)
 
-### Apple Wallet
+Els passis són una comoditat: l'entrada queda desada a l'aplicació Wallet del
+mòbil. **No són imprescindibles**: sense configurar-los, el PDF amb el codi QR
+funciona igual i els botons simplement no apareixen.
 
-Necessiteu un compte de desenvolupador d'Apple (99 €/any):
+### 11.1 Apple Wallet, pas a pas
 
-1. Creeu un **Pass Type ID** al portal de desenvolupadors.
-2. Genereu-ne el certificat i exporteu-lo com a `.p12`.
-3. Descarregueu el certificat intermedi **WWDR** d'Apple.
-4. Pugeu-ho tot a **Configuració → Wallet** amb el Team ID.
+Compteu-hi una hora i **99 €/any** del programa de desenvolupadors d'Apple.
 
-### Google Wallet
+#### Pas 1 · Donar-se d'alta a l'Apple Developer Program
 
-1. Demaneu accés a la **Google Wallet Console** i anoteu l'*Issuer ID*.
-2. Creeu un compte de servei a Google Cloud i descarregueu-ne el JSON.
-3. Autoritzeu l'adreça del compte de servei a la Wallet Console.
-4. Pugeu el JSON i l'Issuer ID a **Configuració → Wallet**.
+1. Aneu a `developer.apple.com/programs` i premeu **Enroll**.
+2. Trieu el tipus de compte:
+   - **Individual**: a nom d'una persona, s'aprova en poques hores. És
+     l'opció pràctica per a una comissió de festes.
+   - **Organization**: exigeix entitat jurídica i número D-U-N-S, i pot trigar
+     setmanes.
+3. Pagueu la quota. Es renova automàticament cada any.
 
-Si no els configureu, els botons no apareixen i les entrades continuen
-funcionant amb el PDF i el codi QR.
+#### Pas 2 · Crear el «Pass Type ID»
 
----
+1. Entreu a `developer.apple.com/account` → **Certificates, Identifiers &
+   Profiles** → **Identifiers** → botó **+**.
+2. Trieu **Pass Type IDs** i premeu Continue.
+3. Ompliu:
+   - *Description*: `Entrada Sopar Pou de s'Horta`
+   - *Identifier*: `pass.online.poudeshorta.entrada`
+
+   L'identificador **ha de començar per `pass.`**; la resta és el vostre domini
+   a l'inrevés. Anoteu-lo: l'haureu de posar al panell exactament igual.
+4. Register.
+
+#### Pas 3 · Generar la sol·licitud de certificat (CSR)
+
+Us recomanem fer-ho amb `openssl`, que funciona en qualsevol ordinador i genera
+directament els fitxers que necessita el servidor:
+
+```bash
+openssl genrsa -out pass.key 2048
+openssl req -new -key pass.key -out pass.csr \
+  -subj "/emailAddress=info@poudeshorta.online/CN=Pou de s'Horta/C=ES"
+```
+
+Guardeu bé `pass.key`: és la clau privada i no es pot recuperar.
+
+> Si ho feu des d'un Mac amb l'**Accés a Claus** (Assistent de certificats →
+> Sol·licitar un certificat...), la clau privada queda dins del clauer i us
+> caldrà exportar-la després com a `.p12`. Funciona igual, però el pas 6 té una
+> nota important sobre aquest format.
+
+#### Pas 4 · Emetre el certificat
+
+1. Al Pass Type ID que heu creat, premeu **Configure** (o **Create
+   Certificate**).
+2. Pugeu el fitxer `pass.csr` i premeu Continue.
+3. Descarregueu el certificat: obtindreu `pass.cer`.
+4. Convertiu-lo a PEM:
+
+```bash
+openssl x509 -inform DER -in pass.cer -out pass-cert.pem
+```
+
+#### Pas 5 · Descarregar el certificat WWDR d'Apple
+
+És el certificat intermedi que encadena el vostre amb l'arrel d'Apple.
+
+1. Aneu a `apple.com/certificateauthority`.
+2. Descarregueu **Worldwide Developer Relations - G4** (`AppleWWDRCAG4.cer`).
+
+No cal convertir-lo: el panell accepta el format `.cer` i el converteix sol.
+
+#### Pas 6 · Pujar-ho tot al Panell de Gestió
+
+A **Configuració → Wallet**:
+
+| Camp | Valor |
+|---|---|
+| Activar els passis | marcat |
+| Pass Type ID | `pass.online.poudeshorta.entrada` |
+| Team ID | els 10 caràcters de *Membership* a developer.apple.com/account |
+| Nom de l'organització | Comissió de Festes del carrer Pou de s'Horta |
+| Certificat del pass | `pass-cert.pem` |
+| Clau privada | `pass.key` |
+| Certificat WWDR | `AppleWWDRCAG4.cer` |
+| Contrasenya del certificat | buida |
+
+Premeu **Desar la configuració dels passis**.
+
+> **Si veniu del Mac amb un `.p12`**: pugeu-lo al camp «Certificat del pass»,
+> escriviu la contrasenya d'exportació i deseu. El sistema el converteix
+> automàticament i esborra el `.p12` i la contrasenya.
+>
+> L'Accés a Claus del Mac exporta els `.p12` amb algorismes antics (RC2-40 i
+> 3DES) que molts servidors amb OpenSSL 3 no llegeixen. Si el panell us diu que
+> no l'ha pogut obrir, torneu-lo a exportar així des del Mac i pugeu el nou:
+>
+> ```bash
+> openssl pkcs12 -in original.p12 -nodes -legacy -out temporal.pem
+> openssl pkcs12 -export -in temporal.pem -out nou.p12 \
+>   -keypbe AES-256-CBC -certpbe AES-256-CBC -macalg sha256
+> rm temporal.pem
+> ```
+
+#### Pas 7 · Comprovar-ho
+
+A la mateixa pàgina, al final, premeu **Generar un passi de prova**. Ha de dir
+*«Passi de prova generat correctament»*. Si dona error, el missatge us indica
+quin dels tres fitxers falla.
+
+#### Pas 8 · Provar-ho en un iPhone de veritat
+
+Amb Stripe en mode de proves, feu una compra, obriu la pantalla de confirmació
+des d'un iPhone i premeu **Afegir a l'Apple Wallet**.
+
+Si l'iPhone diu que no pot afegir el passi però la prova del pas 7 passava, la
+causa gairebé sempre és que el **Pass Type ID o el Team ID del panell no
+coincideixen exactament** amb els del certificat. Reviseu-los caràcter a
+caràcter.
+
+#### Renovació
+
+El certificat del pass **caduca al cap d'un any**. Quan caduqui, els passis ja
+descarregats continuen al mòbil, però no se'n poden signar de nous i la prova
+del pas 7 començarà a fallar. Apunteu-vos la data i repetiu els passos 3 a 7.
+
+### 11.2 Google Wallet
+
+No té cost, però l'alta d'emissor l'ha d'aprovar Google i pot trigar uns dies.
+
+1. Demaneu accés a la **Google Wallet Console**
+   (`pay.google.com/business/console`) i anoteu-ne l'*Issuer ID*.
+2. Al Google Cloud Console, creeu un **compte de servei**, activeu-hi l'API de
+   Google Wallet i descarregueu-ne la clau en format JSON.
+3. A la Wallet Console, autoritzeu l'adreça del compte de servei
+   (`...@....iam.gserviceaccount.com`) com a usuari.
+4. Al panell, a **Configuració → Wallet**, poseu-hi l'Issuer ID i pugeu el JSON.
 
 ## 12. Actualitzacions OTA
 
@@ -244,6 +359,8 @@ Si algun dia canvia:
 | No arriben els correus | El botó de prova a **Configuració → Correu**; reviseu SPF i DKIM |
 | El PDF surt sense codi QR | Cal l'extensió `gd` de PHP |
 | L'actualització OTA falla | Permisos d'escriptura del projecte i l'extensió `zip` |
+| El passi d'Apple no s'afegeix al mòbil | Que el Pass Type ID i el Team ID coincideixin amb el certificat (apartat 11.1, pas 8) |
+| No es pot obrir el `.p12` d'Apple | L'exportació del Mac fa servir algorismes antics: reexporteu-lo (apartat 11.1, pas 6) |
 | Els comunicats no s'envien | Comproveu que la tasca cron s'executa (Estat del sistema) |
 
 ---

@@ -134,13 +134,13 @@ final class GoogleWallet
 
         $signingInput = $encode(['alg' => 'RS256', 'typ' => 'JWT']) . '.' . $encode($claims);
 
-        $key = openssl_pkey_get_private($privateKey);
+        $key = @openssl_pkey_get_private($privateKey);
         if ($key === false) {
             throw new RuntimeException('La clau privada del compte de servei de Google no és vàlida.');
         }
 
         $signature = '';
-        if (!openssl_sign($signingInput, $signature, $key, OPENSSL_ALGO_SHA256)) {
+        if (!@openssl_sign($signingInput, $signature, $key, OPENSSL_ALGO_SHA256)) {
             throw new RuntimeException('No s\'ha pogut signar el passi del Google Wallet.');
         }
 

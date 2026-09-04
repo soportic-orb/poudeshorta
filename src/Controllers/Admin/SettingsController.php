@@ -208,6 +208,14 @@ final class SettingsController
             'wallet_enabled' => 'bool',
         ]);
 
+        // La contrasenya primer: la necessitem per obrir el .p12 que puguin pujar.
+        $password = (string) Request::post('apple_key_password', '');
+        if ($password !== '' && !str_starts_with($password, '••')) {
+            Settings::set('apple_key_password', $password);
+        } else {
+            $password = (string) Settings::get('apple_key_password');
+        }
+
         // Els certificats es desen fora de public/ perquè no siguin accessibles pel web.
         foreach ([
             'apple_cert_path' => ['field' => 'apple_cert', 'ext' => ['p12', 'pfx', 'pem', 'cer', 'crt']],
@@ -218,15 +226,65 @@ final class SettingsController
                 $path = $this->storeCertificate($spec['field'], $spec['ext']);
                 if ($path !== null) {
                     Settings::set($setting, $path);
+                    if ($setting === 'apple_cert_path') {
+                        $this->convertPkcs12($path, $password);
+                    }
                 }
             }
         }
 
-        $password = (string) Request::post('apple_key_password', '');
-        if ($password !== '' && !str_starts_with($password, '••')) {
-            Settings::set('apple_key_password', $password);
+        $this->saveGoogleServiceAccount();
+
+        Logger::audit('configura_wallet');
+        Flash::success('Configuració dels passis desada.');
+        Response::redirect(Url::to('/admin/configuracio/wallet'));
+    }
+
+    /**
+     * Converteix un .p12 acabat de pujar en la parella certificat + clau en PEM.
+     *
+     * Ho fem en el moment de pujar-lo perquè l'error surti aquí i no la primera
+     * vegada que algú provi de descarregar-se el passi. A més, els .p12 que
+     * exporta el Keychain del Mac fan servir algorismes antics que molts
+     * servidors amb OpenSSL 3 no llegeixen directament.
+     */
+    private function convertPkcs12(string $path, string $password): void
+    {
+        if (!preg_match('/\.(p12|pfx)$/i', $path)) {
+            return;
         }
 
+        try {
+            $bundle = AppleWallet::extractPkcs12((string) file_get_contents($path), $password);
+        } catch (\Throwable $e) {
+            Flash::warning('El certificat s\'ha desat, però no s\'ha pogut obrir: ' . $e->getMessage());
+            return;
+        }
+
+        $dir = dirname($path);
+        $certPath = $dir . '/apple_cert.pem';
+        $keyPath  = $dir . '/apple_key.pem';
+
+        if (file_put_contents($certPath, $bundle['cert']) === false
+            || file_put_contents($keyPath, $bundle['key']) === false) {
+            Flash::warning('No s\'ha pogut desar el certificat convertit; es farà servir el .p12 tal qual.');
+            return;
+        }
+
+        @chmod($certPath, 0600);
+        @chmod($keyPath, 0600);
+
+        Settings::set('apple_cert_path', $certPath);
+        Settings::set('apple_key_path', $keyPath);
+        // Ja no cal la contrasenya: la clau desada no està xifrada.
+        Settings::set('apple_key_password', '');
+        @unlink($path);
+
+        Flash::info('El certificat .p12 s\'ha convertit al format que fa servir el servidor.');
+    }
+
+    private function saveGoogleServiceAccount(): void
+    {
         $serviceAccount = trim((string) Request::post('google_service_account_json', ''));
         if ($serviceAccount !== '' && !str_starts_with($serviceAccount, '••')) {
             if (json_decode($serviceAccount, true) === null) {
@@ -234,6 +292,7 @@ final class SettingsController
             }
             Settings::set('google_service_account_json', $serviceAccount);
         }
+
         if (!empty($_FILES['google_json']['tmp_name'])) {
             $contents = (string) file_get_contents($_FILES['google_json']['tmp_name']);
             if (json_decode($contents, true) !== null) {
@@ -242,9 +301,17 @@ final class SettingsController
                 Flash::warning('El fitxer JSON del compte de servei no és vàlid.');
             }
         }
+    }
 
-        Logger::audit('configura_wallet');
-        Flash::success('Configuració dels passis desada.');
+    /** Genera un passi de prova per validar el certificat d'Apple Wallet. */
+    public function testWallet(): void
+    {
+        $result = AppleWallet::selfTest();
+
+        $result['ok']
+            ? Flash::success('Apple Wallet: ' . $result['message'])
+            : Flash::error('Apple Wallet: ' . $result['message']);
+
         Response::redirect(Url::to('/admin/configuracio/wallet'));
     }
 

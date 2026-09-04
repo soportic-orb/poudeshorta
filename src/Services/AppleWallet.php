@@ -183,13 +183,27 @@ final class AppleWallet
     private function writeSignature(string $dir): void
     {
         [$certPem, $keyPem] = $this->loadCertificate();
-        $wwdr = (string) file_get_contents((string) Settings::get('apple_wwdr_path'));
+
+        if (@openssl_x509_read($certPem) === false) {
+            throw new RuntimeException(
+                'El certificat del pass no es pot llegir. Comproveu que heu pujat el certificat '
+                . 'del vostre «Pass Type ID» d\'Apple i no un altre fitxer.'
+            );
+        }
+
+        $wwdrPem = $this->toPem((string) file_get_contents((string) Settings::get('apple_wwdr_path')));
+        if (@openssl_x509_read($wwdrPem) === false) {
+            throw new RuntimeException(
+                'El certificat WWDR d\'Apple no es pot llegir. Descarregueu-lo de nou des de '
+                . 'apple.com/certificateauthority (Worldwide Developer Relations, G4) i torneu-lo a pujar.'
+            );
+        }
 
         $wwdrFile = $dir . '/.wwdr.pem';
-        file_put_contents($wwdrFile, $this->toPem($wwdr));
+        file_put_contents($wwdrFile, $wwdrPem);
 
         $signatureFile = $dir . '/.signature.pem';
-        $ok = openssl_pkcs7_sign(
+        $ok = @openssl_pkcs7_sign(
             $dir . '/manifest.json',
             $signatureFile,
             $certPem,
@@ -203,19 +217,56 @@ final class AppleWallet
             throw new RuntimeException('No s\'ha pogut signar el pass: ' . (openssl_error_string() ?: 'error desconegut'));
         }
 
-        // openssl retorna S/MIME; el .pkpass necessita el bloc PKCS#7 en DER.
-        $smime = (string) file_get_contents($signatureFile);
-        $parts = preg_split('/\r?\n\r?\n/', $smime, 2);
-        $base64 = preg_replace('/-----(BEGIN|END)[^-]+-----|\s+/', '', $parts[1] ?? '') ?? '';
-        $der = base64_decode($base64, true);
-
-        if ($der === false || $der === '') {
-            throw new RuntimeException('La signatura generada no és vàlida.');
-        }
+        // openssl retorna un missatge S/MIME multipart; el .pkpass necessita
+        // només el bloc PKCS#7, i en DER.
+        $der = self::derFromSmime((string) file_get_contents($signatureFile));
 
         file_put_contents($dir . '/signature', $der);
         @unlink($signatureFile);
         @unlink($wwdrFile);
+    }
+
+    /**
+     * Extreu el bloc PKCS#7 en DER d'un missatge S/MIME signat.
+     *
+     * openssl_pkcs7_sign retorna un multipart/signed que conté el manifest
+     * original i, en una part a part, la signatura en base64. Aquí busquem
+     * aquesta part concreta i la descodifiquem.
+     */
+    private static function derFromSmime(string $smime): string
+    {
+        $section = null;
+
+        if (preg_match('/boundary="?([^";\r\n]+)"?/i', $smime, $match) === 1) {
+            foreach (explode('--' . $match[1], $smime) as $part) {
+                // Cal la capçalera Content-Type de la part: la capçalera general
+                // del missatge també anomena el tipus, dins de protocol="…".
+                if (preg_match('#Content-Type:\s*application/x-pkcs7-signature#i', $part) === 1) {
+                    $section = $part;
+                    break;
+                }
+            }
+        }
+
+        if ($section === null) {
+            // Sense límit de parts reconegut: ens quedem amb el darrer bloc base64.
+            $section = $smime;
+        }
+
+        // El cos comença després de la línia en blanc que tanca les capçaleres.
+        $parts = preg_split('/\R\R/', trim($section), 2);
+        $body = $parts[1] ?? $parts[0] ?? '';
+
+        $base64 = preg_replace('/[^A-Za-z0-9+\/=]/', '', $body) ?? '';
+        $der = $base64 !== '' ? base64_decode($base64, true) : false;
+
+        // Una signatura PKCS#7 és una SEQUENCE d'ASN.1 (0x30) i mai és curta:
+        // si no ho és, hem agafat el bloc equivocat i val més aturar-se.
+        if ($der === false || strlen($der) < 256 || $der[0] !== "\x30") {
+            throw new RuntimeException('No s\'ha pogut extreure la signatura del certificat.');
+        }
+
+        return $der;
     }
 
     /**
@@ -230,11 +281,8 @@ final class AppleWallet
         $contents = (string) file_get_contents($certPath);
 
         if (str_ends_with(strtolower($certPath), '.p12') || str_ends_with(strtolower($certPath), '.pfx')) {
-            $bundle = [];
-            if (!openssl_pkcs12_read($contents, $bundle, $password)) {
-                throw new RuntimeException('No s\'ha pogut llegir el certificat .p12 (comproveu la contrasenya).');
-            }
-            return [$bundle['cert'], [$bundle['pkey'], '']];
+            $bundle = self::extractPkcs12($contents, $password);
+            return [$bundle['cert'], [$bundle['key'], '']];
         }
 
         $keyPath = (string) Settings::get('apple_key_path');
@@ -242,6 +290,105 @@ final class AppleWallet
             throw new RuntimeException('Falta la clau privada del certificat d\'Apple Wallet.');
         }
         return [$contents, [(string) file_get_contents($keyPath), $password]];
+    }
+
+    /**
+     * Obté el certificat i la clau privada d'un fitxer .p12.
+     *
+     * El Keychain del Mac exporta els .p12 amb algorismes antics (RC2-40 i
+     * 3DES) que OpenSSL 3 no accepta per defecte, de manera que aquí provem
+     * primer la lectura normal i, si falla, la del binari openssl amb l'opció
+     * -legacy. Si tampoc és possible, expliquem què cal fer.
+     *
+     * @return array{cert:string, key:string}
+     */
+    public static function extractPkcs12(string $contents, string $password): array
+    {
+        $bundle = [];
+        if (@openssl_pkcs12_read($contents, $bundle, $password)
+            && !empty($bundle['cert']) && !empty($bundle['pkey'])) {
+            return ['cert' => (string) $bundle['cert'], 'key' => (string) $bundle['pkey']];
+        }
+
+        $errors = [];
+        while ($error = openssl_error_string()) {
+            $errors[] = $error;
+        }
+        $legacyAlgorithm = false;
+        foreach ($errors as $error) {
+            if (str_contains($error, 'unsupported') || str_contains($error, 'digital envelope')) {
+                $legacyAlgorithm = true;
+            }
+        }
+
+        $fallback = self::extractPkcs12WithCli($contents, $password);
+        if ($fallback !== null) {
+            return $fallback;
+        }
+
+        if ($legacyAlgorithm) {
+            throw new RuntimeException(
+                'El certificat .p12 utilitza algorismes antics que aquest servidor no accepta '
+                . '(és el format que exporta el Keychain del Mac). Torneu-lo a exportar amb: '
+                . 'openssl pkcs12 -in original.p12 -nodes -legacy | openssl pkcs12 -export '
+                . '-keypbe AES-256-CBC -certpbe AES-256-CBC -macalg sha256 -out nou.p12'
+            );
+        }
+
+        throw new RuntimeException(
+            'No s\'ha pogut llegir el certificat .p12. Comproveu que la contrasenya és correcta '
+            . 'i que el fitxer conté el certificat i la clau privada.'
+        );
+    }
+
+    /**
+     * Segona oportunitat fent servir el binari openssl amb -legacy.
+     * La contrasenya es passa per variable d'entorn perquè no aparegui a la
+     * llista de processos del servidor.
+     *
+     * @return array{cert:string, key:string}|null
+     */
+    private static function extractPkcs12WithCli(string $contents, string $password): ?array
+    {
+        if (!function_exists('proc_open')
+            || in_array('proc_open', array_map('trim', explode(',', (string) ini_get('disable_functions'))), true)) {
+            return null;
+        }
+
+        $tmp = tempnam(sys_get_temp_dir(), 'p12_');
+        if ($tmp === false) {
+            return null;
+        }
+        file_put_contents($tmp, $contents);
+        @chmod($tmp, 0600);
+
+        $descriptors = [1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
+        $command = 'openssl pkcs12 -in ' . escapeshellarg($tmp) . ' -nodes -legacy -passin env:PKCS12_PASSWORD 2>/dev/null';
+
+        $process = @proc_open($command, $descriptors, $pipes, null, ['PKCS12_PASSWORD' => $password]);
+        if (!is_resource($process)) {
+            @unlink($tmp);
+            return null;
+        }
+
+        $output = (string) stream_get_contents($pipes[1]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+        $status = proc_close($process);
+        @unlink($tmp);
+
+        if ($status !== 0 || $output === '') {
+            return null;
+        }
+
+        preg_match('/-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----/s', $output, $cert);
+        preg_match('/-----BEGIN (?:ENCRYPTED )?PRIVATE KEY-----.*?-----END (?:ENCRYPTED )?PRIVATE KEY-----/s', $output, $key);
+
+        if (empty($cert[0]) || empty($key[0])) {
+            return null;
+        }
+
+        return ['cert' => $cert[0], 'key' => $key[0]];
     }
 
     /** Accepta un certificat en DER i el converteix a PEM si cal. */
@@ -285,6 +432,35 @@ final class AppleWallet
             }
         }
         @rmdir($dir);
+    }
+
+    /**
+     * Genera un passi de prova amb dades fictícies per comprovar que el
+     * certificat funciona, sense haver d'esperar a la primera venda.
+     *
+     * @return array{ok:bool, message:string}
+     */
+    public static function selfTest(): array
+    {
+        if (!self::isConfigured()) {
+            return ['ok' => false, 'message' => self::configurationHint()];
+        }
+
+        try {
+            $pass = (new self())->build(
+                ['id' => 0, 'reference' => 'PDSH-PROVA', 'name' => 'Entrada', 'surname' => 'de prova'],
+                ['code' => 'PROVA123', 'attendee_name' => 'Entrada de prova', 'status' => 'valid'],
+                ['name' => 'Prova de configuració', 'includes' => '']
+            );
+        } catch (\Throwable $e) {
+            return ['ok' => false, 'message' => $e->getMessage()];
+        }
+
+        return [
+            'ok'      => true,
+            'message' => 'Passi de prova generat correctament (' . strlen($pass) . ' bytes). '
+                . 'El certificat, la clau i el certificat WWDR són vàlids i es poden signar passis.',
+        ];
     }
 
     /** Motiu pel qual el pass no està disponible, per mostrar-lo al panell. */
