@@ -9,6 +9,28 @@ Actualitzacions i a la barra lateral.
 
 ---
 
+## [1.3.0] — 2026-09-04
+
+### Canviat
+
+- **Pàgina de l'entrada (la del codi QR)**: l'estat ara es veu abans de llegir
+  res, amb una franja de color a tota l'amplada — verd si és vàlida, ambre si
+  ja s'ha validat, vermell si està anul·lada, no pagada o no existeix — i el
+  nom de l'assistent en gran. És la pantalla que es mira a la porta, de nit i
+  amb pressa.
+- **Pàgines interiors** (informació, les meves entrades, detall de la
+  inscripció): totes tenen ara una capçalera de color amb el títol, una frase
+  d'context i l'enllaç per tornar enrere, en comptes de començar amb un títol
+  nu sobre el fons crema.
+- Els títols de secció porten un traç d'accent a sota, com el subratllat del
+  cartell.
+
+### Afegit
+
+- Compte enrere a la portada quan s'ha indicat la data exacta de
+  l'esdeveniment: «Falten 22 dies», «Demà!» o «És avui!».
+---
+
 ## [1.2.0] — 2026-09-04
 
 ### Afegit

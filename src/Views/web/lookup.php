@@ -1,12 +1,16 @@
 <?php use App\Core\Csrf; ?>
 
+<div class="page-head">
+    <div class="wrap wrap--narrow">
+        <a class="page-head__back" href="<?= e(url('/')) ?>">← Tornar a l'inici</a>
+        <h1>Les meves entrades</h1>
+        <p>Introduïu l'adreça electrònica amb què us vau inscriure i us enviarem un enllaç
+           per veure, descarregar o anul·lar les vostres entrades. No cal cap compte d'usuari.</p>
+    </div>
+</div>
+
 <section class="section">
     <div class="wrap wrap--narrow">
-        <h1>Les meves entrades</h1>
-        <p style="color:var(--pdsh-muted);">
-            Introduïu l'adreça electrònica amb què us vau inscriure i us enviarem un enllaç
-            per veure, descarregar o anul·lar les vostres entrades. No cal cap compte d'usuari.
-        </p>
 
         <div class="card">
             <div class="card__body">

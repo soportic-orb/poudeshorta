@@ -233,12 +233,76 @@ p  { margin: 0 0 1em; }
     font-style: normal; font-weight: 900; flex: 0 0 auto;
 }
 
+/* ------------------------------------------------- Capçalera de pàgina */
+
+/* Franja compacta per a les pàgines interiors, perquè no comencin amb un
+   títol nu sobre el fons crema. */
+.page-head {
+    background: linear-gradient(160deg, var(--pdsh-primary) 0%, #6E0C1E 100%);
+    color: var(--pdsh-cream);
+    padding: clamp(28px, 5vw, 44px) 0 clamp(24px, 4vw, 38px);
+    border-bottom: 4px solid var(--pdsh-accent);
+}
+.page-head h1 { margin: 0 0 .25em; font-size: clamp(1.6rem, 4vw, 2.3rem); }
+.page-head p { margin: 0; opacity: .88; max-width: 60ch; }
+.page-head__back {
+    display: inline-block; color: var(--pdsh-accent); text-decoration: none;
+    font-weight: 700; font-size: .88rem; margin-bottom: 12px;
+}
+.page-head__back:hover { color: #fff; }
+
+/* ------------------------------------------------- Estat d'una entrada */
+
+/* Es mira de nit, a la porta i amb pressa: el color ha de dir-ho tot abans
+   de llegir res. */
+.state-banner {
+    color: #fff; text-align: center;
+    padding: clamp(30px, 7vw, 52px) 20px clamp(26px, 5vw, 40px);
+}
+.state-banner--ok        { background: #1F6B45; }
+.state-banner--warning   { background: #8A5A06; }
+.state-banner--error     { background: #8E1C16; }
+
+.state-banner__icon {
+    font-size: clamp(3rem, 12vw, 4.6rem); line-height: 1; display: block; margin-bottom: 10px;
+}
+.state-banner__title {
+    font-size: clamp(1.7rem, 6vw, 2.6rem); font-weight: 900; margin: 0 0 .2em; line-height: 1.1;
+}
+.state-banner__name {
+    font-size: clamp(1.1rem, 4vw, 1.4rem); font-weight: 700; margin: 14px 0 0;
+    background: rgba(255, 255, 255, .16); border-radius: 999px;
+    padding: 9px 22px; display: inline-block;
+}
+.state-banner__note { margin: 12px 0 0; opacity: .9; font-size: .95rem; }
+
 /* -------------------------------------------------------------- Seccions */
 
 .section { padding: clamp(40px, 7vw, 68px) 0; }
 .section--tight { padding: clamp(28px, 4vw, 40px) 0; }
 .section__head { margin-bottom: 28px; max-width: 60ch; }
 .section__head p { color: var(--pdsh-muted); margin: 0; }
+
+/* Traç d'accent sota els títols, com el subratllat del cartell. */
+.section__head h2 { position: relative; display: inline-block; padding-bottom: 10px; }
+.section__head h2::after {
+    content: ""; position: absolute; left: 0; bottom: 0;
+    width: min(100%, 118px); height: 5px; border-radius: 3px;
+    background: var(--pdsh-accent);
+}
+
+/* Compte enrere fins a l'esdeveniment.
+   Va dins de .hero__meta, així que cal guanyar-li l'especificitat perquè no
+   sembli un xip més: aquest ha de destacar. */
+.hero__meta .hero__countdown,
+.hero--image .hero__meta .hero__countdown {
+    display: inline-flex; align-items: baseline; gap: 7px;
+    background: var(--pdsh-accent); color: var(--pdsh-ink);
+    border: 1px solid var(--pdsh-accent);
+    padding: 8px 17px; border-radius: 999px; font-weight: 800; font-size: .93rem;
+    backdrop-filter: none;
+}
+.hero__meta .hero__countdown strong { font-size: 1.2rem; font-weight: 900; }
 
 .card {
     background: var(--pdsh-surface); border: 1px solid var(--pdsh-line);

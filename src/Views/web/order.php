@@ -9,15 +9,20 @@ $valid = array_values(array_filter($tickets, static fn ($t) => $t['status'] === 
 $paid = in_array((string) $order['status'], ['paid', 'partially_refunded'], true);
 ?>
 
-<section class="section">
+<div class="page-head">
     <div class="wrap wrap--narrow">
-
+        <a class="page-head__back" href="<?= e(url('/les-meves-entrades')) ?>">← Les meves entrades</a>
         <h1>Inscripció <?= e($order['reference']) ?></h1>
-        <p style="color:var(--pdsh-muted);">
+        <p>
             <?= dt((string) $order['created_at'], 'd/m/Y') ?> ·
             <?= e($order['email']) ?> ·
-            <span class="badge <?= $paid ? 'badge--ok' : 'badge--muted' ?>"><?= e(TicketService::statusLabel((string) $order['status'])) ?></span>
+            <?= e(TicketService::statusLabel((string) $order['status'])) ?>
         </p>
+    </div>
+</div>
+
+<section class="section">
+    <div class="wrap wrap--narrow">
 
         <?php if ($paid): ?>
             <div class="action-grid" style="margin-bottom:32px;">
@@ -148,8 +153,5 @@ $paid = in_array((string) $order['status'], ['paid', 'partially_refunded'], true
             </div>
         <?php endif; ?>
 
-        <p style="margin-top:26px;">
-            <a href="<?= e(url('/les-meves-entrades')) ?>">← Totes les meves inscripcions</a>
-        </p>
     </div>
 </section>

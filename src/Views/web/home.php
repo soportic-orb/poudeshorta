@@ -23,6 +23,16 @@ if ($heroImage !== '') {
     );
 }
 
+// Dies que falten, si s'ha indicat la data exacta de l'esdeveniment.
+$daysLeft = null;
+$eventDate = trim((string) Settings::get('event_date'));
+if ($eventDate !== '' && ($eventTs = strtotime($eventDate)) !== false) {
+    $diff = (int) floor(($eventTs - time()) / 86400);
+    if ($diff >= 0 && $diff <= 400) {
+        $daysLeft = $diff;
+    }
+}
+
 // El cartell es pot amagar quan ja hi ha fotografia de fons.
 $showPoster = $poster !== '' && (Settings::bool('hero_show_poster', true) || $heroImage === '');
 ?>
@@ -36,6 +46,17 @@ $showPoster = $poster !== '' && (Settings::bool('hero_show_poster', true) || $he
             <p class="hero__lead"><?= nl2br(e(Settings::get('event_description'))) ?></p>
 
             <div class="hero__meta">
+                <?php if ($daysLeft !== null): ?>
+                    <span class="hero__countdown">
+                        <?php if ($daysLeft === 0): ?>
+                            🎉 <strong>És avui!</strong>
+                        <?php elseif ($daysLeft === 1): ?>
+                            ⏳ <strong>Demà!</strong>
+                        <?php else: ?>
+                            ⏳ Falten <strong><?= $daysLeft ?></strong> dies
+                        <?php endif; ?>
+                    </span>
+                <?php endif; ?>
                 <span>📅 <?= e(Settings::get('event_date_text')) ?></span>
                 <?php if (($place = trim((string) Settings::get('event_location') . ' ' . (string) Settings::get('event_city'))) !== ''): ?>
                     <span>📍 <?= e($place) ?></span>

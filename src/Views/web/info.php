@@ -5,9 +5,17 @@ use App\Services\TicketService;
 $deadline = TicketService::cancellationDeadline();
 ?>
 
+<div class="page-head">
+    <div class="wrap wrap--narrow">
+        <a class="page-head__back" href="<?= e(url('/')) ?>">← Tornar a l'inici</a>
+        <h1>Informació de l'esdeveniment</h1>
+        <p>Tot el que cal saber sobre el <?= e(Settings::get('event_name')) ?>,
+           les condicions de la inscripció i com anul·lar-la.</p>
+    </div>
+</div>
+
 <section class="section">
     <div class="wrap wrap--narrow">
-        <h1>Informació de l'esdeveniment</h1>
 
         <div class="card" style="margin-bottom:20px;">
             <div class="card__body">

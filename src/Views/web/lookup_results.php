@@ -2,10 +2,16 @@
 use App\Services\TicketService;
 ?>
 
+<div class="page-head">
+    <div class="wrap wrap--narrow">
+        <a class="page-head__back" href="<?= e(url('/')) ?>">← Tornar a l'inici</a>
+        <h1>Les meves entrades</h1>
+        <p>Inscripcions associades a <strong><?= e($email) ?></strong>.</p>
+    </div>
+</div>
+
 <section class="section">
     <div class="wrap wrap--narrow">
-        <h1>Les meves entrades</h1>
-        <p style="color:var(--pdsh-muted);">Inscripcions associades a <strong><?= e($email) ?></strong>.</p>
 
         <?php if ($orders === []): ?>
             <div class="card"><div class="card__body">
