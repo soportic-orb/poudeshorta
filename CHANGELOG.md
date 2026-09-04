@@ -9,6 +9,22 @@ Actualitzacions i a la barra lateral.
 
 ---
 
+## [1.12.1] — 2026-09-04
+
+### Corregit
+
+- **A l'apartat d'anul·lar no sortia el llistat d'entrades quan només en
+  quedava una de vàlida.** La llista només apareixia amb dues o més, de manera
+  que en inscripcions on ja se n'havia utilitzat o anul·lat alguna no es veia
+  què s'anul·laria. Ara la llista hi és sempre que hi hagi alguna entrada per
+  anul·lar, amb el codi de cada entrada al costat.
+- Quan les anul·lacions parcials estan desactivades, ara s'indica igualment
+  quines entrades s'anul·laran, en lloc de no dir res.
+- El botó i els textos s'ajusten al nombre d'entrades: «Anul·lar l'entrada»
+  quan només n'hi ha una i «Anul·lar les entrades» quan n'hi ha més.
+
+---
+
 ## [1.12.0] — 2026-09-04
 
 ### Afegit

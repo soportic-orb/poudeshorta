@@ -143,23 +143,45 @@ $paid = in_array((string) $order['status'], ['paid', 'partially_refunded'], true
                             <?= Csrf::field() ?>
                             <input type="hidden" name="t" value="<?= e($token) ?>">
 
-                            <?php if (Settings::bool('cancellation_allow_partial', true) && count($valid) > 1): ?>
+                            <?php /* Sempre ensenyem quines entrades es poden anul·lar, encara que
+                                    només en quedi una: així es veu exactament què s'anul·larà. Les
+                                    que ja s'han utilitzat o anul·lat no hi surten perquè no s'hi pot
+                                    fer res. */ ?>
+                            <?php if (Settings::bool('cancellation_allow_partial', true)): ?>
                                 <fieldset>
-                                    <legend style="font-size:.95rem;">Trieu quines entrades voleu anul·lar</legend>
+                                    <legend style="font-size:.95rem;">
+                                        <?= count($valid) === 1
+                                            ? 'Entrada que podeu anul·lar'
+                                            : 'Trieu quines entrades voleu anul·lar' ?>
+                                    </legend>
                                     <?php foreach ($valid as $ticket): ?>
                                         <label class="check" style="margin-bottom:9px;">
                                             <input type="checkbox" name="tickets[]" value="<?= (int) $ticket['id'] ?>">
                                             <span>
                                                 <?= e($ticket['attendee_name'] ?: 'Entrada') ?>
                                                 — <?= e($ticket['type_name']) ?> (<?= money((int) $ticket['price_cents']) ?>)
+                                                <span class="mono" style="color:var(--pdsh-muted);"><?= e($ticket['code']) ?></span>
                                             </span>
                                         </label>
                                     <?php endforeach; ?>
-                                    <span class="field__hint">Si no en marqueu cap, s'anul·larà la inscripció sencera.</span>
+                                    <span class="field__hint">
+                                        <?= count($valid) === 1
+                                            ? 'Si no la marqueu, s\'anul·larà igualment aquesta entrada.'
+                                            : 'Si no en marqueu cap, s\'anul·laran totes les que hi ha aquí.' ?>
+                                    </span>
                                 </fieldset>
+                            <?php else: ?>
+                                <p style="font-size:.94rem;margin-bottom:14px;">
+                                    S'anul·<?= count($valid) === 1 ? 'larà aquesta entrada' : 'laran aquestes entrades' ?>:
+                                    <?php foreach ($valid as $i => $ticket): ?>
+                                        <?= $i > 0 ? ', ' : '' ?><strong><?= e($ticket['attendee_name'] ?: $ticket['code']) ?></strong>
+                                    <?php endforeach; ?>.
+                                </p>
                             <?php endif; ?>
 
-                            <button type="submit" class="btn btn--danger">Anul·lar la inscripció</button>
+                            <button type="submit" class="btn btn--danger">
+                                <?= count($valid) === 1 ? 'Anul·lar l\'entrada' : 'Anul·lar les entrades' ?>
+                            </button>
                         </form>
                     <?php endif; ?>
                 </div>
