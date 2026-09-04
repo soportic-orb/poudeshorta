@@ -69,6 +69,8 @@ final class Settings
         'stripe_fee_percent'     => '1.5',
         'stripe_fee_fixed_cents' => '25',
         'show_stripe_fee'        => '1',
+        'checkout_notice_enabled' => '0',
+        'checkout_notice'         => '',
 
         // SMTP
         'smtp_host'       => '',

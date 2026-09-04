@@ -68,6 +68,33 @@ final class Str
         return $visible . str_repeat('*', max(1, mb_strlen($user) - 2)) . '@' . $domain;
     }
 
+    /**
+     * Converteix text pla escrit per una persona en HTML segur: escapa
+     * l'entrada, converteix els enllaços en clicables i respecta els
+     * paràgrafs i els salts de línia.
+     *
+     * @param string $linkAttributes Atributs extra per als enllaços (els
+     *                               correus necessiten estils en línia).
+     */
+    public static function toHtmlParagraphs(string $text, string $linkAttributes = ''): string
+    {
+        $escaped = htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+        $attributes = $linkAttributes !== '' ? ' ' . trim($linkAttributes) : '';
+        $escaped = preg_replace(
+            '#\b(https?://[^\s<]+)#',
+            '<a href="$1"' . $attributes . '>$1</a>',
+            $escaped
+        ) ?? $escaped;
+
+        $html = '';
+        foreach (preg_split('/\R{2,}/', trim($escaped)) ?: [] as $paragraph) {
+            $html .= '<p>' . nl2br(trim($paragraph)) . '</p>';
+        }
+
+        return $html;
+    }
+
     /** Substitueix marcadors {{clau}} dins d'una plantilla de text. */
     public static function template(string $text, array $vars): string
     {

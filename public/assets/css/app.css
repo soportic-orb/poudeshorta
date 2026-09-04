@@ -588,6 +588,21 @@ legend { font-weight: 800; font-size: 1.05rem; padding: 0; margin-bottom: 4px; }
 }
 .fee-note strong { color: var(--pdsh-ink); }
 
+/* Missatge que l'organització escriu des del panell. Es distingeix de la nota
+   de comissions perquè és un avís seu, no una dada del cobrament. */
+.checkout-notice {
+    margin: 16px 0 0;
+    padding: 14px 16px;
+    background: #FFF6E3;
+    border-left: 4px solid var(--pdsh-accent);
+    border-radius: var(--pdsh-radius-sm);
+    font-size: .95rem;
+    line-height: 1.55;
+}
+.checkout-notice p { margin: 0 0 .7em; }
+.checkout-notice p:last-child { margin-bottom: 0; }
+.checkout-notice a { color: var(--pdsh-primary); font-weight: 700; }
+
 /* Passes de la compra */
 .steps { display: flex; gap: 8px; align-items: center; margin-bottom: 26px; flex-wrap: wrap; font-size: .88rem; }
 .steps span { display: inline-flex; align-items: center; gap: 8px; color: var(--pdsh-muted); font-weight: 600; }

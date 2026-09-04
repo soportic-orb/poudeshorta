@@ -105,6 +105,34 @@ $live = $s['stripe_mode'] === 'live';
     <div class="panel">
         <div class="panel__head">
             <div>
+                <h2>Missatge a la pantalla de pagament</h2>
+                <p>Apareix al quadre «Resum», sota l'import total i just abans de les condicions.</p>
+            </div>
+        </div>
+        <div class="panel__body">
+            <div class="field">
+                <label class="check">
+                    <input type="checkbox" name="checkout_notice_enabled" value="1"<?= checkedIf($s['checkout_notice_enabled'] === '1') ?>>
+                    <span><strong>Mostrar el missatge</strong></span>
+                </label>
+            </div>
+
+            <div class="field" style="margin-bottom:0;">
+                <label for="checkout_notice">Text del missatge</label>
+                <textarea class="textarea" id="checkout_notice" name="checkout_notice" rows="5"
+                          placeholder="Per exemple: el sopar es fa igualment si plou, sota la carpa del carrer."><?= e($s['checkout_notice']) ?></textarea>
+                <span class="field__hint">
+                    Text pla: es respecten els salts de línia i els paràgrafs, i les adreces que
+                    comencin per <code>https://</code> es converteixen en enllaços.
+                    Si el deixeu buit no es mostra res, encara que la casella estigui marcada.
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel__head">
+            <div>
                 <h2>Claus de proves</h2>
                 <p>Les trobareu al tauler de Stripe amb el mode de proves activat.</p>
             </div>

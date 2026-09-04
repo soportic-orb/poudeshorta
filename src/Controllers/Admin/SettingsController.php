@@ -110,6 +110,9 @@ final class SettingsController
         Settings::set('stripe_fee_fixed_cents', (string) max(0, Money::toCents((string) Request::post('stripe_fee_fixed', '0,25'))));
         Settings::set('show_stripe_fee', Request::post('show_stripe_fee') ? '1' : '0');
 
+        Settings::set('checkout_notice', (string) Request::post('checkout_notice', ''));
+        Settings::set('checkout_notice_enabled', Request::post('checkout_notice_enabled') ? '1' : '0');
+
         foreach ([
             'stripe_test_pk', 'stripe_test_sk', 'stripe_test_wh_secret',
             'stripe_live_pk', 'stripe_live_sk', 'stripe_live_wh_secret',

@@ -180,6 +180,15 @@ $errors = $errors ?? [];
                         </p>
                     <?php endif; ?>
 
+                    <?php
+                    $avis = trim((string) Settings::get('checkout_notice'));
+                    ?>
+                    <?php if ($avis !== '' && Settings::bool('checkout_notice_enabled')): ?>
+                        <div class="checkout-notice">
+                            <?= \App\Core\Str::toHtmlParagraphs($avis) ?>
+                        </div>
+                    <?php endif; ?>
+
                     <?php if (Settings::bool('require_terms', true)): ?>
                         <div class="field" style="margin:18px 0 0;">
                             <label class="check">

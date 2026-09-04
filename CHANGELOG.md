@@ -9,6 +9,23 @@ Actualitzacions i a la barra lateral.
 
 ---
 
+## [1.6.0] — 2026-09-04
+
+### Afegit
+
+- Missatge propi a la pantalla de pagament, al quadre «Resum», sota l'import
+  total i just abans de les condicions. S'escriu i s'activa des de
+  Configuració → Pagaments. Admet diverses línies i converteix les adreces
+  web en enllaços; l'HTML que s'hi escrigui s'escapa i no s'executa.
+
+### Canviat
+
+- La conversió de text pla a HTML passa a `Str::toHtmlParagraphs()`, que ara
+  comparteixen el missatge del pagament i els correus. Comprovat que els
+  correus generen exactament el mateix HTML que abans.
+
+---
+
 ## [1.5.0] — 2026-09-04
 
 ### Afegit

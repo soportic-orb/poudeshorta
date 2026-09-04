@@ -5,6 +5,7 @@ namespace App\Services;
 
 use App\Core\Logger;
 use App\Core\Settings;
+use App\Core\Str;
 use App\Core\Url;
 use App\Core\View;
 use PHPMailer\PHPMailer\Exception as MailException;
@@ -134,20 +135,12 @@ final class Mailer
     }
 
     /** Converteix un cos escrit en text pla a HTML senzill (per a les campanyes). */
+    /** Converteix un cos escrit en text pla a HTML senzill (per a les campanyes). */
     public static function textToHtml(string $text): string
     {
-        $escaped = htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        $escaped = preg_replace(
-            '#\b(https?://[^\s<]+)#',
-            '<a href="$1" style="color:#8C1027;">$1</a>',
-            $escaped
-        ) ?? $escaped;
-        $paragraphs = preg_split('/\R{2,}/', trim($escaped)) ?: [];
-        $html = '';
-        foreach ($paragraphs as $p) {
-            $html .= '<p>' . nl2br(trim($p)) . '</p>';
-        }
-        return $html;
+        // Els gestors de correu no apliquen fulls d'estil: l'enllaç ha de
+        // portar el color a dins.
+        return Str::toHtmlParagraphs($text, 'style="color:#8C1027;"');
     }
 
     private function toPlainText(string $html): string
