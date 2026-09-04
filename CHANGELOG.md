@@ -9,6 +9,20 @@ Actualitzacions i a la barra lateral.
 
 ---
 
+## [1.7.2] — 2026-09-04
+
+### Corregit
+
+- **La creació de la classe del Google Wallet fallava** amb «Default value for
+  LocalizedString cannot be empty» quan no s'havia omplert el lloc de
+  l'esdeveniment: s'enviava l'adreça del recinte buida i Google la rebutja.
+  Ara el bloc del lloc només s'envia si se sap, i cap text localitzat pot anar
+  buit.
+- Si falta el nom de l'esdeveniment o l'organitzador, s'avisa abans de trucar a
+  Google i s'indica on omplir-ho.
+
+---
+
 ## [1.7.1] — 2026-09-04
 
 ### Canviat

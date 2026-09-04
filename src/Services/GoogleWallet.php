@@ -96,21 +96,57 @@ final class GoogleWallet
         return self::SAVE_URL . $jwt;
     }
 
+    /**
+     * Cadena localitzada per a Google. Retorna null si el text és buit:
+     * Google rebutja les LocalizedString sense valor amb un 400.
+     */
+    private static function localized(?string $value): ?array
+    {
+        $value = trim((string) $value);
+
+        return $value === ''
+            ? null
+            : ['defaultValue' => ['language' => 'ca', 'value' => $value]];
+    }
+
+    /**
+     * Comprova que hi ha les dades que Google exigeix, per avisar-ne aquí i no
+     * haver d'interpretar un error seu.
+     *
+     * @return string|null Motiu, o null si tot hi és.
+     */
+    public static function missingData(): ?string
+    {
+        if (trim((string) Settings::get('event_name')) === '') {
+            return 'Cal indicar el nom de l\'esdeveniment a Configuració → Esdeveniment.';
+        }
+        if (trim((string) Settings::get('event_organizer')) === '') {
+            return 'Cal indicar qui organitza l\'esdeveniment a Configuració → Esdeveniment: '
+                . 'Google ho fa servir com a nom de l\'emissor del passi.';
+        }
+
+        return null;
+    }
+
     private function classPayload(string $classId, string $issuerId): array
     {
-        $venue = trim((string) Settings::get('event_location') . ' ' . (string) Settings::get('event_city'));
-
         $class = [
             'id'                 => $classId,
-            'issuerName'         => (string) Settings::get('event_organizer'),
+            'issuerName'         => trim((string) Settings::get('event_organizer')),
             'reviewStatus'       => 'UNDER_REVIEW',
-            'eventName'          => ['defaultValue' => ['language' => 'ca', 'value' => (string) Settings::get('event_name')]],
+            'eventName'          => self::localized((string) Settings::get('event_name')),
             'hexBackgroundColor' => (string) Settings::get('brand_primary'),
-            'venue'              => [
-                'name'    => ['defaultValue' => ['language' => 'ca', 'value' => $venue !== '' ? $venue : (string) Settings::get('event_name')]],
-                'address' => ['defaultValue' => ['language' => 'ca', 'value' => $venue]],
-            ],
         ];
+
+        // El lloc només s'envia si el sabem: Google exigeix que el nom i
+        // l'adreça del recinte tinguin contingut si s'inclou el bloc.
+        $venue = trim((string) Settings::get('event_location') . ' ' . (string) Settings::get('event_city'));
+        if ($venue !== '') {
+            $class['venue'] = [
+                'name'    => self::localized($venue),
+                'address' => self::localized($venue),
+            ];
+        }
 
         $eventDate = trim((string) Settings::get('event_date'));
         if ($eventDate !== '' && ($ts = strtotime($eventDate)) !== false) {
@@ -122,7 +158,7 @@ final class GoogleWallet
             $class['homepageUri'] = ['uri' => $homepage, 'description' => Url::host()];
         }
 
-        return $class;
+        return array_filter($class, static fn ($v) => $v !== null && $v !== '');
     }
 
     private function objectPayload(
@@ -137,9 +173,9 @@ final class GoogleWallet
             'id'      => $objectId,
             'classId' => $classId,
             'state'   => ($ticket['status'] ?? 'valid') === 'valid' ? 'ACTIVE' : 'INACTIVE',
-            'ticketHolderName' => $attendee,
+            'ticketHolderName' => $attendee !== '' ? $attendee : 'Assistent',
             'ticketNumber'     => (string) $ticket['code'],
-            'ticketType'       => ['defaultValue' => ['language' => 'ca', 'value' => (string) ($type['name'] ?? 'Inscripció')]],
+            'ticketType'       => self::localized((string) ($type['name'] ?? '')) ?? self::localized('Inscripció'),
             'barcode' => [
                 'type'         => 'QR_CODE',
                 'value'        => Url::full('/e/' . $ticket['code']),
@@ -201,6 +237,10 @@ final class GoogleWallet
         $account = self::serviceAccount();
         if ($account === null || trim((string) Settings::get('google_issuer_id')) === '') {
             return ['ok' => false, 'message' => self::configurationHint()];
+        }
+
+        if (($falta = self::missingData()) !== null) {
+            return ['ok' => false, 'message' => $falta];
         }
 
         $classId = self::classId();
