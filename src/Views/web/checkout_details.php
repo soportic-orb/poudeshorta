@@ -6,6 +6,14 @@ use App\Core\Settings;
 $errors = $errors ?? [];
 ?>
 
+<div class="page-head">
+    <div class="wrap wrap--narrow">
+        <a class="page-head__back" href="<?= e(url('/')) ?>#inscripcions">← Canviar la selecció</a>
+        <h1>Dades de la inscripció</h1>
+        <p>Necessitem el vostre contacte per enviar-vos les entrades i el nom de cada assistent.</p>
+    </div>
+</div>
+
 <section class="section">
     <div class="wrap wrap--narrow">
 
@@ -14,11 +22,6 @@ $errors = $errors ?? [];
             <span class="is-current" data-step="2">Les vostres dades</span><i>›</i>
             <span data-step="3">Pagament</span>
         </div>
-
-        <h1>Dades de la inscripció</h1>
-        <p style="color:var(--pdsh-muted);">
-            Necessitem el vostre contacte per enviar-vos les entrades i el nom de cada assistent.
-        </p>
 
         <form method="post" action="<?= e(url('/inscripcio/pagament')) ?>" data-guard novalidate>
             <?= Csrf::field() ?>

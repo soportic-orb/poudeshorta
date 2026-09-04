@@ -13,7 +13,8 @@ del cartell de l'esdeveniment i es poden canviar des del Panell de Gestió.
 
 ### Web públic (sense comptes d'usuari)
 
-- Pàgina de l'esdeveniment amb la informació, el cartell i els atractius.
+- Pàgina de l'esdeveniment amb la informació, el cartell i els atractius, amb
+  la tipografia i els colors del cartell i imatge de fons opcional.
 - Tipus d'inscripció amb preu, descripció i detall del que inclou cadascun.
 - Selecció de places, dades dels assistents i camps addicionals configurables
   (al·lèrgies, talla, taula…).
@@ -81,7 +82,7 @@ Les instruccions detallades per a CloudPanel són a **[DEPLOY.md](DEPLOY.md)**.
 bin/            Tasques programades (cron.php) i servidor de desenvolupament
 config/         Configuració local (config.php, no es puja al repositori)
 migrations/     Fitxers .sql que creen i actualitzen l'esquema
-public/         Arrel web: controlador frontal, CSS, JS i fitxers pujats
+public/         Arrel web: controlador frontal, CSS, JS, tipografies i pujades
 src/
   Core/         Encaminador, base de dades, sessió, seguretat, ajudants
   Services/     Stripe, PDF, QR, correu, wallets, actualitzacions

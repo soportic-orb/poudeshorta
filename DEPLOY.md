@@ -171,6 +171,10 @@ Al Panell de Gestió, seguiu la llista de comprovació del resum:
    fons de la capçalera va bé una fotografia horitzontal de 1920 × 1080 px o
    més, sense text; el control «Intensitat del vel de color» decideix quant es
    tapa perquè el títol es llegeixi.
+
+   Les tipografies (Caveat Brush per als titulars i Nunito per al text) estan
+   allotjades al mateix servidor, a `public/assets/fonts/`: el web no fa cap
+   crida a servidors externs per carregar-les i no cal configurar res.
 3. **Tipus d'inscripció**: preus, aforament i què inclou cada inscripció.
 4. **Configuració → Anul·lacions**: termini, devolucions i despeses de gestió.
 5. Quan tot estigui a punt, activeu **Inscripcions obertes**.

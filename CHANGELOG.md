@@ -9,6 +9,32 @@ Actualitzacions i a la barra lateral.
 
 ---
 
+## [1.4.0] — 2026-09-04
+
+### Canviat
+
+- **Tipografia del cartell a tot el web públic**: Caveat Brush, de pinzell, per
+  als titulars, i Nunito per al text. Totes dues estan allotjades al mateix
+  servidor (`public/assets/fonts/`), de manera que el web no fa cap crida a
+  servidors externs. Llicència SIL OFL 1.1 en tots dos casos.
+- Els titulars s'han redimensionat: la lletra de pinzell té l'ull més petit i
+  necessita més cos i menys interlineat.
+- La pàgina de dades de la inscripció fa servir la mateixa capçalera de color
+  que la resta de pàgines interiors.
+
+### Afegit
+
+- **Banderoles** sota la barra de navegació, com les de la part alta del
+  cartell, dibuixades amb els colors configurats al panell.
+
+### Notes
+
+- Els correus i les entrades en PDF continuen amb les tipografies de sempre:
+  els gestors de correu no carreguen lletres externes de manera fiable i el PDF
+  ha de veure's igual a qualsevol lector.
+
+---
+
 ## [1.3.0] — 2026-09-04
 
 ### Canviat

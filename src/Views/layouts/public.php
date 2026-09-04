@@ -33,6 +33,8 @@ use App\Core\View;
     </div>
 </header>
 
+<div class="bunting" aria-hidden="true"></div>
+
 <main>
     <?php if (!empty($showFlashInWrap ?? true)): ?>
         <?php $flash = View::partial('layouts/_flash'); ?>
