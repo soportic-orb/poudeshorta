@@ -1,5 +1,6 @@
 <?php
 use App\Core\Csrf;
+use App\Core\View;
 use App\Core\Settings;
 use App\Services\QrCode;
 
@@ -36,28 +37,20 @@ $valid = array_values(array_filter($tickets, static fn ($t) => in_array($t['stat
             <span>Per imprimir o desar al mòbil</span>
         </a>
 
-        <?php if ($walletApple): ?>
-            <a class="action-tile" href="<?= e(url('/comanda/' . $order['reference'] . '/wallet/apple') . '?t=' . $token) ?>">
-                <span class="action-tile__icon" aria-hidden="true">🍎</span>
-                <strong>Afegir a l'Apple Wallet</strong>
-                <span>Entrada sempre a mà a l'iPhone</span>
-            </a>
-        <?php endif; ?>
-
-        <?php if ($walletGoogle): ?>
-            <a class="action-tile" href="<?= e(url('/comanda/' . $order['reference'] . '/wallet/google') . '?t=' . $token) ?>">
-                <span class="action-tile__icon" aria-hidden="true">🤖</span>
-                <strong>Afegir al Google Wallet</strong>
-                <span>Entrada sempre a mà a l'Android</span>
-            </a>
-        <?php endif; ?>
-
         <button type="submit" form="send-tickets" class="action-tile" style="border:2px solid var(--pdsh-line);cursor:pointer;font:inherit;">
             <span class="action-tile__icon" aria-hidden="true">✉️</span>
             <strong>Enviar per correu</strong>
             <span>Torna a enviar el PDF adjunt</span>
         </button>
     </div>
+
+    <?= View::partial('web/_wallet_buttons', [
+        'base'         => url('/comanda/' . $order['reference']),
+        'token'        => $token,
+        'walletApple'  => $walletApple,
+        'walletGoogle' => $walletGoogle,
+        'ticketCount'  => count($valid),
+    ]) ?>
 
     <form id="send-tickets" method="post" action="<?= e(url('/comanda/' . $order['reference'] . '/enviar')) ?>" hidden>
         <?= Csrf::field() ?>

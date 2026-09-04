@@ -1,5 +1,6 @@
 <?php
 use App\Core\Csrf;
+use App\Core\View;
 use App\Core\Settings;
 use App\Services\TicketService;
 
@@ -32,28 +33,20 @@ $paid = in_array((string) $order['status'], ['paid', 'partially_refunded'], true
                     <span>Totes les entrades vàlides</span>
                 </a>
 
-                <?php if ($walletApple): ?>
-                    <a class="action-tile" href="<?= e($base . '/wallet/apple?t=' . $token) ?>">
-                        <span class="action-tile__icon" aria-hidden="true">🍎</span>
-                        <strong>Apple Wallet</strong>
-                        <span>Afegir al mòbil</span>
-                    </a>
-                <?php endif; ?>
-
-                <?php if ($walletGoogle): ?>
-                    <a class="action-tile" href="<?= e($base . '/wallet/google?t=' . $token) ?>">
-                        <span class="action-tile__icon" aria-hidden="true">🤖</span>
-                        <strong>Google Wallet</strong>
-                        <span>Afegir al mòbil</span>
-                    </a>
-                <?php endif; ?>
-
                 <button type="submit" form="resend" class="action-tile" style="border:2px solid var(--pdsh-line);cursor:pointer;font:inherit;">
                     <span class="action-tile__icon" aria-hidden="true">✉️</span>
                     <strong>Enviar per correu</strong>
                     <span>A <?= e($order['email']) ?></span>
                 </button>
             </div>
+
+            <?= View::partial('web/_wallet_buttons', [
+                'base'         => $base,
+                'token'        => $token,
+                'walletApple'  => $walletApple,
+                'walletGoogle' => $walletGoogle,
+                'ticketCount'  => count($valid),
+            ]) ?>
 
             <form id="resend" method="post" action="<?= e($base . '/enviar') ?>" hidden>
                 <?= Csrf::field() ?>
@@ -85,6 +78,23 @@ $paid = in_array((string) $order['status'], ['paid', 'partially_refunded'], true
                                 </span>
                             </div>
                             <span class="ticket-row__code"><?= e($ticket['code']) ?></span>
+
+                            <?php if (($walletApple || $walletGoogle) && in_array($ticket['status'], ['valid', 'used'], true)): ?>
+                                <span class="ticket-row__wallet">
+                                    <?php if ($walletApple): ?>
+                                        <a href="<?= e($base . '/wallet/apple?t=' . $token . '&entrada=' . (int) $ticket['id']) ?>"
+                                           title="Afegir només aquesta entrada a l'Apple Wallet">
+                                            <img src="<?= e(asset('img/wallet/apple-wallet.svg')) ?>" alt="Afegir aquesta entrada a l'Apple Wallet" width="26" height="26">
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if ($walletGoogle): ?>
+                                        <a href="<?= e($base . '/wallet/google?t=' . $token . '&entrada=' . (int) $ticket['id']) ?>"
+                                           title="Afegir només aquesta entrada al Google Wallet">
+                                            <img src="<?= e(asset('img/wallet/google-wallet.svg')) ?>" alt="Afegir aquesta entrada al Google Wallet" width="26" height="26">
+                                        </a>
+                                    <?php endif; ?>
+                                </span>
+                            <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
                 </div>

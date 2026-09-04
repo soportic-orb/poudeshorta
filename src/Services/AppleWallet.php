@@ -64,6 +64,65 @@ final class AppleWallet
         }
     }
 
+    /**
+     * Totes les entrades d'una comanda en un sol fitxer.
+     *
+     * L'Apple Wallet obre els paquets .pkpasses (un ZIP amb un .pkpass a
+     * dins per cada entrada) i ofereix afegir-les totes de cop. Amb una sola
+     * entrada val més enviar el .pkpass de sempre, que és el que entenen
+     * també les versions antigues d'iOS.
+     *
+     * @param array $tickets     Files de `tickets`.
+     * @param array $typesById   Tipus d'inscripció indexats per identificador.
+     * @return array{0:string,1:string,2:string} Contingut, nom del fitxer i tipus MIME.
+     */
+    public function buildAll(array $order, array $tickets, array $typesById): array
+    {
+        $tickets = array_values($tickets);
+        if ($tickets === []) {
+            throw new RuntimeException('Aquesta comanda no té cap entrada per afegir al wallet.');
+        }
+
+        $referencia = strtolower((string) $order['reference']);
+
+        if (count($tickets) === 1) {
+            $ticket = $tickets[0];
+
+            return [
+                $this->build($order, $ticket, $typesById[(int) $ticket['ticket_type_id']] ?? []),
+                'entrada-' . strtolower((string) $ticket['code']) . '.pkpass',
+                'application/vnd.apple.pkpass',
+            ];
+        }
+
+        $workDir = dirname(__DIR__, 2) . '/storage/tmp/pkpasses_' . bin2hex(random_bytes(8));
+        if (!mkdir($workDir, 0775, true) && !is_dir($workDir)) {
+            throw new RuntimeException('No s\'ha pogut crear el directori temporal dels passis.');
+        }
+
+        try {
+            $zipPath = $workDir . '/paquet.pkpasses';
+            $zip = new ZipArchive();
+            if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+                throw new RuntimeException('No s\'ha pogut crear el paquet de passis.');
+            }
+
+            foreach ($tickets as $ticket) {
+                $zip->addFromString(
+                    'entrada-' . strtolower((string) $ticket['code']) . '.pkpass',
+                    $this->build($order, $ticket, $typesById[(int) $ticket['ticket_type_id']] ?? [])
+                );
+            }
+
+            $zip->close();
+            $contingut = (string) file_get_contents($zipPath);
+
+            return [$contingut, 'entrades-' . $referencia . '.pkpasses', 'application/vnd.apple.pkpasses'];
+        } finally {
+            $this->removeDir($workDir);
+        }
+    }
+
     private function passPayload(array $order, array $ticket, array $type): array
     {
         $primary = Pdf::rgb((string) Settings::get('brand_primary'));
@@ -132,38 +191,160 @@ final class AppleWallet
         return $pass;
     }
 
-    /** L'Apple Wallet exigeix com a mínim icon.png; generem les imatges amb els colors de la marca. */
+    /**
+     * Imatges del passi.
+     *
+     * L'Apple Wallet exigeix icon.png (és el que surt a les notificacions) i
+     * mostra logo.png a dalt a l'esquerra, al costat del nom de l'organització.
+     * Fem servir el logotip que hi ha configurat a Configuració → Aparença; si
+     * no n'hi ha cap, dibuixem una marca amb els colors de la plataforma.
+     *
+     * Es pot substituir qualsevol imatge deixant-la a public/uploads/wallet/.
+     */
     private function writeImages(string $dir): void
     {
         $custom = dirname(__DIR__, 2) . '/public/uploads/wallet';
-        $sizes = ['icon.png' => 29, 'icon@2x.png' => 58, 'logo.png' => 50, 'logo@2x.png' => 100];
+        $logo = $this->brandLogo();
 
-        foreach ($sizes as $filename => $size) {
-            $provided = $custom . '/' . $filename;
-            if (is_file($provided)) {
-                copy($provided, $dir . '/' . $filename);
+        // L'icona és quadrada; el logotip pot ser apaïsat (màxim 160 × 50 punts).
+        $icones = ['icon.png' => 29, 'icon@2x.png' => 58, 'icon@3x.png' => 87];
+        $logos  = ['logo.png' => 1, 'logo@2x.png' => 2, 'logo@3x.png' => 3];
+
+        foreach ($icones as $filename => $size) {
+            if ($this->copyProvided($custom, $filename, $dir)) {
                 continue;
             }
-            file_put_contents($dir . '/' . $filename, $this->brandSquare($size));
+            file_put_contents($dir . '/' . $filename, $this->iconImage($size, $logo));
+        }
+
+        foreach ($logos as $filename => $escala) {
+            if ($this->copyProvided($custom, $filename, $dir)) {
+                continue;
+            }
+            file_put_contents($dir . '/' . $filename, $this->logoImage($escala, $logo));
+        }
+
+        if ($logo !== null) {
+            imagedestroy($logo);
         }
     }
 
-    private function brandSquare(int $size): string
+    private function copyProvided(string $dir, string $filename, string $desti): bool
     {
-        $image = imagecreatetruecolor($size, $size);
+        if (!is_file($dir . '/' . $filename)) {
+            return false;
+        }
+
+        return copy($dir . '/' . $filename, $desti . '/' . $filename);
+    }
+
+    /** El logotip configurat al panell, ja carregat amb GD. Null si no n'hi ha. */
+    private function brandLogo(): ?\GdImage
+    {
+        $ruta = trim((string) Settings::get('event_logo'));
+        if ($ruta === '') {
+            return null;
+        }
+
+        $fitxer = dirname(__DIR__, 2) . '/public/' . ltrim($ruta, '/');
+        if (!is_file($fitxer)) {
+            Logger::warn('Apple Wallet: no es troba el logotip configurat (' . $ruta . ').');
+            return null;
+        }
+
+        $imatge = @imagecreatefromstring((string) file_get_contents($fitxer));
+        if ($imatge === false) {
+            Logger::warn('Apple Wallet: el logotip configurat no es pot llegir (' . $ruta . ').');
+            return null;
+        }
+
+        return $imatge;
+    }
+
+    /** Icona quadrada: el logotip centrat sobre el color de fons de la marca. */
+    private function iconImage(int $size, ?\GdImage $logo): string
+    {
+        $llenc = imagecreatetruecolor($size, $size);
         [$r, $g, $b] = Pdf::rgb((string) Settings::get('brand_cream'));
-        $bg = imagecolorallocate($image, $r, $g, $b);
-        imagefilledrectangle($image, 0, 0, $size, $size, $bg);
+        imagefilledrectangle($llenc, 0, 0, $size, $size, imagecolorallocate($llenc, $r, $g, $b));
 
-        [$r, $g, $b] = Pdf::rgb((string) Settings::get('brand_primary'));
-        $fg = imagecolorallocate($image, $r, $g, $b);
-        $inset = max(1, (int) round($size * 0.12));
-        imagefilledellipse($image, (int) ($size / 2), (int) ($size / 2), $size - $inset * 2, $size - $inset * 2, $fg);
+        if ($logo !== null) {
+            $marge = (int) round($size * 0.1);
+            $this->dibuixaAjustat($llenc, $logo, $marge, $marge, $size - $marge * 2, $size - $marge * 2);
+        } else {
+            [$r, $g, $b] = Pdf::rgb((string) Settings::get('brand_primary'));
+            $inset = max(1, (int) round($size * 0.12));
+            imagefilledellipse(
+                $llenc,
+                (int) ($size / 2),
+                (int) ($size / 2),
+                $size - $inset * 2,
+                $size - $inset * 2,
+                imagecolorallocate($llenc, $r, $g, $b)
+            );
+        }
 
+        return $this->png($llenc);
+    }
+
+    /**
+     * Logotip de la capçalera. Apple el mostra dins d'un espai de 160 × 50
+     * punts: hi encabim la imatge sencera i retallem el llenç a l'amplada que
+     * realment ocupa, perquè no quedi desplaçat cap a la dreta.
+     */
+    private function logoImage(int $escala, ?\GdImage $logo): string
+    {
+        $alt = 50 * $escala;
+
+        if ($logo === null) {
+            return $this->iconImage($alt, null);
+        }
+
+        $ample = min(160 * $escala, max(1, (int) round(imagesx($logo) * ($alt / max(1, imagesy($logo))))));
+
+        $llenc = imagecreatetruecolor($ample, $alt);
+        imagealphablending($llenc, false);
+        imagesavealpha($llenc, true);
+        imagefilledrectangle($llenc, 0, 0, $ample, $alt, imagecolorallocatealpha($llenc, 0, 0, 0, 127));
+        imagealphablending($llenc, true);
+
+        $this->dibuixaAjustat($llenc, $logo, 0, 0, $ample, $alt);
+
+        return $this->png($llenc);
+    }
+
+    /** Copia $logo dins del rectangle indicat sense deformar-lo. */
+    private function dibuixaAjustat(\GdImage $desti, \GdImage $logo, int $x, int $y, int $ample, int $alt): void
+    {
+        $origAmple = imagesx($logo);
+        $origAlt = imagesy($logo);
+        $factor = min($ample / max(1, $origAmple), $alt / max(1, $origAlt));
+
+        $nouAmple = max(1, (int) round($origAmple * $factor));
+        $nouAlt = max(1, (int) round($origAlt * $factor));
+
+        imagecopyresampled(
+            $desti,
+            $logo,
+            $x + (int) (($ample - $nouAmple) / 2),
+            $y + (int) (($alt - $nouAlt) / 2),
+            0,
+            0,
+            $nouAmple,
+            $nouAlt,
+            $origAmple,
+            $origAlt
+        );
+    }
+
+    private function png(\GdImage $imatge): string
+    {
+        imagesavealpha($imatge, true);
         ob_start();
-        imagepng($image, null, 9);
+        imagepng($imatge, null, 9);
         $png = (string) ob_get_clean();
-        imagedestroy($image);
+        imagedestroy($imatge);
+
         return $png;
     }
 

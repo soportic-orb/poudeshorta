@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Google Wallet">
+  <defs><clipPath id="gw"><rect width="48" height="48" rx="11"/></clipPath></defs>
+  <g clip-path="url(#gw)">
+    <rect width="48" height="48" fill="#34A853"/>
+    <path d="M0 4.5C13 15.5 35 15.5 48 4.5V48H0Z" fill="#FBBC04"/>
+    <path d="M0 10.5C13 22.5 35 22.5 48 10.5V48H0Z" fill="#EA4335"/>
+    <path d="M0 17.5C13 31 35 31 48 17.5V48H0Z" fill="#4285F4"/>
+  </g>
+</svg>

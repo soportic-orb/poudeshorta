@@ -534,6 +534,47 @@ legend { font-weight: 800; font-size: 1.05rem; padding: 0; margin-bottom: 4px; }
 .success-hero h1 { color: var(--pdsh-primary); margin-bottom: .3em; }
 .success-hero p { color: var(--pdsh-muted); font-size: 1.05rem; max-width: 54ch; margin-inline: auto; }
 
+/* ------------------------------------------------- Botons dels wallets */
+
+/* Els botons oficials «Add to Apple Wallet» i «Add to Google Wallet» tenen un
+   aspecte marcat per Apple i Google: fons negre, text blanc en negreta i la
+   icona a l'esquerra. No els canviem els colors ni el text. */
+.wallet-buttons {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 12px; margin-top: 22px;
+}
+
+.wallet-btn {
+    --wallet-alt: 52px;
+    display: inline-flex; align-items: center; justify-content: flex-start;
+    gap: 12px; height: var(--wallet-alt); padding: 0 26px 0 14px;
+    background: #000; border-radius: calc(var(--wallet-alt) * .22);
+    text-decoration: none; transition: opacity .15s ease, transform .12s ease;
+}
+
+.wallet-btn:hover, .wallet-btn:focus-visible { background: #000; opacity: .85; }
+.wallet-btn:active { transform: translateY(1px); }
+
+.wallet-btn__icon { width: calc(var(--wallet-alt) * .6); height: calc(var(--wallet-alt) * .6); flex: none; }
+
+.wallet-btn__text {
+    color: #fff; font-weight: 800; letter-spacing: -.01em; white-space: nowrap;
+    font-size: calc(var(--wallet-alt) * .38);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.ticket-row__wallet { display: inline-flex; gap: 8px; align-items: center; margin-left: 12px; }
+.ticket-row__wallet a { display: inline-flex; border-radius: 7px; opacity: .75; transition: opacity .15s ease; }
+.ticket-row__wallet a:hover { opacity: 1; }
+
+.wallet-buttons__note {
+    text-align: center; color: var(--pdsh-muted); font-size: .86rem; margin: 10px 0 0;
+}
+
+@media (max-width: 520px) {
+    .wallet-btn { flex: 1 1 100%; justify-content: center; padding: 0 18px; }
+}
+
 .action-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); margin-top: 30px; }
 
 .action-tile {

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Core\Logger;
 use App\Core\Settings;
 use App\Core\Str;
 use App\Core\Url;
@@ -49,32 +50,92 @@ final class GoogleWallet
         return trim((string) Settings::get('google_class_registered')) === self::classId();
     }
 
-    public function saveUrl(array $order, array $ticket, array $type): string
+    /**
+     * Enllaç «Add to Google Wallet» amb totes les entrades d'una comanda.
+     *
+     * L'enllaç porta un JWT dins de l'URL, i això en limita la mida. Amb una
+     * sola entrada hi cap la definició sencera i n'hi ha prou de signar-la
+     * (no cal parlar amb Google). A partir de dues ja no hi cabria, així que
+     * desem les entrades al compte de Google i el JWT només n'ha de portar
+     * l'identificador: així hi caben totes les d'una comanda normal.
+     *
+     * @param array $tickets    Files de `tickets`.
+     * @param array $typesById  Tipus d'inscripció indexats per identificador.
+     */
+    public function saveUrl(array $order, array $tickets, array $typesById): string
     {
         $account = self::serviceAccount();
         if (!self::isConfigured() || $account === null) {
             throw new RuntimeException('El Google Wallet no està configurat al Panell de Gestió.');
         }
 
+        $tickets = array_values($tickets);
+        if ($tickets === []) {
+            throw new RuntimeException('Aquesta comanda no té cap entrada per afegir al wallet.');
+        }
+
         $issuerId = trim((string) Settings::get('google_issuer_id'));
-        $classId  = $issuerId . '.' . Str::slug((string) Settings::get('google_class_suffix', 'esdeveniment'), '_');
-        $objectId = $issuerId . '.' . preg_replace('/[^A-Za-z0-9_.-]/', '', (string) $ticket['code']);
+        $classId  = self::classId();
 
-        $attendee = trim((string) ($ticket['attendee_name'] ?? ''))
-            ?: trim((string) $order['name'] . ' ' . (string) ($order['surname'] ?? ''));
+        $objectes = [];
+        foreach ($tickets as $ticket) {
+            $attendee = trim((string) ($ticket['attendee_name'] ?? ''))
+                ?: trim((string) $order['name'] . ' ' . (string) ($order['surname'] ?? ''));
 
-        $payload = [
-            'eventTicketObjects' => [$this->objectPayload($objectId, $classId, $order, $ticket, $type, $attendee)],
-        ];
+            $objectes[] = $this->objectPayload(
+                $issuerId . '.' . preg_replace('/[^A-Za-z0-9_.-]/', '', (string) $ticket['code']),
+                $classId,
+                $order,
+                $ticket,
+                $typesById[(int) $ticket['ticket_type_id']] ?? [],
+                $attendee
+            );
+        }
 
-        // Si la classe encara no existeix al compte de Google, l'hem d'enviar
-        // dins del JWT perquè la creï. Ocupa molt, i per això val més crear-la
-        // una sola vegada des del panell.
+        // Pla A: l'enllaç es basta tot sol. És el més ràpid, perquè no cal
+        // parlar amb Google, i és el que passa amb una sola entrada.
+        $payload = ['eventTicketObjects' => $objectes];
         if (!self::classRegistered()) {
             $payload = ['eventTicketClasses' => [$this->classPayload($classId, $issuerId)]] + $payload;
         }
 
-        $claims = [
+        $jwt = $this->signJwt($this->claims($account, $payload), (string) $account['private_key']);
+        if (strlen($jwt) <= self::MAX_JWT) {
+            return self::SAVE_URL . $jwt;
+        }
+
+        // Pla B: amb dues entrades o més, la definició sencera ja no hi cap.
+        // Les desem al compte de Google i l'enllaç només en porta l'identificador.
+        $desats = $this->registerObjects($objectes);
+
+        if ($desats === null) {
+            throw new RuntimeException(
+                'No s\'han pogut desar les entrades al vostre compte de Google i l\'enllaç, que llavors '
+                . 'les ha de portar senceres, queda massa llarg (' . strlen($jwt) . ' caràcters de '
+                . self::MAX_JWT . ') per a ' . count($objectes) . ' entrades. Comproveu a Configuració → '
+                . 'Wallet que el compte de servei té permís sobre l\'emissor.'
+            );
+        }
+
+        $jwt = $this->signJwt(
+            $this->claims($account, ['eventTicketObjects' => $desats]),
+            (string) $account['private_key']
+        );
+
+        if (strlen($jwt) > self::MAX_JWT) {
+            throw new RuntimeException(
+                'Aquesta comanda té massa entrades (' . count($objectes) . ') per afegir-les totes amb un sol '
+                . 'enllaç del Google Wallet. Afegiu-les d\'una en una des de «Les meves entrades».'
+            );
+        }
+
+        return self::SAVE_URL . $jwt;
+    }
+
+    /** @param array<string,mixed> $payload */
+    private function claims(array $account, array $payload): array
+    {
+        return [
             'iss'     => $account['client_email'],
             'aud'     => 'google',
             'typ'     => 'savetowallet',
@@ -82,18 +143,51 @@ final class GoogleWallet
             'origins' => [Url::base()],
             'payload' => $payload,
         ];
+    }
 
-        $jwt = $this->signJwt($claims, (string) $account['private_key']);
+    /**
+     * Desa les entrades al compte de Google i en retorna les referències per
+     * posar dins del JWT. Retorna null si no s'han pogut desar, perquè qui
+     * ens ha cridat pugui provar l'enllaç autònom.
+     *
+     * @param array<int,array> $objectes
+     * @return array<int,array{id:string}>|null
+     */
+    private function registerObjects(array $objectes): ?array
+    {
+        try {
+            $account = self::serviceAccount();
+            if ($account === null) {
+                return null;
+            }
 
-        if (strlen($jwt) > self::MAX_JWT) {
-            throw new RuntimeException(
-                'L\'enllaç del Google Wallet és massa llarg (' . strlen($jwt) . ' caràcters, el màxim segur '
-                . 'són ' . self::MAX_JWT . '). Creeu la classe des de Configuració → Wallet: així l\'enllaç '
-                . 'només ha de portar l\'entrada i queda molt més curt.'
-            );
+            // Els objectes no es poden desar si la classe encara no existeix.
+            if (!self::classRegistered() && ($this->ensureClass()['ok'] ?? false) !== true) {
+                return null;
+            }
+
+            $token = $this->accessToken($account);
+
+            foreach ($objectes as $objecte) {
+                $ruta = 'eventTicketObject/' . rawurlencode((string) $objecte['id']);
+                [$status] = $this->api('GET', $ruta, null, $token);
+
+                [$status, $body] = $status === 404
+                    ? $this->api('POST', 'eventTicketObject', $objecte, $token)
+                    : $this->api('PUT', $ruta, $objecte, $token);
+
+                if ($status >= 400) {
+                    Logger::warn('Google Wallet: no s\'ha pogut desar l\'entrada al compte de Google. '
+                        . $this->describeApiError($status, $body));
+                    return null;
+                }
+            }
+
+            return array_map(static fn (array $o): array => ['id' => (string) $o['id']], $objectes);
+        } catch (\Throwable $e) {
+            Logger::exception($e, 'Google Wallet (desant les entrades)');
+            return null;
         }
-
-        return self::SAVE_URL . $jwt;
     }
 
     /**

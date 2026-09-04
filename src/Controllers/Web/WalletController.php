@@ -17,25 +17,25 @@ final class WalletController
 {
     public function apple(string $reference): void
     {
-        [$order, $ticket, $type] = $this->context($reference);
+        [$order, $tickets, $types] = $this->context($reference);
 
         try {
-            $pass = (new AppleWallet())->build($order, $ticket, $type);
+            [$contingut, $nom, $mime] = (new AppleWallet())->buildAll($order, $tickets, $types);
         } catch (\Throwable $e) {
             Logger::exception($e, 'Apple Wallet');
             Flash::error('No s\'ha pogut generar el passi per a l\'Apple Wallet: ' . $e->getMessage());
             Response::redirect($this->back($order));
         }
 
-        Response::download($pass, 'entrada-' . strtolower((string) $ticket['code']) . '.pkpass', 'application/vnd.apple.pkpass');
+        Response::download($contingut, $nom, $mime);
     }
 
     public function google(string $reference): void
     {
-        [$order, $ticket, $type] = $this->context($reference);
+        [$order, $tickets, $types] = $this->context($reference);
 
         try {
-            $url = (new GoogleWallet())->saveUrl($order, $ticket, $type);
+            $url = (new GoogleWallet())->saveUrl($order, $tickets, $types);
         } catch (\Throwable $e) {
             Logger::exception($e, 'Google Wallet');
             Flash::error('No s\'ha pogut generar el passi per al Google Wallet: ' . $e->getMessage());
@@ -45,7 +45,12 @@ final class WalletController
         Response::redirect($url);
     }
 
-    /** @return array{0:array,1:array,2:array} */
+    /**
+     * Les entrades de la comanda: totes, o només una si l'enllaç ho demana
+     * (des del llistat d'entrades se'n pot afegir una de sola).
+     *
+     * @return array{0:array,1:array<int,array>,2:array}
+     */
     private function context(string $reference): array
     {
         $order = Db::first('SELECT * FROM `orders` WHERE `reference` = :r', ['r' => $reference]);
@@ -62,17 +67,23 @@ final class WalletController
         }
 
         $ticketId = (int) Request::get('entrada', 0);
-        $ticket = $ticketId > 0
-            ? Db::first("SELECT * FROM `tickets` WHERE `id` = :id AND `order_id` = :oid AND `status` IN ('valid','used')", ['id' => $ticketId, 'oid' => $order['id']])
-            : Db::first("SELECT * FROM `tickets` WHERE `order_id` = :oid AND `status` IN ('valid','used') ORDER BY `id` LIMIT 1", ['oid' => $order['id']]);
 
-        if ($ticket === null) {
-            Flash::error('No hem trobat aquesta entrada.');
+        $tickets = $ticketId > 0
+            ? Db::all(
+                "SELECT * FROM `tickets` WHERE `id` = :id AND `order_id` = :oid AND `status` IN ('valid','used')",
+                ['id' => $ticketId, 'oid' => $order['id']]
+            )
+            : Db::all(
+                "SELECT * FROM `tickets` WHERE `order_id` = :oid AND `status` IN ('valid','used') ORDER BY `id`",
+                ['oid' => $order['id']]
+            );
+
+        if ($tickets === []) {
+            Flash::error('No hem trobat cap entrada per afegir al wallet.');
             Response::redirect($this->back($order));
         }
 
-        $types = TicketService::ticketTypesById();
-        return [$order, $ticket, $types[(int) $ticket['ticket_type_id']] ?? []];
+        return [$order, $tickets, TicketService::ticketTypesById()];
     }
 
     private function back(array $order): string

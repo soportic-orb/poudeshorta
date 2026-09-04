@@ -9,6 +9,37 @@ Actualitzacions i a la barra lateral.
 
 ---
 
+## [1.9.0] — 2026-09-04
+
+### Canviat
+
+- **Els botons dels wallets ara hi afegeixen totes les entrades de la comanda.**
+  Fins ara només s'hi afegia la primera: qui comprava quatre entrades només en
+  desava una al mòbil.
+  - **Apple Wallet**: si la comanda té més d'una entrada s'envia un paquet
+    `.pkpasses` i el mòbil ofereix afegir-les totes de cop. Amb una sola entrada
+    es continua enviant el `.pkpass` de sempre.
+  - **Google Wallet**: amb una entrada l'enllaç es basta tot sol, com fins ara.
+    A partir de dues no hi cabrien totes dins de l'enllaç, i per això les
+    entrades es desen abans al compte de Google i l'enllaç només n'ha de portar
+    l'identificador.
+- **Botons oficials «Add to Apple Wallet» i «Add to Google Wallet»**, amb el
+  fons negre i les icones de cada marca, en lloc dels botons genèrics amb
+  emoji.
+- A «Les meves entrades», cada entrada té al costat la icona dels wallets per
+  afegir-hi **només aquella entrada**.
+
+### Corregit
+
+- **El passi d'Apple no mostrava el logotip configurat a la web.** Ara la
+  capçalera del passi porta el logotip de Configuració → Aparença, reescalat a
+  la mida que demana Apple i sense deformar-lo. Abans sempre hi sortia una
+  marca dibuixada amb els colors de la plataforma.
+- Els passis inclouen també les imatges `@3x`, perquè es vegin nítides a les
+  pantalles dels mòbils actuals.
+
+---
+
 ## [1.8.0] — 2026-09-04
 
 ### Afegit

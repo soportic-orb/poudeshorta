@@ -187,6 +187,33 @@ Els passis són una comoditat: l'entrada queda desada a l'aplicació Wallet del
 mòbil. **No són imprescindibles**: sense configurar-los, el PDF amb el codi QR
 funciona igual i els botons simplement no apareixen.
 
+### 11.0 Què s'hi afegeix i amb quin aspecte
+
+Els botons **«Add to Apple Wallet»** i **«Add to Google Wallet»** de la pantalla
+de confirmació i de «Les meves entrades» hi afegeixen **totes les entrades de la
+comanda de cop**. Si algú només en vol una (per exemple per passar-la a un altre
+mòbil), al costat de cada entrada del llistat hi ha la icona del wallet
+corresponent, que hi afegeix només aquella.
+
+El **logotip del passi** és el que hi hagi a *Configuració → Aparença →
+Logotip*. Es reescala tot sol a la mida que demana Apple (fins a 160 × 50 punts)
+sense deformar-lo, i sobre fons transparent. Si no n'hi ha cap de configurat, es
+dibuixa una marca amb els colors de la plataforma.
+
+Si voleu unes imatges diferents només per als passis d'Apple, deixeu-les a
+`public/uploads/wallet/` amb aquests noms i tindran prioritat sobre el logotip:
+`icon.png` (29 × 29), `icon@2x.png` (58 × 58), `icon@3x.png` (87 × 87),
+`logo.png` (160 × 50), `logo@2x.png` (320 × 100) i `logo@3x.png` (480 × 150).
+
+> **Google Wallet i el nombre d'entrades.** L'enllaç «Add to Google Wallet»
+> porta les dades dins de l'URL i té un límit de mida. Amb **una sola entrada**
+> l'enllaç es basta tot sol. **A partir de dues**, la plataforma desa abans les
+> entrades al vostre compte de Google i l'enllaç només n'ha de portar
+> l'identificador; per això cal que el compte de servei tingui permís sobre
+> l'emissor (pas 3 de l'apartat 11.2). Així hi caben sense problema les
+> comandes normals; per damunt d'una vintena d'entrades, cal afegir-les d'una
+> en una des del llistat.
+
 ### 11.1 Apple Wallet, pas a pas
 
 Compteu-hi una hora i **99 €/any** del programa de desenvolupadors d'Apple.
