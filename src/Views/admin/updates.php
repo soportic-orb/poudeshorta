@@ -19,12 +19,55 @@ $available = $latest !== '' && $latest !== $current && $latest !== ($commit ?? '
     </div>
     <div class="panel__body">
         <dl class="kv">
-            <dt>Versió</dt><dd><?= e($current) ?></dd>
-            <?php if ($commit): ?><dt>Revisió</dt><dd class="mono"><?= e($commit) ?></dd><?php endif; ?>
+            <dt>Versió</dt>
+            <dd>
+                <?= e($current) ?>
+                <?php if ($s['ota_channel'] !== 'release'): ?>
+                    <span style="font-weight:400;color:var(--pdsh-muted);font-size:.85rem;">
+                        · només canvia quan es publica una versió nova
+                    </span>
+                <?php endif; ?>
+            </dd>
+
+            <dt>Revisió instal·lada</dt>
+            <dd>
+                <?php $installed = \App\Services\Updater::installedRef(); ?>
+                <?php if ($installed !== ''): ?>
+                    <span class="mono"><?= e($installed) ?></span>
+                    <span style="font-weight:400;color:var(--pdsh-muted);font-size:.85rem;">
+                        · identifica el codi que teniu ara mateix
+                    </span>
+                <?php else: ?>
+                    <span style="color:var(--pdsh-muted);">desconeguda fins a la primera actualització</span>
+                <?php endif; ?>
+            </dd>
+
+            <?php if (!empty($lastUpdate)): ?>
+                <dt>Última actualització</dt>
+                <dd>
+                    <?= dt($lastUpdate['finished_at'] ?: $lastUpdate['created_at']) ?>
+                    <?php if ($lastUpdate['from_version'] !== $lastUpdate['to_version']): ?>
+                        <span style="font-weight:400;color:var(--pdsh-muted);font-size:.85rem;">
+                            · <?= e($lastUpdate['from_version']) ?> → <?= e($lastUpdate['to_version']) ?>
+                        </span>
+                    <?php endif; ?>
+                </dd>
+            <?php endif; ?>
+
             <dt>Última comprovació</dt><dd><?= dt($s['ota_last_check']) ?></dd>
-            <dt>Versió publicada</dt><dd><?= $latest !== '' ? e($latest) : '—' ?></dd>
+
+            <dt><?= $s['ota_channel'] === 'release' ? 'Versió publicada' : 'Revisió publicada' ?></dt>
+            <dd>
+                <?php if ($latest !== ''): ?>
+                    <span class="mono"><?= e($latest) ?></span>
+                <?php else: ?>
+                    <span style="color:var(--pdsh-muted);">encara no s'ha comprovat</span>
+                <?php endif; ?>
+            </dd>
+
             <?php if ($pendingMigrations !== []): ?>
-                <dt>Migracions pendents</dt><dd style="color:var(--pdsh-danger);"><?= e(implode(', ', $pendingMigrations)) ?></dd>
+                <dt>Migracions pendents</dt>
+                <dd style="color:var(--pdsh-danger);"><?= e(implode(', ', $pendingMigrations)) ?></dd>
             <?php endif; ?>
         </dl>
     </div>

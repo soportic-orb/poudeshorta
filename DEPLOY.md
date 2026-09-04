@@ -345,6 +345,22 @@ A **Actualitzacions → Origen de les actualitzacions**:
 > troba la branca. Poseu-hi el nom exacte, o fusioneu la branca a `main` i
 > deixeu-hi `main`.
 
+### Quin canal triar
+
+| Canal | Com decideix si hi ha novetats | Quan va bé |
+|---|---|---|
+| **Últim canvi de la branca** | Compara la revisió (el commit) instal·lada amb l'última de la branca | Mentre es fan canvis sovint |
+| **Només versions publicades** | Compara el fitxer `VERSION` amb l'última *release* de GitHub | Per a la plataforma ja en marxa |
+
+Amb el canal de branca, **el número de versió només canvia quan algú edita el
+fitxer `VERSION`**: el que identifica el codi que teniu és la revisió, que el
+panell mostra just a sota. Si voleu que el número de versió sigui el criteri,
+trieu el canal de versions publicades i, a cada entrega:
+
+1. Actualitzeu `VERSION` i `CHANGELOG.md`.
+2. Creeu una *release* a GitHub amb l'etiqueta corresponent (per exemple
+   `v1.1.0`). Un tag sol no n'hi ha prou: ha de ser una release publicada.
+
 ### Token d'accés per a repositoris privats
 
 Si el repositori és privat cal un token, perquè **GitHub respon 404 (no pas

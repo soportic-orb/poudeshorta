@@ -27,6 +27,7 @@ final class UpdateController
             'strategy'   => Updater::strategy(),
             'settings'   => Settings::all(),
             'history'    => Db::all('SELECT * FROM `updates_log` ORDER BY `id` DESC LIMIT 15'),
+            'lastUpdate' => Db::first("SELECT * FROM `updates_log` WHERE `status` = 'success' ORDER BY `id` DESC LIMIT 1"),
             'backups'    => Updater::backups(),
             'pendingMigrations' => Migrator::pending(),
             'result'     => Session::pull('update_result'),
