@@ -9,6 +9,7 @@
 !/storage/backups/.gitkeep
 /public/uploads/*
 !/public/uploads/.gitkeep
+!/public/uploads/.htaccess
 .DS_Store
 Thumbs.db
 *.log

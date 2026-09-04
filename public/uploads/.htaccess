@@ -1,0 +1,8 @@
+# Els fitxers pujats no s'han d'executar mai com a codi.
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<FilesMatch "\.(php|phtml|php[0-9]|pl|py|cgi|sh)$">
+    Require all denied
+</FilesMatch>
+Options -Indexes
