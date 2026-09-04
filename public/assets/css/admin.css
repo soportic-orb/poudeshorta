@@ -297,3 +297,22 @@
     .admin-body { grid-template-columns: 1fr; }
     .panel { box-shadow: none; }
 }
+
+/* ------------------------------------------------- Selecció múltiple */
+
+.table th.tria, .table td.tria { width: 38px; text-align: center; padding-left: 14px; padding-right: 0; }
+.table .tria input { width: 17px; height: 17px; cursor: pointer; accent-color: var(--pdsh-secondary); }
+
+/* La barra apareix quan hi ha res seleccionat i acompanya en fer scroll. */
+.bulk {
+    position: sticky; top: 0; z-index: 5;
+    display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+    margin: 0 0 -1px; padding: 12px 22px;
+    background: var(--pdsh-ink); color: #fff;
+    border-radius: 12px 12px 0 0;
+}
+
+.bulk__count { font-weight: 700; margin-right: auto; }
+.bulk .btn { border-width: 2px; }
+.bulk .btn--danger { background: transparent; border-color: #F3A9A2; color: #F3A9A2; }
+.bulk .btn--danger:hover { background: var(--pdsh-danger); border-color: var(--pdsh-danger); color: #fff; }

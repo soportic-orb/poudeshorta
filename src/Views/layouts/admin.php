@@ -113,5 +113,8 @@ try {
     <script src="<?= e(asset('js/checkin.js')) ?>" defer></script>
     <script src="<?= e(asset('js/scanner.js')) ?>" defer></script>
 <?php endif; ?>
+<?php if (str_starts_with($path, '/admin/inscripcions')): ?>
+    <script src="<?= e(asset('js/bulk.js')) ?>" defer></script>
+<?php endif; ?>
 </body>
 </html>

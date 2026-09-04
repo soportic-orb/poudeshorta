@@ -9,6 +9,37 @@ Actualitzacions i a la barra lateral.
 
 ---
 
+## [1.10.0] — 2026-09-04
+
+### Afegit
+
+- **Selecció múltiple i esborrat al llistat d'inscripcions.** Cada entrada té
+  una casella, hi ha una casella per marcar-les totes de cop i, quan n'hi ha
+  cap de marcada, apareix una barra amb el compte i el botó d'esborrar.
+  - Abans d'esborrar res es mostra **una pantalla de confirmació** amb la
+    llista del que desapareixerà, quantes inscripcions queden afectades i què
+    implica. No hi ha esborrat d'un sol clic.
+  - Si l'esborrat afecta entrades cobrades, s'avisa que **no es retorna cap
+    diner** i s'indica que per això hi ha «Anul·lar», que sí que tramita la
+    devolució a Stripe.
+  - També avisa si alguna de les entrades **ja s'havia validat** al control
+    d'accés.
+  - Quan una inscripció es queda sense cap entrada, s'esborra també ella.
+  - Només hi poden arribar els comptes amb rol **propietari o administrador**;
+    la resta no veuen ni les caselles, i la petició es rebutja encara que
+    s'intenti a mà.
+  - Queda registrat a l'auditoria amb els codis de les entrades esborrades.
+  - En tornar al llistat es mantenen els filtres que hi havia posats.
+
+### Corregit
+
+- **La cerca del llistat d'inscripcions donava error 500.** La consulta
+  repetia el mateix marcador per a les set columnes on cerca, i les consultes
+  preparades no ho admeten. Afectava també les exportacions a PDF i CSV quan
+  es feien amb una cerca activa.
+
+---
+
 ## [1.9.0] — 2026-09-04
 
 ### Canviat

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controllers\Admin;
 
+use App\Core\Auth;
 use App\Core\Db;
 use App\Core\Flash;
 use App\Core\Logger;
@@ -68,6 +69,7 @@ final class RegistrationController
             'totals'  => $totals,
             'page'    => $page,
             'pages'   => $pages,
+            'potEsborrar' => Auth::is('owner', 'admin'),
         ], 'layouts/admin');
     }
 
@@ -235,17 +237,115 @@ final class RegistrationController
     // ----------------------------------------------------------------- Filtres
 
     /** @return array<string, string> */
+    /**
+     * Esborrat definitiu de les entrades seleccionades al llistat.
+     *
+     * Es fa en dos temps: la primera crida mostra què s'esborrarà i la segona,
+     * amb «confirmar», ho executa. No és el mateix que anul·lar: aquí no es
+     * retorna cap diner ni queda rastre de l'entrada, i per això només hi
+     * poden arribar els comptes de gestió.
+     */
+    public function destroy(): void
+    {
+        if (!Auth::is('owner', 'admin')) {
+            Flash::error('Només els comptes de gestió poden esborrar inscripcions.');
+            Response::redirect(Url::to('/admin/inscripcions'));
+        }
+
+        $ids = array_values(array_unique(array_filter(
+            array_map('intval', Request::postArray('tickets')),
+            static fn (int $id): bool => $id > 0
+        )));
+
+        // Tornar al llistat amb els mateixos filtres que tenia obert.
+        $retorn = Url::to('/admin/inscripcions');
+        $filtres = array_filter($this->filters(), static fn ($v): bool => $v !== '');
+        if ($filtres !== []) {
+            $retorn .= '?' . http_build_query($filtres);
+        }
+
+        if ($ids === []) {
+            Flash::warning('No heu seleccionat cap entrada.');
+            Response::redirect($retorn);
+        }
+
+        $rows = Db::all(
+            $this->baseSelect() . ' WHERE t.`id` IN (' . implode(',', array_fill(0, count($ids), '?')) . ')'
+            . ' ORDER BY o.`created_at` DESC, t.`id` ASC',
+            $ids
+        );
+
+        if ($rows === []) {
+            Flash::warning('Les entrades seleccionades ja no hi són.');
+            Response::redirect($retorn);
+        }
+
+        if ((string) Request::post('confirmar', '') !== '1') {
+            View::render('admin/registrations_delete', [
+                'title'  => 'Esborrar inscripcions',
+                'rows'   => $rows,
+                'ids'    => $ids,
+                'retorn' => $retorn,
+            ], 'layouts/admin');
+            return;
+        }
+
+        $esborrades = Db::transaction(static function () use ($rows): array {
+            $codis = [];
+            $comandes = [];
+
+            foreach ($rows as $row) {
+                Db::run('DELETE FROM `tickets` WHERE `id` = :id', ['id' => (int) $row['ticket_id']]);
+                $codis[] = (string) $row['code'];
+                $comandes[(int) $row['order_id']] = (string) $row['reference'];
+            }
+
+            // Una comanda sense cap entrada ja no representa res: se'n va
+            // també ella, i amb ella les devolucions que hi pengen.
+            $buides = [];
+            foreach ($comandes as $orderId => $referencia) {
+                $queden = (int) Db::value('SELECT COUNT(*) FROM `tickets` WHERE `order_id` = :o', ['o' => $orderId], 0);
+                if ($queden === 0) {
+                    Db::run('DELETE FROM `orders` WHERE `id` = :o', ['o' => $orderId]);
+                    $buides[] = $referencia;
+                }
+            }
+
+            return ['codis' => $codis, 'comandes' => $buides];
+        });
+
+        Logger::audit('esborra_inscripcions', implode(', ', $esborrades['codis']), [
+            'entrades' => count($esborrades['codis']),
+            'comandes' => $esborrades['comandes'],
+        ]);
+
+        $missatge = count($esborrades['codis']) === 1
+            ? 'S\'ha esborrat 1 entrada.'
+            : 'S\'han esborrat ' . count($esborrades['codis']) . ' entrades.';
+
+        if ($esborrades['comandes'] !== []) {
+            $missatge .= ' ' . (count($esborrades['comandes']) === 1
+                ? 'La inscripció ' . $esborrades['comandes'][0] . ' ha quedat sense entrades i també s\'ha esborrat.'
+                : count($esborrades['comandes']) . ' inscripcions han quedat sense entrades i també s\'han esborrat.');
+        }
+
+        Flash::success($missatge);
+        Response::redirect($retorn);
+    }
+
+    /**
+     * Els filtres actius. Es llegeixen tant de la query com del cos de la
+     * petició: l'esborrat múltiple arriba per POST i ha de poder tornar al
+     * llistat tal com el tenia l'usuari.
+     */
     private function filters(): array
     {
-        return [
-            'cerca'    => trim((string) Request::get('cerca', '')),
-            'tipus'    => trim((string) Request::get('tipus', '')),
-            'estat'    => trim((string) Request::get('estat', '')),
-            'entrada'  => trim((string) Request::get('entrada', '')),
-            'des_de'   => trim((string) Request::get('des_de', '')),
-            'fins_a'   => trim((string) Request::get('fins_a', '')),
-            'validada' => trim((string) Request::get('validada', '')),
-        ];
+        $filtres = [];
+        foreach (['cerca', 'tipus', 'estat', 'entrada', 'des_de', 'fins_a', 'validada'] as $nom) {
+            $filtres[$nom] = trim((string) Request::input($nom, ''));
+        }
+
+        return $filtres;
     }
 
     private function baseSelect(): string
@@ -268,10 +368,16 @@ final class RegistrationController
         $params = [];
 
         if ($filters['cerca'] !== '') {
-            $conditions[] = '(o.`email` LIKE :q OR o.`name` LIKE :q OR o.`surname` LIKE :q
-                              OR o.`reference` LIKE :q OR t.`code` LIKE :q OR t.`attendee_name` LIKE :q
-                              OR o.`phone` LIKE :q)';
-            $params['q'] = '%' . $filters['cerca'] . '%';
+            // Cada columna necessita el seu propi marcador: amb les consultes
+            // preparades de debò (sense emulació) un nom no es pot repetir.
+            $camps = ['o.`email`', 'o.`name`', 'o.`surname`', 'o.`reference`',
+                      't.`code`', 't.`attendee_name`', 'o.`phone`'];
+            $cerca = [];
+            foreach ($camps as $i => $camp) {
+                $cerca[] = $camp . ' LIKE :q' . $i;
+                $params['q' . $i] = '%' . $filters['cerca'] . '%';
+            }
+            $conditions[] = '(' . implode(' OR ', $cerca) . ')';
         }
         if ($filters['tipus'] !== '') {
             $conditions[] = 't.`ticket_type_id` = :tipus';

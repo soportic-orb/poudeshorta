@@ -1,4 +1,5 @@
 <?php
+use App\Core\Csrf;
 use App\Core\Url;
 use App\Services\TicketService;
 
@@ -91,10 +92,31 @@ $exportQuery = $query === [] ? '' : '?' . http_build_query($query);
         </div>
     </div>
 
+    <?php if ($potEsborrar): ?>
+        <div class="bulk" id="bulk" hidden>
+            <span class="bulk__count" id="bulk-compte"></span>
+            <button type="submit" form="bulk-form" class="btn btn--danger btn--sm">Esborrar les seleccionades</button>
+            <button type="button" class="btn btn--light btn--sm" id="bulk-neteja">Desmarcar</button>
+        </div>
+    <?php endif; ?>
+
+    <form id="bulk-form" method="post" action="<?= e(url('/admin/inscripcions/esborrar')) ?>">
+        <?= Csrf::field() ?>
+        <?php foreach ($filters as $nom => $valor): ?>
+            <?php if ($valor !== ''): ?>
+                <input type="hidden" name="<?= e($nom) ?>" value="<?= e($valor) ?>">
+            <?php endif; ?>
+        <?php endforeach; ?>
+
     <div class="table-wrap">
         <table class="table">
             <thead>
                 <tr>
+                    <?php if ($potEsborrar): ?>
+                        <th class="tria">
+                            <input type="checkbox" id="tria-tot" aria-label="Seleccionar totes les entrades d'aquesta pàgina">
+                        </th>
+                    <?php endif; ?>
                     <th>Data</th><th>Referència</th><th>Codi</th><th>Assistent</th>
                     <th>Contacte</th><th>Tipus</th><th>Estat</th><th class="num">Import</th>
                 </tr>
@@ -108,6 +130,12 @@ $exportQuery = $query === [] ? '' : '?' . http_build_query($query);
                     };
                 ?>
                     <tr>
+                        <?php if ($potEsborrar): ?>
+                            <td class="tria">
+                                <input type="checkbox" name="tickets[]" value="<?= (int) $row['ticket_id'] ?>"
+                                       aria-label="Seleccionar l'entrada <?= e($row['code']) ?>">
+                            </td>
+                        <?php endif; ?>
                         <td style="white-space:nowrap;"><?= dt((string) $row['created_at'], 'd/m/y H:i') ?></td>
                         <td class="mono">
                             <a href="<?= e(url('/admin/inscripcions/' . $row['order_id'])) ?>"><?= e($row['reference']) ?></a>
@@ -135,7 +163,7 @@ $exportQuery = $query === [] ? '' : '?' . http_build_query($query);
                 <?php endforeach; ?>
 
                 <?php if ($rows === []): ?>
-                    <tr><td colspan="8" class="empty">
+                    <tr><td colspan="<?= $potEsborrar ? 9 : 8 ?>" class="empty">
                         <span class="empty__icon" aria-hidden="true">🔍</span>
                         Cap inscripció coincideix amb aquests filtres.
                     </td></tr>
@@ -143,6 +171,7 @@ $exportQuery = $query === [] ? '' : '?' . http_build_query($query);
             </tbody>
         </table>
     </div>
+    </form>
 
     <?php if ($pages > 1): ?>
         <div class="pagination">
