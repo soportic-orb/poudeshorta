@@ -144,6 +144,7 @@ $router->group([$csrf, [Auth::class, 'requireLogin']], static function (Router $
 
     $r->get('/admin/actualitzacions',          [Admin\UpdateController::class, 'index']);
     $r->post('/admin/actualitzacions/comprovar', [Admin\UpdateController::class, 'check']);
+    $r->post('/admin/actualitzacions/diagnostic', [Admin\UpdateController::class, 'diagnose']);
     $r->post('/admin/actualitzacions/aplicar', [Admin\UpdateController::class, 'apply']);
     $r->post('/admin/actualitzacions/configuracio', [Admin\UpdateController::class, 'saveSettings']);
     $r->get('/admin/sistema',                  [Admin\UpdateController::class, 'system']);

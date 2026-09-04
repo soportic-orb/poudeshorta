@@ -104,6 +104,8 @@ final class Settings
         'ota_last_check'    => '',
         'ota_latest_version' => '',
         'ota_latest_sha'    => '',
+        'ota_latest_ref'    => '',
+        'ota_installed_ref' => '',
 
         // Sistema
         'maintenance_mode'  => '0',

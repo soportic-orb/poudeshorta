@@ -80,9 +80,42 @@ final class Updater
     /**
      * Consulta GitHub i desa el resultat a la configuració.
      *
-     * @return array{available:bool, version:string, current:string, notes:string, published_at:string, sha:string, channel:string}
+     * @return array{available:bool, version:string, current:string, notes:string, published_at:string, sha:string, ref:string, channel:string}
      */
     public static function check(): array
+    {
+        $remote  = self::resolveRemote();
+        $channel = (string) Settings::get('ota_channel', 'branch');
+        $current = self::installedRef();
+
+        $available = $channel === 'release'
+            ? ($remote['version'] !== '' && version_compare($remote['version'], self::currentVersion(), '>'))
+            : ($remote['version'] !== '' && $remote['version'] !== $current);
+
+        Settings::setMany([
+            'ota_last_check'     => date('Y-m-d H:i:s'),
+            'ota_latest_version' => $remote['version'],
+            'ota_latest_sha'     => $remote['sha'],
+            'ota_latest_ref'     => $remote['ref'],
+        ]);
+
+        return array_merge($remote, [
+            'available' => $available,
+            'current'   => $current === '' ? self::currentVersion() : $current,
+            'channel'   => $channel,
+        ]);
+    }
+
+    /**
+     * Esbrina quina és l'última versió publicada al repositori.
+     *
+     * Per a les branques resolem el commit amb el nom de branca com a
+     * paràmetre de consulta i no dins del camí: així les branques que
+     * contenen barres (per exemple «feina/nova-funcio») també funcionen.
+     *
+     * @return array{version:string, sha:string, ref:string, notes:string, published_at:string}
+     */
+    public static function resolveRemote(): array
     {
         $repo    = trim((string) Settings::get('ota_repo'));
         $branch  = trim((string) Settings::get('ota_branch', 'main'));
@@ -94,41 +127,145 @@ final class Updater
 
         if ($channel === 'release') {
             $data = self::api("repos/{$repo}/releases/latest");
-            $version = ltrim((string) ($data['tag_name'] ?? ''), 'v');
-            $result = [
-                'version'      => $version,
+            $tag = (string) ($data['tag_name'] ?? '');
+
+            return [
+                'version'      => ltrim($tag, 'v'),
                 'sha'          => '',
+                // El paquet es baixa per etiqueta.
+                'ref'          => $tag,
                 'notes'        => (string) ($data['body'] ?? ''),
                 'published_at' => (string) ($data['published_at'] ?? ''),
             ];
-        } else {
-            $data = self::api("repos/{$repo}/commits/" . rawurlencode($branch));
-            $sha = (string) ($data['sha'] ?? '');
-            $result = [
-                'version'      => substr($sha, 0, 7),
-                'sha'          => $sha,
-                'notes'        => (string) ($data['commit']['message'] ?? ''),
-                'published_at' => (string) ($data['commit']['author']['date'] ?? ''),
-            ];
         }
 
-        $current = $channel === 'release' ? self::currentVersion() : (self::currentCommit() ?? self::currentVersion());
+        if ($branch === '') {
+            throw new RuntimeException('Cal indicar la branca del repositori.');
+        }
 
-        $available = $channel === 'release'
-            ? ($result['version'] !== '' && version_compare($result['version'], self::currentVersion(), '>'))
-            : ($result['version'] !== '' && $result['version'] !== $current);
+        $commits = self::api("repos/{$repo}/commits", ['sha' => $branch, 'per_page' => 1]);
+        $commit = $commits[0] ?? null;
 
-        Settings::setMany([
-            'ota_last_check'      => date('Y-m-d H:i:s'),
-            'ota_latest_version'  => $result['version'],
-            'ota_latest_sha'      => $result['sha'],
-        ]);
+        if (!is_array($commit) || empty($commit['sha'])) {
+            throw new RuntimeException(
+                'La branca «' . $branch . '» no existeix al repositori ' . $repo . ', o no té cap commit.'
+            );
+        }
 
-        return array_merge($result, [
-            'available' => $available,
-            'current'   => $current,
-            'channel'   => $channel,
-        ]);
+        $sha = (string) $commit['sha'];
+
+        return [
+            'version'      => substr($sha, 0, 7),
+            'sha'          => $sha,
+            // El paquet es baixa pel commit, que mai conté barres.
+            'ref'          => $sha,
+            'notes'        => (string) ($commit['commit']['message'] ?? ''),
+            'published_at' => (string) ($commit['commit']['author']['date'] ?? ''),
+        ];
+    }
+
+    /**
+     * Revisió instal·lada actualment.
+     *
+     * En un desplegament amb git la llegim de .git; en un desplegament per
+     * còpia de fitxers la desem nosaltres en actualitzar, perquè si no no
+     * hi hauria manera de saber-ho i sempre diria que hi ha novetats.
+     */
+    public static function installedRef(): string
+    {
+        $commit = self::currentCommit();
+        if ($commit !== null) {
+            return $commit;
+        }
+
+        $stored = trim((string) Settings::get('ota_installed_ref', ''));
+        return $stored !== '' ? substr($stored, 0, 7) : '';
+    }
+
+    // ------------------------------------------------------------ Diagnòstic
+
+    /**
+     * Comprova, un per un, tots els requisits d'una actualització i explica
+     * quin falla. Serveix per convertir un «no funciona» en una causa concreta.
+     *
+     * @return array<int, array{label:string, ok:bool, detail:string}>
+     */
+    public static function diagnostics(): array
+    {
+        $checks = [];
+        $add = static function (string $label, bool $ok, string $detail) use (&$checks): void {
+            $checks[] = ['label' => $label, 'ok' => $ok, 'detail' => $detail];
+        };
+
+        $repo   = trim((string) Settings::get('ota_repo'));
+        $branch = trim((string) Settings::get('ota_branch', 'main'));
+        $token  = trim((string) Settings::get('ota_token'));
+        $channel = (string) Settings::get('ota_channel', 'branch');
+
+        $add('Repositori configurat', $repo !== '', $repo !== '' ? $repo : 'Falta indicar-lo aquí sota.');
+        $add(
+            'Token d\'accés',
+            true,
+            $token !== ''
+                ? 'Configurat. Necessari si el repositori és privat.'
+                : 'Sense token. Només funcionarà si el repositori és públic.'
+        );
+
+        $add('Extensió zip de PHP', class_exists(ZipArchive::class), class_exists(ZipArchive::class)
+            ? 'Disponible.'
+            : 'Cal activar-la per poder aplicar actualitzacions.');
+
+        $strategy = self::strategy();
+        $add(
+            'Mètode d\'actualització',
+            true,
+            $strategy === 'git'
+                ? 'git: el desplegament és un clon del repositori.'
+                : 'paquet ZIP: es descarrega el codi de GitHub' . (is_dir(self::root() . '/.git')
+                    ? ' (hi ha .git, però no es pot executar git en aquest servidor).'
+                    : '.')
+        );
+
+        $writable = is_writable(self::root());
+        $add('Permisos d\'escriptura', $writable, $writable
+            ? self::root()
+            : 'El servidor no pot escriure a ' . self::root() . '. Executeu: chmod -R u+w ' . self::root());
+
+        $free = @disk_free_space(self::root());
+        $enough = $free === false || $free > 50 * 1024 * 1024;
+        $add('Espai lliure al disc', $enough, $free === false
+            ? 'No s\'ha pogut comprovar.'
+            : self::humanBytes((int) $free) . ' disponibles (calen 50 MB).');
+
+        if ($repo === '') {
+            return $checks;
+        }
+
+        // Connexió i accés reals.
+        try {
+            self::api("repos/{$repo}");
+            $add('Accés al repositori', true, 'GitHub respon i el repositori és accessible.');
+        } catch (\Throwable $e) {
+            $add('Accés al repositori', false, $e->getMessage());
+            return $checks;
+        }
+
+        try {
+            $remote = self::resolveRemote();
+            $add(
+                $channel === 'release' ? 'Última versió publicada' : 'Branca «' . $branch . '»',
+                $remote['version'] !== '',
+                $remote['version'] !== ''
+                    ? 'Trobada: ' . $remote['version'] . ($remote['published_at'] !== ''
+                        ? ' (' . date('d/m/Y H:i', (int) strtotime($remote['published_at'])) . ')'
+                        : '')
+                    : 'No s\'ha trobat cap versió.'
+            );
+        } catch (\Throwable $e) {
+            $add($channel === 'release' ? 'Última versió publicada' : 'Branca «' . $branch . '»', false, $e->getMessage());
+        }
+
+        return $checks;
     }
 
     // ----------------------------------------------------------- Actualització
@@ -162,11 +299,7 @@ final class Updater
             $backupPath = $this->backup();
             $this->note('Còpia de seguretat creada: ' . basename((string) $backupPath));
 
-            if ($strategy === 'git') {
-                $this->applyGit();
-            } else {
-                $this->applyZip();
-            }
+            $installedRef = $strategy === 'git' ? $this->applyGit() : $this->applyZip();
 
             $this->note('Executant migracions de base de dades…');
             Settings::flush();
@@ -179,6 +312,11 @@ final class Updater
             }
 
             $this->clearCaches();
+
+            if ($installedRef !== '') {
+                Settings::set('ota_installed_ref', $installedRef);
+            }
+
             $toVersion = self::currentVersion();
             $this->note('Actualització completada. Versió: ' . $toVersion);
             $success = true;
@@ -233,7 +371,7 @@ final class Updater
 
     // ---------------------------------------------------------------- Git
 
-    private function applyGit(): void
+    private function applyGit(): string
     {
         $branch = trim((string) Settings::get('ota_branch', 'main'));
         $root = escapeshellarg(self::root());
@@ -256,17 +394,21 @@ final class Updater
                 throw new RuntimeException('L\'ordre de git ha fallat (codi ' . $code . ').');
             }
         }
+
+        return self::currentCommit() ?? '';
     }
 
     // ---------------------------------------------------------------- Zip
 
-    private function applyZip(): void
+    private function applyZip(): string
     {
-        $repo = trim((string) Settings::get('ota_repo'));
-        $channel = (string) Settings::get('ota_channel', 'branch');
-        $ref = $channel === 'release'
-            ? (trim((string) Settings::get('ota_latest_version')) ?: trim((string) Settings::get('ota_branch', 'main')))
-            : trim((string) Settings::get('ota_branch', 'main'));
+        $repo   = trim((string) Settings::get('ota_repo'));
+        $remote = self::resolveRemote();
+        $ref    = $remote['ref'];
+
+        if ($ref === '') {
+            throw new RuntimeException('No s\'ha pogut determinar quina versió cal baixar del repositori.');
+        }
 
         $tmpDir = self::root() . '/storage/tmp/update_' . bin2hex(random_bytes(6));
         if (!mkdir($tmpDir, 0775, true) && !is_dir($tmpDir)) {
@@ -275,7 +417,7 @@ final class Updater
 
         try {
             $zipFile = $tmpDir . '/package.zip';
-            $this->note('Descarregant el paquet des de GitHub (' . $repo . ' · ' . $ref . ')…');
+            $this->note('Descarregant el paquet des de GitHub (' . $repo . ' · ' . substr($ref, 0, 12) . ')…');
             self::download("https://api.github.com/repos/{$repo}/zipball/" . rawurlencode($ref), $zipFile);
             $this->note('Paquet descarregat (' . self::humanBytes((int) filesize($zipFile)) . ').');
 
@@ -298,12 +440,20 @@ final class Updater
             if (!is_file($sourceDir . '/VERSION') && !is_dir($sourceDir . '/src')) {
                 throw new RuntimeException('El paquet descarregat no sembla una versió vàlida de la plataforma.');
             }
+            if (!is_dir($sourceDir . '/vendor')) {
+                throw new RuntimeException(
+                    'El paquet descarregat no inclou el directori vendor/. Comproveu que la branca '
+                    . 'configurada és la de la plataforma i que vendor/ està al repositori.'
+                );
+            }
 
             $copied = $this->copyTree($sourceDir, self::root());
             $this->note($copied . ' fitxers actualitzats.');
         } finally {
             self::removeTree($tmpDir);
         }
+
+        return $ref;
     }
 
     /** Copia recursivament respectant les rutes protegides. Retorna els fitxers escrits. */
@@ -456,16 +606,24 @@ final class Updater
 
     // --------------------------------------------------------------- HTTP
 
-    private static function api(string $path): array
+    private static function api(string $path, array $query = []): array
     {
-        $body = self::http('https://api.github.com/' . ltrim($path, '/'));
+        $url = 'https://api.github.com/' . ltrim($path, '/');
+        if ($query !== []) {
+            $url .= '?' . http_build_query($query);
+        }
+
+        $body = self::http($url);
         $decoded = json_decode($body, true);
+
         if (!is_array($decoded)) {
             throw new RuntimeException('Resposta no vàlida de l\'API de GitHub.');
         }
+        // Les llistes són arrays numèrics; només els objectes porten «message» d'error.
         if (isset($decoded['message']) && !isset($decoded['sha']) && !isset($decoded['tag_name'])) {
             throw new RuntimeException('GitHub: ' . $decoded['message']);
         }
+
         return $decoded;
     }
 
@@ -482,12 +640,20 @@ final class Updater
         }
 
         $ch = curl_init($url);
+        $responseHeaders = [];
         $options = [
             CURLOPT_HTTPHEADER     => $headers,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_MAXREDIRS      => 5,
-            CURLOPT_TIMEOUT        => 180,
+            CURLOPT_TIMEOUT        => 300,
             CURLOPT_CONNECTTIMEOUT => 15,
+            CURLOPT_HEADERFUNCTION => static function ($handle, string $line) use (&$responseHeaders): int {
+                $parts = explode(':', $line, 2);
+                if (count($parts) === 2) {
+                    $responseHeaders[strtolower(trim($parts[0]))] = trim($parts[1]);
+                }
+                return strlen($line);
+            },
         ];
 
         $handle = null;
@@ -511,13 +677,44 @@ final class Updater
         }
 
         if ($result === false) {
-            throw new RuntimeException('Error de xarxa en contactar amb GitHub: ' . $error);
+            throw new RuntimeException(
+                'No s\'ha pogut contactar amb GitHub: ' . $error
+                . '. Comproveu que el servidor té sortida a Internet cap a api.github.com pel port 443.'
+            );
         }
+
         if ($status >= 400) {
-            throw new RuntimeException('GitHub ha respost amb el codi ' . $status . '. Si el repositori és privat, cal configurar un token d\'accés.');
+            throw new RuntimeException(self::describeHttpError($status, $responseHeaders));
         }
 
         return $saveTo !== null ? '' : (string) $result;
+    }
+
+    /** Tradueix el codi de resposta de GitHub a una explicació accionable. */
+    private static function describeHttpError(int $status, array $headers): string
+    {
+        $hasToken = trim((string) Settings::get('ota_token')) !== '';
+        $repo = trim((string) Settings::get('ota_repo'));
+
+        if ($status === 403 && ($headers['x-ratelimit-remaining'] ?? null) === '0') {
+            $reset = isset($headers['x-ratelimit-reset'])
+                ? ' Es reprèn a les ' . date('H:i', (int) $headers['x-ratelimit-reset']) . '.'
+                : '';
+            return 'Heu superat el límit de consultes de GitHub' . ($hasToken ? '' : ' (60 per hora sense token)') . '.' . $reset;
+        }
+
+        return match (true) {
+            $status === 401 => 'GitHub ha rebutjat el token d\'accés: comproveu que no ha caducat i que té permís de lectura del repositori.',
+            $status === 403 => 'GitHub ha denegat l\'accés (403).' . ($hasToken
+                ? ' El token no té permís sobre ' . $repo . '.'
+                : ' Si el repositori és privat, cal configurar un token d\'accés.'),
+            $status === 404 => 'GitHub no troba «' . $repo . '» (404). Reviseu que el nom del repositori sigui correcte i, '
+                . ($hasToken
+                    ? 'si el repositori és privat, que el token hi tingui accés.'
+                    : 'si és privat, configureu un token d\'accés: sense token GitHub respon 404 als repositoris privats.'),
+            $status >= 500  => 'GitHub està tenint problemes (codi ' . $status . '). Torneu-ho a provar més tard.',
+            default         => 'GitHub ha respost amb el codi ' . $status . '.',
+        };
     }
 
     private static function download(string $url, string $destination): void

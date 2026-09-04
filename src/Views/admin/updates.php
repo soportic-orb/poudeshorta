@@ -33,8 +33,38 @@ $available = $latest !== '' && $latest !== $current && $latest !== ($commit ?? '
             <?= Csrf::field() ?>
             <button type="submit" class="btn btn--light" data-loading="Consultant GitHub…">Comprovar si hi ha novetats</button>
         </form>
+        <form method="post" action="<?= e(url('/admin/actualitzacions/diagnostic')) ?>">
+            <?= Csrf::field() ?>
+            <button type="submit" class="btn btn--light" data-loading="Comprovant…">Diagnosticar la connexió</button>
+        </form>
     </div>
 </div>
+
+<?php if (!empty($diagnostics)): ?>
+    <div class="panel">
+        <div class="panel__head">
+            <div>
+                <h2>Diagnòstic</h2>
+                <p>Requisits per poder actualitzar, comprovats un per un.</p>
+            </div>
+        </div>
+        <div class="panel__body">
+            <div class="checklist">
+                <?php foreach ($diagnostics as $item): ?>
+                    <div class="checklist__item">
+                        <span class="checklist__state <?= $item['ok'] ? 'is-ok' : 'is-todo' ?>">
+                            <?= $item['ok'] ? '✓' : '!' ?>
+                        </span>
+                        <span class="checklist__text">
+                            <strong><?= e($item['label']) ?></strong>
+                            <span><?= e($item['detail']) ?></span>
+                        </span>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
 
 <?php if (!empty($check) && !empty($check['notes'])): ?>
     <div class="panel">

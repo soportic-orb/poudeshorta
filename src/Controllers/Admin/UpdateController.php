@@ -31,7 +31,15 @@ final class UpdateController
             'pendingMigrations' => Migrator::pending(),
             'result'     => Session::pull('update_result'),
             'check'      => Session::pull('update_check'),
+            'diagnostics' => Session::pull('update_diagnostics'),
         ], 'layouts/admin');
+    }
+
+    /** Comprova un per un tots els requisits i mostra quin falla. */
+    public function diagnose(): void
+    {
+        Session::set('update_diagnostics', Updater::diagnostics());
+        Response::redirect(Url::to('/admin/actualitzacions'));
     }
 
     public function check(): void
