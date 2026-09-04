@@ -1,0 +1,27 @@
+{
+    "name": "poudeshorta/inscripcions",
+    "description": "Plataforma d'inscripcions - Sopar de germanor del carrer Pou de s'Horta",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.1",
+        "ext-curl": "*",
+        "ext-gd": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "ext-openssl": "*",
+        "ext-pdo": "*",
+        "bacon/bacon-qr-code": "^3.0",
+        "phpmailer/phpmailer": "^6.9",
+        "setasign/fpdf": "^1.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}

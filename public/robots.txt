@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /admin
+Disallow: /comanda
+Disallow: /confirmacio
+Disallow: /les-meves-entrades
+Disallow: /e/
+Disallow: /pagament
+Disallow: /tasques
+Allow: /

@@ -1,0 +1,34 @@
+# Configuració per a servidors Apache.
+# A CloudPanel (Nginx) aquest fitxer s'ignora: allà cal apuntar l'arrel del
+# lloc a la carpeta public/ (vegeu DEPLOY.md).
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Les peticions a fitxers o carpetes existents es serveixen tal qual.
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # La resta van al controlador frontal.
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Memòria cau llarga per als recursos estàtics (porten número de versió a l'URL).
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+</IfModule>
+
+Options -Indexes

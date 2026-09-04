@@ -1,0 +1,16 @@
+/config/config.php
+/storage/logs/*
+/storage/cache/*
+/storage/tmp/*
+/storage/backups/*
+!/storage/logs/.gitkeep
+!/storage/cache/.gitkeep
+!/storage/tmp/.gitkeep
+!/storage/backups/.gitkeep
+/public/uploads/*
+!/public/uploads/.gitkeep
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/
