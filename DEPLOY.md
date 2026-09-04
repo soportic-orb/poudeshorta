@@ -327,10 +327,52 @@ Mai es toquen `config/config.php`, `storage/` ni `public/uploads/`. Si alguna
 cosa falla, es restaura automàticament la còpia anterior.
 
 Si el desplegament és un clon de git, s'utilitza `git fetch` + `git reset`; si
-no, es descarrega el paquet ZIP del repositori. Per a un repositori privat,
-indiqueu un token d'accés de GitHub amb permís de lectura.
+no, es descarrega el paquet ZIP del repositori.
 
----
+### Configuració
+
+A **Actualitzacions → Origen de les actualitzacions**:
+
+| Camp | Què hi va |
+|---|---|
+| Repositori | `soportic-orb/poudeshorta` |
+| Branca | **el nom exacte de la branca que voleu seguir** |
+| Canal | *Últim canvi de la branca* o *Només versions publicades* |
+| Token d'accés | obligatori si el repositori és privat |
+
+> **El camp «Branca» ve amb `main` per defecte.** Si el codi encara viu en una
+> branca de treball i `main` no existeix, l'actualització fallarà dient que no
+> troba la branca. Poseu-hi el nom exacte, o fusioneu la branca a `main` i
+> deixeu-hi `main`.
+
+### Token d'accés per a repositoris privats
+
+Si el repositori és privat cal un token, perquè **GitHub respon 404 (no pas
+403) als repositoris privats quan qui pregunta no hi té accés**: sense token
+sembla que el repositori no existeixi.
+
+1. A GitHub: **Settings → Developer settings → Personal access tokens →
+   Fine-grained tokens → Generate new token**.
+2. *Repository access*: només `soportic-orb/poudeshorta`.
+3. *Permissions → Repository permissions → Contents*: **Read-only**.
+4. Copieu el token i enganxeu-lo al camp «Token d'accés» del panell.
+
+### Si l'actualització no funciona
+
+Premeu **Diagnosticar la connexió**. Comprova un per un el repositori, el
+token, l'extensió `zip`, el mètode d'actualització, els permisos d'escriptura,
+l'espai lliure, l'accés real a GitHub i l'existència de la branca, i us marca
+en vermell el que falla.
+
+| El diagnòstic diu | Què cal fer |
+|---|---|
+| No troba el repositori (404) | Reviseu-ne el nom; si és privat, configureu el token |
+| Accés denegat (403) | El token no té permís de lectura sobre aquest repositori |
+| Token rebutjat (401) | El token ha caducat: genereu-ne un de nou |
+| Límit de consultes exhaurit | Espereu a l'hora que indica, o configureu un token |
+| La branca no existeix | Poseu el nom exacte de la branca (vegeu l'avís de dalt) |
+| No es pot contactar amb GitHub | El servidor no té sortida cap a `api.github.com:443` |
+| Sense permisos d'escriptura | `chmod -R u+w` al directori del projecte |
 
 ## Canviar el domini més endavant
 
