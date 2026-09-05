@@ -119,7 +119,7 @@ $showPoster = $poster !== '' && (Settings::bool('hero_show_poster', true) || $he
 
         <?php if ($types === []): ?>
             <div class="card"><div class="card__body">
-                <p style="margin:0;">Encara no hi ha cap tipus d'inscripció publicat. Torneu a consultar-ho més endavant.</p>
+                <p style="margin:0;">Encara no hi ha cap tipus d'inscripció publicat. Torna a consultar-ho més endavant.</p>
             </div></div>
         <?php else: ?>
             <form method="post" action="<?= e(url('/inscripcio')) ?>" data-cart-form data-max-total="<?= $maxTotal ?>" data-guard>
@@ -181,7 +181,7 @@ $showPoster = $poster !== '' && (Settings::bool('hero_show_poster', true) || $he
                     <div class="cart-bar">
                         <div class="cart-bar__total">
                             <strong data-cart-total>0,00 €</strong>
-                            <span class="cart-bar__count" data-cart-count>Encara no heu triat cap inscripció</span>
+                            <span class="cart-bar__count" data-cart-count>Encara no has triat cap inscripció</span>
                         </div>
                         <button type="submit" class="btn btn--accent btn--lg" data-cart-submit disabled
                                 data-loading="Preparant…">
@@ -199,10 +199,10 @@ $showPoster = $poster !== '' && (Settings::bool('hero_show_poster', true) || $he
         <div class="card"><div class="card__body">
             <div class="field-row" style="align-items:center;">
                 <div>
-                    <h3 style="margin-bottom:.3em;">Ja us heu inscrit?</h3>
+                    <h3 style="margin-bottom:.3em;">Ja t'has inscrit?</h3>
                     <p style="margin:0;color:var(--pdsh-muted);">
-                        Introduïu el vostre correu electrònic i us enviarem un enllaç per veure,
-                        descarregar o anul·lar les vostres entrades.
+                        Introdueix el teu correu electrònic i t'enviarem un enllaç per veure,
+                        descarregar o anul·lar les teves entrades.
                     </p>
                 </div>
                 <div style="text-align:right;">

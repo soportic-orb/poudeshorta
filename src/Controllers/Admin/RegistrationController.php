@@ -202,7 +202,7 @@ final class RegistrationController
             $sent = TicketService::sendConfirmationEmail($order);
             $sent
                 ? Flash::success('S\'han reenviat les entrades a ' . $order['email'] . '.')
-                : Flash::error('No s\'han pogut reenviar les entrades. Reviseu la configuració SMTP.');
+                : Flash::error('No s\'han pogut reenviar les entrades. Revisa la configuració SMTP.');
         } catch (\Throwable $e) {
             Logger::exception($e, 'Reenviament d\'entrades');
             Flash::error('No s\'han pogut reenviar les entrades: ' . $e->getMessage());
@@ -265,7 +265,7 @@ final class RegistrationController
         }
 
         if ($ids === []) {
-            Flash::warning('No heu seleccionat cap entrada.');
+            Flash::warning('No has seleccionat cap entrada.');
             Response::redirect($retorn);
         }
 

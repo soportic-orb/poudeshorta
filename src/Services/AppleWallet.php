@@ -374,16 +374,16 @@ final class AppleWallet
 
         if (@openssl_x509_read($certPem) === false) {
             throw new RuntimeException(
-                'El certificat del pass no es pot llegir. Comproveu que heu pujat el certificat '
-                . 'del vostre «Pass Type ID» d\'Apple i no un altre fitxer.'
+                'El certificat del pass no es pot llegir. Comprova que has pujat el certificat '
+                . 'del teu «Pass Type ID» d\'Apple i no un altre fitxer.'
             );
         }
 
         $wwdrPem = $this->toPem((string) file_get_contents((string) Settings::get('apple_wwdr_path')));
         if (@openssl_x509_read($wwdrPem) === false) {
             throw new RuntimeException(
-                'El certificat WWDR d\'Apple no es pot llegir. Descarregueu-lo de nou des de '
-                . 'apple.com/certificateauthority (Worldwide Developer Relations, G4) i torneu-lo a pujar.'
+                'El certificat WWDR d\'Apple no es pot llegir. Descarrega\'l de nou des de '
+                . 'apple.com/certificateauthority (Worldwide Developer Relations, G4) i torna\'l a pujar.'
             );
         }
 
@@ -517,14 +517,14 @@ final class AppleWallet
         if ($legacyAlgorithm) {
             throw new RuntimeException(
                 'El certificat .p12 utilitza algorismes antics que aquest servidor no accepta '
-                . '(és el format que exporta el Keychain del Mac). Torneu-lo a exportar amb: '
+                . '(és el format que exporta el Keychain del Mac). Torna\'l a exportar amb: '
                 . 'openssl pkcs12 -in original.p12 -nodes -legacy | openssl pkcs12 -export '
                 . '-keypbe AES-256-CBC -certpbe AES-256-CBC -macalg sha256 -out nou.p12'
             );
         }
 
         throw new RuntimeException(
-            'No s\'ha pogut llegir el certificat .p12. Comproveu que la contrasenya és correcta '
+            'No s\'ha pogut llegir el certificat .p12. Comprova que la contrasenya és correcta '
             . 'i que el fitxer conté el certificat i la clau privada.'
         );
     }
@@ -678,7 +678,7 @@ final class AppleWallet
         ] as $key => $nom) {
             $path = trim((string) Settings::get($key));
             if ($path !== '' && !is_file($path)) {
-                return 'No es troba el fitxer amb ' . $nom . ' (' . basename($path) . '). Torneu-lo a pujar.';
+                return 'No es troba el fitxer amb ' . $nom . ' (' . basename($path) . '). Torna\'l a pujar.';
             }
         }
 

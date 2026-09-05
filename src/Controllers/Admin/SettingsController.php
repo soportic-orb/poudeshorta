@@ -172,7 +172,7 @@ final class SettingsController
         $to = trim((string) Request::post('test_email', '')) ?: (string) (Auth::user()['email'] ?? '');
 
         if (!filter_var($to, FILTER_VALIDATE_EMAIL)) {
-            Flash::error('Indiqueu una adreça electrònica vàlida.');
+            Flash::error('Indica una adreça electrònica vàlida.');
             Response::redirect(Url::to('/admin/configuracio/correu'));
         }
 

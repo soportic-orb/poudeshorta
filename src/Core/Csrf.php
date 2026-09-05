@@ -35,7 +35,7 @@ final class Csrf
         if (!self::check(is_string($token) ? $token : null)) {
             http_response_code(419);
             header('Content-Type: text/html; charset=utf-8');
-            echo '<h1>419 · Sessió caducada</h1><p>El formulari ha caducat. Torneu enrere i proveu-ho de nou.</p>';
+            echo '<h1>419 · Sessió caducada</h1><p>El formulari ha caducat. Torna enrere i prova-ho de nou.</p>';
             exit;
         }
     }

@@ -70,7 +70,7 @@ $attendee = $ticket === null ? '' : trim((string) ($ticket['attendee_name']
 
                     <?php if ($state === 'valid'): ?>
                         <p style="margin:18px 0 0;color:var(--pdsh-muted);font-size:.92rem;">
-                            Mostreu aquesta pantalla o el PDF de l'entrada al personal de l'accés.
+                            Mostra aquesta pantalla o el PDF de l'entrada al personal de l'accés.
                         </p>
                     <?php endif; ?>
                 </div>
@@ -90,7 +90,7 @@ $attendee = $ticket === null ? '' : trim((string) ($ticket['attendee_name']
             <div class="card">
                 <div class="card__body" style="text-align:center;">
                     <p style="margin:0;color:var(--pdsh-muted);">
-                        Comproveu que heu escanejat bé el codi. Si el problema continua, poseu-vos en
+                        Comprova que has escanejat bé el codi. Si el problema continua, posa't en
                         contacte amb l'organització.
                     </p>
                 </div>

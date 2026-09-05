@@ -16,11 +16,11 @@ $valid = array_values(array_filter($tickets, static fn ($t) => in_array($t['stat
         <span class="success-hero__icon" role="img" aria-label="Celebració">🎉</span>
         <h1>Compra realitzada correctament!</h1>
         <p>
-            Ja teniu la vostra plaça per al <strong><?= e(Settings::get('event_name')) ?></strong>.
+            Ja tens la teva plaça per al <strong><?= e(Settings::get('event_name')) ?></strong>.
             <?php if (!empty($order['confirmation_sent_at'])): ?>
-                Us hem enviat les entrades a <strong><?= e($order['email']) ?></strong>.
+                T'hem enviat les entrades a <strong><?= e($order['email']) ?></strong>.
             <?php else: ?>
-                Descarregueu-vos les entrades aquí sota o envieu-vos-les per correu a
+                Descarrega't les entrades aquí sota o envia-te-les per correu a
                 <strong><?= e($order['email']) ?></strong>.
             <?php endif; ?>
         </p>
@@ -64,7 +64,7 @@ $valid = array_values(array_filter($tickets, static fn ($t) => in_array($t['stat
     <?php endif; ?>
 
     <section class="section">
-        <h2>Les vostres entrades</h2>
+        <h2>Les teves entrades</h2>
         <div class="ticket-list">
             <?php foreach ($valid as $ticket): ?>
                 <div class="ticket-row">
@@ -82,7 +82,7 @@ $valid = array_values(array_filter($tickets, static fn ($t) => in_array($t['stat
                 <img src="<?= e(QrCode::dataUri(\App\Core\Url::full('/e/' . $valid[0]['code']), 420)) ?>"
                      alt="Codi QR de l'entrada <?= e($valid[0]['code']) ?>">
                 <p style="color:var(--pdsh-muted);font-size:.88rem;margin-top:10px;">
-                    Mostreu aquest codi a l'entrada de l'esdeveniment.
+                    Mostra aquest codi a l'entrada de l'esdeveniment.
                 </p>
             </div>
         <?php endif; ?>
@@ -96,7 +96,7 @@ $valid = array_values(array_filter($tickets, static fn ($t) => in_array($t['stat
                 <?php if (($place = trim((string) Settings::get('event_location') . ' ' . (string) Settings::get('event_city'))) !== ''): ?>
                     <li><strong>Lloc:</strong> <?= e($place) ?></li>
                 <?php endif; ?>
-                <li>Podeu tornar a consultar les entrades en qualsevol moment des de
+                <li>Pots tornar a consultar les entrades en qualsevol moment des de
                     <a href="<?= e(url('/les-meves-entrades')) ?>">Les meves entrades</a>.</li>
                 <li><a href="<?= e($manageUrl) ?>">Gestionar o anul·lar aquesta inscripció</a></li>
             </ul>

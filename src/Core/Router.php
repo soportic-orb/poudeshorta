@@ -118,7 +118,7 @@ final class Router
         View::render('web/error', [
             'title'   => 'Pàgina no trobada',
             'code'    => 404,
-            'message' => 'La pàgina que cerqueu no existeix o s\'ha mogut.',
+            'message' => 'La pàgina que cerques no existeix o s\'ha mogut.',
         ]);
     }
 }

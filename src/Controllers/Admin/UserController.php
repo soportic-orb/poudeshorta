@@ -29,7 +29,7 @@ final class UserController
     public function store(): void
     {
         if (!Auth::is('owner', 'admin')) {
-            Flash::error('No teniu permisos per crear usuaris.');
+            Flash::error('No tens permisos per crear usuaris.');
             Response::redirect(Url::to('/admin/usuaris'));
         }
 
@@ -46,7 +46,7 @@ final class UserController
         if ($validator->fails()) {
             Flash::setErrors($validator->errors());
             Flash::setOld($_POST);
-            Flash::error($validator->firstError() ?? 'Reviseu les dades.');
+            Flash::error($validator->firstError() ?? 'Revisa les dades.');
             Response::redirect(Url::to('/admin/usuaris'));
         }
 
@@ -68,11 +68,11 @@ final class UserController
         $id = (int) $id;
 
         if (!Auth::is('owner', 'admin')) {
-            Flash::error('No teniu permisos per eliminar usuaris.');
+            Flash::error('No tens permisos per eliminar usuaris.');
             Response::redirect(Url::to('/admin/usuaris'));
         }
         if ($id === Auth::id()) {
-            Flash::error('No podeu eliminar el vostre propi usuari.');
+            Flash::error('No pots eliminar el teu propi usuari.');
             Response::redirect(Url::to('/admin/usuaris'));
         }
 

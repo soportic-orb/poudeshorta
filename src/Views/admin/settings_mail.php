@@ -12,7 +12,7 @@ $s = $settings;
     <div class="alert alert--warning">
         <span aria-hidden="true">⚠️</span>
         <span>Sense servidor SMTP no es poden enviar ni les entrades ni els comunicats.
-              A CloudPanel podeu crear un compte de correu del domini i fer-lo servir aquí.</span>
+              A CloudPanel pots crear un compte de correu del domini i fer-lo servir aquí.</span>
     </div>
 <?php endif; ?>
 
@@ -49,7 +49,7 @@ $s = $settings;
                     <label for="smtp_pass">Contrasenya</label>
                     <input class="input" type="password" id="smtp_pass" name="smtp_pass"
                            placeholder="<?= $s['smtp_pass'] !== '' ? '••••••••••' : '' ?>" autocomplete="new-password">
-                    <span class="field__hint">Deixeu-ho buit per conservar la contrasenya desada.</span>
+                    <span class="field__hint">Deixa-ho buit per conservar la contrasenya desada.</span>
                 </div>
                 <div class="field">
                     <label for="smtp_batch_size">Correus per lot</label>

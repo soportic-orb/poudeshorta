@@ -191,7 +191,7 @@ final class TicketPdf
         $pdf->textHex('#7A7268');
         $pdf->SetFont('Helvetica', '', 8);
         $pdf->SetXY($sepX, $qrY + $qrSize + 11);
-        $pdf->MultiCell((self::MARGIN + $contentW) - $sepX, 4, $pdf->t("Mostreu aquest codi\na l'entrada"), 0, 'C');
+        $pdf->MultiCell((self::MARGIN + $contentW) - $sepX, 4, $pdf->t("Mostra aquest codi\na l'entrada"), 0, 'C');
 
         // ---------- Què inclou ----------
         $boxY = $cardY + $cardH + 8;

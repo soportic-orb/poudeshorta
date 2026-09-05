@@ -23,7 +23,7 @@ foreach ($rows as $row) {
     <div class="panel__head">
         <div>
             <h2>Esborrar <?= count($rows) ?> <?= count($rows) === 1 ? 'entrada' : 'entrades' ?></h2>
-            <p>Reviseu la llista abans de confirmar. Això no es pot desfer.</p>
+            <p>Revisa la llista abans de confirmar. Això no es pot desfer.</p>
         </div>
     </div>
 
@@ -39,8 +39,8 @@ foreach ($rows as $row) {
                     <strong>No es retorna cap diner.</strong> S'han cobrat
                     <strong><?= money($import) ?></strong> per
                     <?= $pagades ?> d'aquestes entrades.
-                    Si el que voleu és
-                    retornar els diners, sortiu d'aquí i feu servir <strong>Anul·lar</strong> des de
+                    Si el que vols és
+                    retornar els diners, surt d'aquí i fes servir <strong>Anul·lar</strong> des de
                     la fitxa de la inscripció: així es tramita la devolució a Stripe i en queda
                     constància.
                 <?php endif; ?>

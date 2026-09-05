@@ -69,7 +69,7 @@ final class InstallController
         if ($validator->fails()) {
             Flash::setErrors($validator->errors());
             Flash::setOld($_POST);
-            Flash::error('Reviseu les dades del formulari.');
+            Flash::error('Revisa les dades del formulari.');
             $this->renderForm();
             return;
         }
@@ -110,7 +110,7 @@ final class InstallController
 
         $configPath = APP_ROOT . '/config/config.php';
         if (!Config::write($configPath, $config)) {
-            Flash::error('No s\'ha pogut escriure config/config.php. Comproveu els permisos del directori config/.');
+            Flash::error('No s\'ha pogut escriure config/config.php. Comprova els permisos del directori config/.');
             $this->renderForm();
             return;
         }

@@ -35,7 +35,7 @@ $available = $latest !== '' && $latest !== $current && $latest !== ($commit ?? '
                 <?php if ($installed !== ''): ?>
                     <span class="mono"><?= e($installed) ?></span>
                     <span style="font-weight:400;color:var(--pdsh-muted);font-size:.85rem;">
-                        · identifica el codi que teniu ara mateix
+                        · identifica el codi que tens ara mateix
                     </span>
                 <?php else: ?>
                     <span style="color:var(--pdsh-muted);">desconeguda fins a la primera actualització</span>
@@ -132,7 +132,7 @@ $available = $latest !== '' && $latest !== $current && $latest !== ($commit ?? '
                 Durant l'actualització el web públic mostra la pàgina de manteniment.
                 <strong>No es toquen mai</strong> la configuració (<code>config/config.php</code>),
                 les imatges pujades ni el directori <code>storage/</code>.
-                Feu-ho preferentment fora de les hores de més venda.
+                Fes-ho preferentment fora de les hores de més venda.
             </span>
         </div>
 
@@ -140,10 +140,10 @@ $available = $latest !== '' && $latest !== $current && $latest !== ($commit ?? '
               data-confirm="Actualitzar la plataforma ara?">
             <?= Csrf::field() ?>
             <div class="field" style="max-width:320px;">
-                <label for="confirm">Escriviu <code>ACTUALITZA</code> per confirmar</label>
+                <label for="confirm">Escriu <code>ACTUALITZA</code> per confirmar</label>
                 <input class="input" type="text" id="confirm" name="confirm" autocomplete="off" placeholder="ACTUALITZA">
             </div>
-            <button type="submit" class="btn btn--primary" data-loading="Actualitzant, no tanqueu la pàgina…">
+            <button type="submit" class="btn btn--primary" data-loading="Actualitzant, no tanquis la pàgina…">
                 Actualitzar ara
             </button>
         </form>

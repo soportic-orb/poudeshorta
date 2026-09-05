@@ -47,7 +47,7 @@ final class CheckinController
 
         // El camp accepta tant el codi com l'URL sencera del QR.
         if ($code === '') {
-            Response::json(['ok' => false, 'estat' => 'buit', 'missatge' => 'Introduïu un codi d\'entrada.'], 422);
+            Response::json(['ok' => false, 'estat' => 'buit', 'missatge' => 'Introdueix un codi d\'entrada.'], 422);
         }
 
         $ticket = Db::first(

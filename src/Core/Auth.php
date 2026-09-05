@@ -81,7 +81,7 @@ final class Auth
         self::requireLogin();
         if (!self::is('owner', 'admin')) {
             http_response_code(403);
-            View::render('admin/error', ['code' => 403, 'message' => 'No teniu permisos per a aquesta acció.'], 'layouts/admin');
+            View::render('admin/error', ['code' => 403, 'message' => 'No tens permisos per a aquesta acció.'], 'layouts/admin');
             exit;
         }
     }

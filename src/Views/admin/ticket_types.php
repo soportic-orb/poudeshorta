@@ -60,7 +60,7 @@
                 <?php if ($types === []): ?>
                     <tr><td colspan="7" class="empty">
                         <span class="empty__icon" aria-hidden="true">🎟</span>
-                        Encara no heu creat cap tipus d'inscripció.<br>
+                        Encara no has creat cap tipus d'inscripció.<br>
                         <a class="btn btn--primary btn--sm" style="margin-top:14px;" href="<?= e(url('/admin/tipus-inscripcio/nou')) ?>">Crear-ne un</a>
                     </td></tr>
                 <?php endif; ?>

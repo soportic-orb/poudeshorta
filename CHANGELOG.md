@@ -9,6 +9,21 @@ Actualitzacions i a la barra lateral.
 
 ---
 
+## [1.13.0] — 2026-09-05
+
+### Canviat
+
+- **Tots els textos de la plataforma passen a tractar l'usuari de tu.** Afecta
+  la web pública, el panell de gestió, els correus, el PDF de l'entrada,
+  l'instal·lador i els missatges d'avís i d'error.
+- Els textos que hi ha desats a la base de dades (descripció de l'esdeveniment,
+  política d'anul·lacions, cossos dels correus, missatge de la pantalla de
+  pagament i tipus d'inscripció) **no es toquen**, perquè els heu escrit
+  vosaltres des del panell: només s'han actualitzat els textos que porta la
+  plataforma de sèrie. Cal repassar-los a mà a Configuració.
+
+---
+
 ## [1.12.1] — 2026-09-04
 
 ### Corregit

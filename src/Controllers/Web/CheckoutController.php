@@ -73,7 +73,7 @@ final class CheckoutController
     {
         $stored = Session::get(self::CART_KEY);
         if (!is_array($stored) || empty($stored['quantities'])) {
-            Flash::error('La selecció d\'entrades ha caducat. Torneu a començar.');
+            Flash::error('La selecció d\'entrades ha caducat. Torna a començar.');
             Response::redirect(Url::to('/') . '#inscripcions');
         }
 
@@ -111,7 +111,7 @@ final class CheckoutController
         if ($validator->fails()) {
             Flash::setErrors($validator->errors());
             Flash::setOld($_POST);
-            Flash::error('Reviseu les dades marcades del formulari.');
+            Flash::error('Revisa les dades marcades del formulari.');
             // Reutilitzem el carretó de la sessió: el formulari de pagament no
             // torna a enviar les quantitats.
             $this->renderDetails($cart);
@@ -133,7 +133,7 @@ final class CheckoutController
             Response::redirect(Url::to('/') . '#inscripcions');
         } catch (\Throwable $e) {
             Logger::exception($e, 'Creació de la comanda');
-            Flash::error('No s\'ha pogut crear la inscripció. Torneu-ho a provar.');
+            Flash::error('No s\'ha pogut crear la inscripció. Torna-ho a provar.');
             Response::redirect(Url::to('/') . '#inscripcions');
         }
 
@@ -156,7 +156,7 @@ final class CheckoutController
         }
 
         if (!Settings::stripeConfigured()) {
-            Flash::error('El sistema de pagament encara no està configurat. Poseu-vos en contacte amb l\'organització.');
+            Flash::error('El sistema de pagament encara no està configurat. Posa\'t en contacte amb l\'organització.');
             Response::redirect(Url::to('/'));
         }
 
@@ -166,7 +166,7 @@ final class CheckoutController
             Db::update('orders', ['status' => 'failed'], '`id` = :id', ['id' => $order['id']]);
             Flash::error(
                 'L\'import mínim per pagar amb targeta és de ' . Money::format($minim)
-                . '. Afegiu alguna inscripció més o poseu-vos en contacte amb l\'organització.'
+                . '. Afegeix alguna inscripció més o posa\'t en contacte amb l\'organització.'
             );
             Response::redirect(Url::to('/') . '#inscripcions');
         }

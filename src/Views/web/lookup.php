@@ -4,8 +4,8 @@
     <div class="wrap wrap--narrow">
         <a class="page-head__back" href="<?= e(url('/')) ?>">← Tornar a l'inici</a>
         <h1>Les meves entrades</h1>
-        <p>Introduïu l'adreça electrònica amb què us vau inscriure i us enviarem un enllaç
-           per veure, descarregar o anul·lar les vostres entrades. No cal cap compte d'usuari.</p>
+        <p>Introdueix l'adreça electrònica amb què et vas inscriure i t'enviarem un enllaç
+           per veure, descarregar o anul·lar les teves entrades. No cal cap compte d'usuari.</p>
     </div>
 </div>
 

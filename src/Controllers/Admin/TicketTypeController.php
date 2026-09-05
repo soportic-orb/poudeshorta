@@ -107,7 +107,7 @@ final class TicketTypeController
         $sold = (int) Db::value('SELECT COUNT(*) FROM `tickets` WHERE `ticket_type_id` = :id', ['id' => $type['id']], 0);
 
         if ($sold > 0) {
-            Flash::error('No es pot eliminar «' . $type['name'] . '» perquè ja té ' . $sold . ' entrades. Desactiveu-lo en comptes d\'eliminar-lo.');
+            Flash::error('No es pot eliminar «' . $type['name'] . '» perquè ja té ' . $sold . ' entrades. Desactiva\'l en comptes d\'eliminar-lo.');
             Response::redirect(Url::to('/admin/tipus-inscripcio'));
         }
 
@@ -155,7 +155,7 @@ final class TicketTypeController
         if ($validator->fails()) {
             Flash::setErrors($validator->errors());
             Flash::setOld($_POST);
-            Flash::error('Reviseu les dades del formulari.');
+            Flash::error('Revisa les dades del formulari.');
             return null;
         }
 

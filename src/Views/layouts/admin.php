@@ -99,7 +99,7 @@ try {
             <div class="alert alert--warning">
                 <span aria-hidden="true">⚠️</span>
                 <span><strong>Mode manteniment actiu.</strong> El web públic no és accessible per als visitants.
-                    Podeu desactivar-lo a <a href="<?= e(url('/admin/configuracio')) ?>">Configuració → Esdeveniment</a>.</span>
+                    Pots desactivar-lo a <a href="<?= e(url('/admin/configuracio')) ?>">Configuració → Esdeveniment</a>.</span>
             </div>
         <?php endif; ?>
 

@@ -50,7 +50,7 @@ set_exception_handler(static function (Throwable $e) use ($debug): void {
         App\Core\View::render('web/error', [
             'title'   => 'Error del servidor',
             'code'    => 500,
-            'message' => 'Hi ha hagut un problema inesperat. Torneu-ho a provar d\'aquí a uns instants.',
+            'message' => 'Hi ha hagut un problema inesperat. Torna-ho a provar d\'aquí a uns instants.',
         ]);
     } catch (Throwable) {
         echo '<h1>500 · Error del servidor</h1>';

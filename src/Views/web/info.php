@@ -42,7 +42,7 @@ $deadline = TicketService::cancellationDeadline();
                 </table>
 
                 <?php if ($highlights !== []): ?>
-                    <h3 style="margin-top:22px;font-size:1.05rem;">Què hi trobareu</h3>
+                    <h3 style="margin-top:22px;font-size:1.05rem;">Què hi trobaràs</h3>
                     <ul class="includes">
                         <?php foreach ($highlights as $highlight): ?><li><span><?= e($highlight) ?></span></li><?php endforeach; ?>
                     </ul>
@@ -58,7 +58,7 @@ $deadline = TicketService::cancellationDeadline();
                     <p style="margin:12px 0 0;"><strong>Termini per anul·lar: <?= date('d/m/Y', $deadline) ?>.</strong></p>
                 <?php endif; ?>
                 <p style="margin:14px 0 0;color:var(--pdsh-muted);font-size:.92rem;">
-                    Podeu tramitar l'anul·lació vosaltres mateixos des de
+                    Pots tramitar l'anul·lació tu mateix des de
                     <a href="<?= e(url('/les-meves-entrades')) ?>">Les meves entrades</a>.
                 </p>
             </div>

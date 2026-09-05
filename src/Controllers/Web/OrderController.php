@@ -78,7 +78,7 @@ final class OrderController
         $back = Url::to('/comanda/' . $reference) . '?t=' . $order['manage_token'];
 
         if (!RateLimit::attempt('mail-tickets:' . $order['id'], 5, 900)) {
-            Flash::error('Heu demanat l\'enviament diverses vegades. Espereu uns minuts abans de tornar-ho a provar.');
+            Flash::error('Has demanat l\'enviament diverses vegades. Espera uns minuts abans de tornar-ho a provar.');
             Response::redirect($back);
         }
 
@@ -91,17 +91,17 @@ final class OrderController
             $pdf = TicketService::pdfForOrder($order);
             $mailer = new Mailer();
             $html = $mailer->wrap(
-                'Les vostres entrades',
+                'Les teves entrades',
                 '<p>Hola ' . Str::e((string) $order['name']) . ',</p>'
-                . '<p>Us adjuntem les entrades de la inscripció <strong>' . Str::e((string) $order['reference']) . '</strong> en format PDF.</p>'
-                . '<p>Podeu imprimir-les o mostrar el codi QR directament des del mòbil.</p>',
+                . '<p>T\'adjuntem les entrades de la inscripció <strong>' . Str::e((string) $order['reference']) . '</strong> en format PDF.</p>'
+                . '<p>Pots imprimir-les o mostrar el codi QR directament des del mòbil.</p>',
                 [['label' => 'Veure les entrades en línia', 'url' => Url::full('/comanda/' . $order['reference']) . '?t=' . $order['manage_token']]]
             );
 
             $sent = $mailer->send(
                 $destination,
                 (string) $order['name'],
-                'Les vostres entrades · ' . Settings::get('event_name'),
+                'Les teves entrades · ' . Settings::get('event_name'),
                 $html,
                 [['content' => $pdf, 'name' => TicketService::pdfFilename($order), 'mime' => 'application/pdf']]
             );
@@ -109,7 +109,7 @@ final class OrderController
             if ($sent) {
                 Flash::success('Hem enviat les entrades a ' . Str::maskEmail($destination) . '.');
             } else {
-                Flash::error('No s\'han pogut enviar les entrades. Proveu de descarregar-les en PDF.');
+                Flash::error('No s\'han pogut enviar les entrades. Prova de descarregar-les en PDF.');
             }
         } catch (\Throwable $e) {
             Logger::exception($e, 'Enviament d\'entrades');
@@ -139,10 +139,10 @@ final class OrderController
             : 'S\'han anul·lat ' . $result['cancelled'] . ' entrades.';
 
         if ($result['refunded_cents'] > 0) {
-            $message .= ' Us retornarem ' . \App\Core\Money::format($result['refunded_cents'])
+            $message .= ' Et retornarem ' . \App\Core\Money::format($result['refunded_cents'])
                 . ' al mateix mitjà de pagament (pot trigar uns dies hàbils).';
         } elseif ($result['refund_error'] !== null) {
-            $message .= ' No hem pogut tramitar la devolució automàticament; l\'organització es posarà en contacte amb vosaltres.';
+            $message .= ' No hem pogut tramitar la devolució automàticament; l\'organització es posarà en contacte amb tu.';
         }
 
         Flash::success($message);
@@ -169,12 +169,12 @@ final class OrderController
         $email = mb_strtolower(trim((string) Request::post('email', '')));
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            Flash::error('Introduïu una adreça electrònica vàlida.');
+            Flash::error('Introdueix una adreça electrònica vàlida.');
             Response::redirect(Url::to('/les-meves-entrades'));
         }
 
         if (!RateLimit::attempt('lookup:' . Request::ip(), 8, 900)) {
-            Flash::error('Hi ha hagut massa intents des d\'aquesta connexió. Espereu uns minuts.');
+            Flash::error('Hi ha hagut massa intents des d\'aquesta connexió. Espera uns minuts.');
             Response::redirect(Url::to('/les-meves-entrades'));
         }
 
@@ -206,12 +206,12 @@ final class OrderController
                 $mailer->send(
                     $email,
                     null,
-                    'Les vostres inscripcions · ' . Settings::get('event_name'),
+                    'Les teves inscripcions · ' . Settings::get('event_name'),
                     $mailer->wrap(
-                        'Les vostres inscripcions',
-                        '<p>Heu demanat consultar les vostres entrades de <strong>' . Str::e((string) Settings::get('event_name')) . '</strong>.</p>'
+                        'Les teves inscripcions',
+                        '<p>Has demanat consultar les teves entrades de <strong>' . Str::e((string) Settings::get('event_name')) . '</strong>.</p>'
                         . '<ul style="padding-left:18px;">' . $list . '</ul>'
-                        . '<p>Feu clic al botó per veure-les, descarregar-les o gestionar-les. L\'enllaç caduca d\'aquí a una hora.</p>',
+                        . '<p>Fes clic al botó per veure-les, descarregar-les o gestionar-les. L\'enllaç caduca d\'aquí a una hora.</p>',
                         [['label' => 'Veure les meves entrades', 'url' => Url::full('/les-meves-entrades/' . $token)]]
                     )
                 );
@@ -221,7 +221,7 @@ final class OrderController
         }
 
         Session::set('lookup_sent', true);
-        Flash::success('Si aquesta adreça té inscripcions, hi rebreu un correu amb l\'enllaç per consultar-les.');
+        Flash::success('Si aquesta adreça té inscripcions, hi rebràs un correu amb l\'enllaç per consultar-les.');
         Response::redirect(Url::to('/les-meves-entrades'));
     }
 
@@ -233,7 +233,7 @@ final class OrderController
         );
 
         if ($link === null) {
-            Flash::error('Aquest enllaç ha caducat. Demaneu-ne un de nou.');
+            Flash::error('Aquest enllaç ha caducat. Demana\'n un de nou.');
             Response::redirect(Url::to('/les-meves-entrades'));
         }
 
@@ -281,7 +281,7 @@ final class OrderController
                 View::render('web/error', [
                     'title'   => 'Enllaç no vàlid',
                     'code'    => 403,
-                    'message' => 'Aquest enllaç no és vàlid o ha caducat. Podeu recuperar les entrades des de «Les meves entrades».',
+                    'message' => 'Aquest enllaç no és vàlid o ha caducat. Pots recuperar les entrades des de «Les meves entrades».',
                 ], 'layouts/public');
                 exit;
             }
@@ -306,7 +306,7 @@ final class OrderController
     {
         try {
             $refundNote = $result['refunded_cents'] > 0
-                ? 'Us retornarem ' . \App\Core\Money::format($result['refunded_cents']) . ' al mateix mitjà de pagament.'
+                ? 'Et retornarem ' . \App\Core\Money::format($result['refunded_cents']) . ' al mateix mitjà de pagament.'
                 : 'Aquesta anul·lació no comporta cap devolució.';
 
             $vars = [

@@ -55,7 +55,7 @@ $colors = [
         <div class="panel__head">
             <div>
                 <h2>Imatge de fons de la capçalera</h2>
-                <p>Una fotografia darrere del títol de la portada. Si no en poseu cap, es fa servir el degradat de la marca.</p>
+                <p>Una fotografia darrere del títol de la portada. Si no en poses cap, es fa servir el degradat de la marca.</p>
             </div>
         </div>
         <div class="panel__body">
@@ -73,7 +73,7 @@ $colors = [
                 <input class="input" type="file" id="hero" name="hero" accept="image/jpeg,image/png,image/webp">
                 <span class="field__hint">
                     Horitzontal i de bona resolució: 1920 × 1080 px o més. JPG, PNG o WebP, màxim 6 MB.
-                    Eviteu les imatges amb text, perquè el títol s'hi superposa.
+                    Evita les imatges amb text, perquè el títol s'hi superposa.
                 </span>
             </div>
 
@@ -110,7 +110,7 @@ $colors = [
                     <span>Continuar mostrant el cartell al costat del títol</span>
                 </label>
                 <span class="field__hint">
-                    Si el desmarqueu i hi ha imatge de fons, al costat del títol hi apareixeran els atractius de l'esdeveniment.
+                    Si el desmarques i hi ha imatge de fons, al costat del títol hi apareixeran els atractius de l'esdeveniment.
                 </span>
             </div>
         </div>

@@ -33,7 +33,7 @@ final class AuthController
 
         if (!RateLimit::attempt($key, 8, 900)) {
             $wait = (int) ceil(RateLimit::retryAfter($key, 900) / 60);
-            Flash::error('Massa intents fallits. Torneu-ho a provar d\'aquí a ' . max(1, $wait) . ' minuts.');
+            Flash::error('Massa intents fallits. Torna-ho a provar d\'aquí a ' . max(1, $wait) . ' minuts.');
             Response::redirect(Url::to('/admin/login'));
         }
 
@@ -54,7 +54,7 @@ final class AuthController
     {
         Logger::audit('tancament_sessio');
         Auth::logout();
-        Flash::success('Heu tancat la sessió.');
+        Flash::success('Has tancat la sessió.');
         Response::redirect(Url::to('/admin/login'));
     }
 }

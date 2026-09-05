@@ -151,7 +151,7 @@ final class Updater
             if (in_array($e->getCode(), [404, 422], true)) {
                 throw new RuntimeException(
                     'No s\'ha trobat la branca «' . $branch . '» a ' . $repo . '. '
-                    . 'Comproveu que el nom sigui exacte, incloses majúscules i barres.',
+                    . 'Comprova que el nom sigui exacte, incloses majúscules i barres.',
                     $e->getCode()
                 );
             }
@@ -243,7 +243,7 @@ final class Updater
         $writable = is_writable(self::root());
         $add('Permisos d\'escriptura', $writable, $writable
             ? self::root()
-            : 'El servidor no pot escriure a ' . self::root() . '. Executeu: chmod -R u+w ' . self::root());
+            : 'El servidor no pot escriure a ' . self::root() . '. Executa: chmod -R u+w ' . self::root());
 
         $free = @disk_free_space(self::root());
         $enough = $free === false || $free > 50 * 1024 * 1024;
@@ -456,7 +456,7 @@ final class Updater
             }
             if (!is_dir($sourceDir . '/vendor')) {
                 throw new RuntimeException(
-                    'El paquet descarregat no inclou el directori vendor/. Comproveu que la branca '
+                    'El paquet descarregat no inclou el directori vendor/. Comprova que la branca '
                     . 'configurada és la de la plataforma i que vendor/ està al repositori.'
                 );
             }
@@ -693,7 +693,7 @@ final class Updater
         if ($result === false) {
             throw new RuntimeException(
                 'No s\'ha pogut contactar amb GitHub: ' . $error
-                . '. Comproveu que el servidor té sortida a Internet cap a api.github.com pel port 443.'
+                . '. Comprova que el servidor té sortida a Internet cap a api.github.com pel port 443.'
             );
         }
 
@@ -716,21 +716,21 @@ final class Updater
             $reset = isset($headers['x-ratelimit-reset'])
                 ? ' Es reprèn a les ' . date('H:i', (int) $headers['x-ratelimit-reset']) . '.'
                 : '';
-            return 'Heu superat el límit de consultes de GitHub' . ($hasToken ? '' : ' (60 per hora sense token)') . '.' . $reset;
+            return 'Has superat el límit de consultes de GitHub' . ($hasToken ? '' : ' (60 per hora sense token)') . '.' . $reset;
         }
 
         return match (true) {
-            $status === 401 => 'GitHub ha rebutjat el token d\'accés: comproveu que no ha caducat i que té permís de lectura del repositori.',
+            $status === 401 => 'GitHub ha rebutjat el token d\'accés: comprova que no ha caducat i que té permís de lectura del repositori.',
             $status === 403 => 'GitHub ha denegat l\'accés (403).' . ($hasToken
                 ? ' El token no té permís sobre ' . $repo . '.'
                 : ' Si el repositori és privat, cal configurar un token d\'accés.'),
-            $status === 404 => 'GitHub no troba «' . $repo . '» (404). Reviseu que el nom del repositori sigui correcte i, '
+            $status === 404 => 'GitHub no troba «' . $repo . '» (404). Revisa que el nom del repositori sigui correcte i, '
                 . ($hasToken
                     ? 'si el repositori és privat, que el token hi tingui accés.'
-                    : 'si és privat, configureu un token d\'accés: sense token GitHub respon 404 als repositoris privats.'),
+                    : 'si és privat, configura un token d\'accés: sense token GitHub respon 404 als repositoris privats.'),
             $status === 422 => 'GitHub no ha pogut resoldre la referència demanada (422). Normalment vol dir que '
                 . 'el nom de la branca no és exacte o que la branca ja no existeix.',
-            $status >= 500  => 'GitHub està tenint problemes (codi ' . $status . '). Torneu-ho a provar més tard.',
+            $status >= 500  => 'GitHub està tenint problemes (codi ' . $status . '). Torna-ho a provar més tard.',
             default         => 'GitHub ha respost amb el codi ' . $status . '.',
         };
     }

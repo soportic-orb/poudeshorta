@@ -80,7 +80,7 @@
             .then(function (p) {
                 window.pdshMostraResultat(p.d, p.ok);
                 senyal(p.ok);
-                mostraEstat(p.ok ? 'Validada. Apunteu la següent.' : 'Apunteu la següent entrada.', p.ok ? 'ok' : 'error');
+                mostraEstat(p.ok ? 'Validada. Apunta la següent.' : 'Apunta la següent entrada.', p.ok ? 'ok' : 'error');
                 aVista();
             })
             .catch(function () {
@@ -170,13 +170,13 @@
             })
             .then(function () {
                 escanejant = true;
-                mostraEstat('Apunteu al codi QR de l\'entrada.', null);
+                mostraEstat('Apunta al codi QR de l\'entrada.', null);
                 cicle();
             })
             .catch(function (e) {
                 var missatge = 'No s\'ha pogut obrir la càmera.';
                 if (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) {
-                    missatge = 'Heu denegat el permís de càmera. Autoritzeu-lo a la barra d\'adreces del navegador i torneu-ho a provar.';
+                    missatge = 'Has denegat el permís de càmera. Autoritza\'l a la barra d\'adreces del navegador i torna-ho a provar.';
                 } else if (e && e.name === 'NotFoundError') {
                     missatge = 'Aquest dispositiu no té cap càmera disponible.';
                 } else if (e && e.message) {

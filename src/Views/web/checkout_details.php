@@ -11,7 +11,7 @@ $errors = $errors ?? [];
     <div class="wrap wrap--narrow">
         <a class="page-head__back" href="<?= e(url('/')) ?>#inscripcions">← Canviar la selecció</a>
         <h1>Dades de la inscripció</h1>
-        <p>Necessitem el vostre contacte per enviar-vos les entrades i el nom de cada assistent.</p>
+        <p>Necessitem el teu contacte per enviar-te les entrades i el nom de cada assistent.</p>
     </div>
 </div>
 
@@ -20,7 +20,7 @@ $errors = $errors ?? [];
 
         <div class="steps">
             <span class="is-done" data-step="1">Tria d'inscripcions</span><i>›</i>
-            <span class="is-current" data-step="2">Les vostres dades</span><i>›</i>
+            <span class="is-current" data-step="2">Les teves dades</span><i>›</i>
             <span data-step="3">Pagament</span>
         </div>
 
@@ -61,14 +61,14 @@ $errors = $errors ?? [];
                                 <?php if (isset($errors['email'])): ?>
                                     <span class="field__error"><?= e($errors['email']) ?></span>
                                 <?php else: ?>
-                                    <span class="field__hint">Reviseu-la bé: hi enviarem les entrades.</span>
+                                    <span class="field__hint">Revisa-la bé: hi enviarem les entrades.</span>
                                 <?php endif; ?>
                             </div>
                             <div class="field">
                                 <label for="phone">Telèfon</label>
                                 <input class="input" type="tel" id="phone" name="phone"
                                        value="<?= old('phone') ?>" autocomplete="tel">
-                                <span class="field__hint">Opcional, per si hem de contactar-vos el mateix dia.</span>
+                                <span class="field__hint">Opcional, per si t'hem de contactar el mateix dia.</span>
                             </div>
                         </div>
                     </fieldset>
@@ -129,7 +129,7 @@ $errors = $errors ?? [];
                                 </label>
                                 <?php if ($field['type'] === 'select'): ?>
                                     <select class="select <?= $hasError ? 'has-error' : '' ?>" id="<?= e($fieldId) ?>" name="<?= e($fieldName) ?>">
-                                        <option value="">Trieu una opció…</option>
+                                        <option value="">Tria una opció…</option>
                                         <?php foreach ($options as $option): ?>
                                             <option value="<?= e($option) ?>"><?= e($option) ?></option>
                                         <?php endforeach; ?>
@@ -176,7 +176,7 @@ $errors = $errors ?? [];
                         <p class="fee-note">
                             D'aquest import, <strong><?= money($comissio) ?></strong> són despeses de la
                             passarel·la de pagament (<?= e(StripeClient::feeDescription()) ?>).
-                            No és cap càrrec addicional: pagareu <?= money((int) $subtotal) ?>.
+                            No és cap càrrec addicional: pagaràs <?= money((int) $subtotal) ?>.
                         </p>
                     <?php endif; ?>
 
@@ -213,7 +213,7 @@ $errors = $errors ?? [];
 
             <p style="text-align:center;color:var(--pdsh-muted);font-size:.86rem;margin-top:18px;">
                 🔒 El pagament es processa a la passarel·la segura de Stripe.
-                Les dades de la vostra targeta no passen mai pel nostre servidor.
+                Les dades de la teva targeta no passen mai pel nostre servidor.
             </p>
         </form>
     </div>

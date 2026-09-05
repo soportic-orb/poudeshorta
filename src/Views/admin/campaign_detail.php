@@ -67,7 +67,7 @@ $queue = $queue ?: ['total' => 0, 'enviats' => 0, 'fallits' => 0, 'pendents' => 
                     </form>
                     <?php if (!$smtpReady): ?>
                         <p style="font-size:.85rem;color:var(--pdsh-danger);margin:0;">
-                            Configureu primer el <a href="<?= e(url('/admin/configuracio/correu')) ?>">servidor SMTP</a>.
+                            Configura primer el <a href="<?= e(url('/admin/configuracio/correu')) ?>">servidor SMTP</a>.
                         </p>
                     <?php endif; ?>
                 <?php elseif ((int) $queue['pendents'] > 0): ?>
@@ -76,7 +76,7 @@ $queue = $queue ?: ['total' => 0, 'enviats' => 0, 'fallits' => 0, 'pendents' => 
                         <button type="submit" class="btn btn--primary btn--block">Enviar el lot següent</button>
                     </form>
                     <p style="font-size:.85rem;color:var(--pdsh-muted);margin:0;">
-                        Si teniu la tasca cron activada, la cua s'envia sola cada pocs minuts.
+                        Si tens la tasca cron activada, la cua s'envia sola cada pocs minuts.
                     </p>
                 <?php endif; ?>
 

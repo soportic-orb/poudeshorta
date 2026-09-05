@@ -54,7 +54,7 @@ final class CampaignController
         if ($validator->fails()) {
             Flash::setErrors($validator->errors());
             Flash::setOld($_POST);
-            Flash::error('Reviseu les dades del formulari.');
+            Flash::error('Revisa les dades del formulari.');
             $this->create();
             return;
         }
@@ -74,7 +74,7 @@ final class CampaignController
         ]);
 
         Logger::audit('crea_comunicat', (string) $id);
-        Flash::success('Comunicat desat com a esborrany. Reviseu-lo i envieu-lo quan vulgueu.');
+        Flash::success('Comunicat desat com a esborrany. Revisa\'l i envia\'l quan vulguis.');
         Response::redirect(Url::to('/admin/comunicacions/' . $id));
     }
 
@@ -108,7 +108,7 @@ final class CampaignController
         $to = trim((string) Request::post('email', '')) ?: (string) (Auth::user()['email'] ?? '');
 
         if (!filter_var($to, FILTER_VALIDATE_EMAIL)) {
-            Flash::error('Indiqueu una adreça electrònica vàlida per a la prova.');
+            Flash::error('Indica una adreça electrònica vàlida per a la prova.');
             Response::redirect(Url::to('/admin/comunicacions/' . $campaign['id']));
         }
 

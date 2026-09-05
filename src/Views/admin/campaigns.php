@@ -5,7 +5,7 @@ $labels = ['draft' => 'Esborrany', 'queued' => 'A la cua', 'sending' => 'Enviant
 <?php if (!$smtpReady): ?>
     <div class="alert alert--warning">
         <span aria-hidden="true">⚠️</span>
-        <span>Encara no heu configurat el servidor SMTP. Els comunicats no es podran enviar fins que ho feu a
+        <span>Encara no has configurat el servidor SMTP. Els comunicats no es podran enviar fins que ho facis a
             <a href="<?= e(url('/admin/configuracio/correu')) ?>">Configuració → Correu</a>.</span>
     </div>
 <?php endif; ?>
@@ -14,7 +14,7 @@ $labels = ['draft' => 'Esborrany', 'queued' => 'A la cua', 'sending' => 'Enviant
     <div class="panel__head">
         <div>
             <h2>Comunicats als inscrits</h2>
-            <p>Escriviu un missatge i envieu-lo per correu a totes les persones inscrites.
+            <p>Escriu un missatge i envia'l per correu a totes les persones inscrites.
                 <?= $pending > 0 ? '<strong>' . (int) $pending . ' correus pendents a la cua.</strong>' : '' ?></p>
         </div>
         <a class="btn btn--primary btn--sm" href="<?= e(url('/admin/comunicacions/nova')) ?>">+ Nou comunicat</a>
@@ -49,7 +49,7 @@ $labels = ['draft' => 'Esborrany', 'queued' => 'A la cua', 'sending' => 'Enviant
                 <?php if ($campaigns === []): ?>
                     <tr><td colspan="6" class="empty">
                         <span class="empty__icon" aria-hidden="true">✉️</span>
-                        Encara no heu enviat cap comunicat.
+                        Encara no has enviat cap comunicat.
                     </td></tr>
                 <?php endif; ?>
             </tbody>

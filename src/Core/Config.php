@@ -45,7 +45,7 @@ final class Config
     public static function write(string $path, array $data): bool
     {
         $export = var_export($data, true);
-        $php = "<?php\n// Fitxer generat automàticament per l'instal·lador. No el pugeu al repositori.\nreturn {$export};\n";
+        $php = "<?php\n// Fitxer generat automàticament per l'instal·lador. No el pugis al repositori.\nreturn {$export};\n";
         $dir = dirname($path);
         if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
             return false;

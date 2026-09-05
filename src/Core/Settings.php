@@ -54,7 +54,7 @@ final class Settings
         'cancellation_deadline_date' => '',
         'cancellation_fee_percent'   => '0',
         'cancellation_refund'        => '1',
-        'cancellation_policy_text'   => 'Podeu anul·lar la vostra inscripció fins a 7 dies abans de l\'esdeveniment i se us retornarà l\'import íntegre.',
+        'cancellation_policy_text'   => 'Pots anul·lar la teva inscripció fins a 7 dies abans de l\'esdeveniment i se\'t retornarà l\'import íntegre.',
         'cancellation_allow_partial' => '1',
 
         // Stripe
@@ -83,13 +83,13 @@ final class Settings
         'smtp_from_name'  => 'Pou de s\'Horta',
         'smtp_reply_to'   => '',
         'smtp_batch_size' => '25',
-        'mail_footer'     => 'Rebeu aquest correu perquè us heu inscrit a un esdeveniment del carrer Pou de s\'Horta.',
+        'mail_footer'     => 'Reps aquest correu perquè t\'has inscrit a un esdeveniment del carrer Pou de s\'Horta.',
 
         // Correus transaccionals
-        'mail_confirmation_subject' => 'La vostra inscripció · {{event_name}}',
-        'mail_confirmation_body'    => "Hola {{name}},\n\nLa vostra inscripció s'ha confirmat correctament.\n\nReferència: {{reference}}\nEntrades: {{ticket_count}}\nImport: {{total}}\n\nTrobareu les entrades adjuntes en aquest correu en format PDF.\n\nFins aviat!\n{{event_organizer}}",
+        'mail_confirmation_subject' => 'La teva inscripció · {{event_name}}',
+        'mail_confirmation_body'    => "Hola {{name}},\n\nLa teva inscripció s'ha confirmat correctament.\n\nReferència: {{reference}}\nEntrades: {{ticket_count}}\nImport: {{total}}\n\nTrobaràs les entrades adjuntes en aquest correu en format PDF.\n\nFins aviat!\n{{event_organizer}}",
         'mail_cancellation_subject' => 'Anul·lació de la inscripció {{reference}}',
-        'mail_cancellation_body'    => "Hola {{name}},\n\nHem anul·lat la vostra inscripció {{reference}}.\n\n{{refund_note}}\n\nGràcies,\n{{event_organizer}}",
+        'mail_cancellation_body'    => "Hola {{name}},\n\nHem anul·lat la teva inscripció {{reference}}.\n\n{{refund_note}}\n\nGràcies,\n{{event_organizer}}",
 
         // Apple / Google Wallet
         'wallet_enabled'            => '0',

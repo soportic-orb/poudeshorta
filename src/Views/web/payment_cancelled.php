@@ -4,8 +4,8 @@
             <span class="success-hero__icon" aria-hidden="true">🛑</span>
             <h1>Pagament no completat</h1>
             <p>
-                No s'ha fet cap càrrec a la vostra targeta i la reserva s'ha alliberat.
-                Podeu tornar a començar quan vulgueu.
+                No s'ha fet cap càrrec a la teva targeta i la reserva s'ha alliberat.
+                Pots tornar a començar quan vulguis.
             </p>
         </div>
 

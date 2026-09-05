@@ -14,7 +14,7 @@ $live = $s['stripe_mode'] === 'live';
     <div class="alert alert--warning">
         <span aria-hidden="true">⚠️</span>
         <span>Encara no hi ha claus de Stripe per al mode <strong><?= $live ? 'real' : 'de proves' ?></strong>.
-              Fins que no les configureu, ningú no podrà pagar.</span>
+              Fins que no les configuris, ningú no podrà pagar.</span>
     </div>
 <?php endif; ?>
 
@@ -90,7 +90,7 @@ $live = $s['stripe_mode'] === 'live';
                     <input class="input" type="text" inputmode="decimal" id="stripe_fee_fixed"
                            name="stripe_fee_fixed"
                            value="<?= e(\App\Core\Money::toDecimal((int) $s['stripe_fee_fixed_cents'])) ?>">
-                    <span class="field__hint">Habitualment 0,25 €. Reviseu-ho al vostre tauler de Stripe.</span>
+                    <span class="field__hint">Habitualment 0,25 €. Revisa-ho al teu tauler de Stripe.</span>
                 </div>
             </div>
             <div class="field" style="margin-bottom:0;">
@@ -124,7 +124,7 @@ $live = $s['stripe_mode'] === 'live';
                 <span class="field__hint">
                     Text pla: es respecten els salts de línia i els paràgrafs, i les adreces que
                     comencin per <code>https://</code> es converteixen en enllaços.
-                    Si el deixeu buit no es mostra res, encara que la casella estigui marcada.
+                    Si el deixes buit no es mostra res, encara que la casella estigui marcada.
                 </span>
             </div>
         </div>
@@ -134,7 +134,7 @@ $live = $s['stripe_mode'] === 'live';
         <div class="panel__head">
             <div>
                 <h2>Claus de proves</h2>
-                <p>Les trobareu al tauler de Stripe amb el mode de proves activat.</p>
+                <p>Les trobaràs al tauler de Stripe amb el mode de proves activat.</p>
             </div>
         </div>
         <div class="panel__body">
@@ -146,7 +146,7 @@ $live = $s['stripe_mode'] === 'live';
                 <label for="stripe_test_sk">Clau secreta (sk_test_…)</label>
                 <input class="input" type="password" id="stripe_test_sk" name="stripe_test_sk"
                        placeholder="<?= e($mask((string) $s['stripe_test_sk'])) ?>" autocomplete="off">
-                <span class="field__hint">Deixeu-ho buit per conservar la clau desada.</span>
+                <span class="field__hint">Deixa-ho buit per conservar la clau desada.</span>
             </div>
             <div class="field">
                 <label for="stripe_test_wh_secret">Secret del webhook (whsec_…)</label>
@@ -160,7 +160,7 @@ $live = $s['stripe_mode'] === 'live';
         <div class="panel__head">
             <div>
                 <h2>Claus reals</h2>
-                <p>Activeu el mode real només quan hàgiu fet una compra de prova completa.</p>
+                <p>Activa el mode real només quan hagis fet una compra de prova completa.</p>
             </div>
         </div>
         <div class="panel__body">
@@ -194,24 +194,24 @@ $live = $s['stripe_mode'] === 'live';
     </div>
     <div class="panel__body">
         <ol style="padding-left:20px;line-height:1.9;">
-            <li>Entreu al tauler de Stripe → <strong>Developers → Webhooks → Add endpoint</strong>.</li>
-            <li>Enganxeu aquesta URL de destinació:
+            <li>Entra al tauler de Stripe → <strong>Developers → Webhooks → Add endpoint</strong>.</li>
+            <li>Enganxa aquesta URL de destinació:
                 <div class="copy-row" style="margin:8px 0;">
                     <input class="input" type="text" id="webhook-url" value="<?= e($webhookUrl) ?>" readonly>
                     <button type="button" class="btn btn--light btn--sm" data-copy-target="#webhook-url">Copiar</button>
                 </div>
             </li>
-            <li>Seleccioneu aquests esdeveniments:
+            <li>Selecciona aquests esdeveniments:
                 <code>checkout.session.completed</code>, <code>checkout.session.expired</code>,
                 <code>checkout.session.async_payment_succeeded</code>, <code>checkout.session.async_payment_failed</code>
                 i <code>charge.refunded</code>.
             </li>
-            <li>Copieu el <strong>Signing secret</strong> (<code>whsec_…</code>) i enganxeu-lo al camp corresponent d'aquesta pàgina.</li>
+            <li>Copia el <strong>Signing secret</strong> (<code>whsec_…</code>) i enganxa'l al camp corresponent d'aquesta pàgina.</li>
         </ol>
 
         <div class="alert alert--info" style="margin-bottom:0;">
             <span aria-hidden="true">ℹ️</span>
-            <span>Per provar-ho: amb el mode de proves, feu una compra amb la targeta
+            <span>Per provar-ho: amb el mode de proves, fes una compra amb la targeta
                 <code>4242 4242 4242 4242</code>, qualsevol data futura i qualsevol CVC.</span>
         </div>
     </div>

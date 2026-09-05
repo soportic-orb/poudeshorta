@@ -11,7 +11,7 @@ $exportQuery = $query === [] ? '' : '?' . http_build_query($query);
     <div class="panel__head">
         <div>
             <h2>Filtres</h2>
-            <p>Combineu-los per acotar el llistat; les exportacions respecten el filtre actiu.</p>
+            <p>Combina'ls per acotar el llistat; les exportacions respecten el filtre actiu.</p>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <a class="btn btn--dark btn--sm" href="<?= e(url('/admin/inscripcions/pdf') . $exportQuery) ?>">Imprimir en PDF</a>

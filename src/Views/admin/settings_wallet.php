@@ -10,7 +10,7 @@ $s = $settings;
 
 <div class="alert alert--info">
     <span aria-hidden="true">ℹ️</span>
-    <span>Els passis de wallet són <strong>opcionals</strong>. Si no els configureu, els botons no apareixeran
+    <span>Els passis de wallet són <strong>opcionals</strong>. Si no els configures, els botons no apareixeran
         i les entrades seguiran funcionant amb el PDF i el codi QR.</span>
 </div>
 
@@ -96,14 +96,14 @@ $s = $settings;
                 <div class="field">
                     <label for="apple_wwdr">Certificat WWDR d'Apple</label>
                     <input class="input" type="file" id="apple_wwdr" name="apple_wwdr" accept=".pem,.cer,.crt">
-                    <span class="field__hint"><?= $s['apple_wwdr_path'] !== '' ? 'Desat: ' . e(basename((string) $s['apple_wwdr_path'])) : 'Descarregueu-lo del portal de desenvolupadors d\'Apple.' ?></span>
+                    <span class="field__hint"><?= $s['apple_wwdr_path'] !== '' ? 'Desat: ' . e(basename((string) $s['apple_wwdr_path'])) : 'Descarrega\'l del portal de desenvolupadors d\'Apple.' ?></span>
                 </div>
             </div>
 
             <div class="alert alert--info" style="margin-bottom:0;">
                 <span aria-hidden="true">🔒</span>
                 <span>Els certificats es desen a <code>storage/certificates/</code>, fora del directori públic,
-                      amb permisos restringits. Si pugeu un <code>.p12</code>, es converteix automàticament al
+                      amb permisos restringits. Si puges un <code>.p12</code>, es converteix automàticament al
                       format que fa servir el servidor i la contrasenya deixa de ser necessària.</span>
             </div>
         </div>
@@ -136,7 +136,7 @@ $s = $settings;
                 <input class="input" type="file" id="google_json" name="google_json" accept=".json,application/json">
                 <span class="field__hint">
                     <?= $s['google_service_account_json'] !== '' ? 'Ja hi ha un compte de servei desat.' : 'Cap compte de servei desat.' ?>
-                    Recordeu autoritzar l'adreça del compte de servei a la Google Wallet Console.
+                    Recorda autoritzar l'adreça del compte de servei a la Google Wallet Console.
                 </span>
             </div>
 
@@ -158,10 +158,10 @@ $s = $settings;
                         (<code><?= e(\App\Services\GoogleWallet::classId()) ?></code>).
                         Els enllaços de cada entrada són curts i no arriben al límit de Google.
                     <?php else: ?>
-                        <strong>Encara no heu creat la classe de l'esdeveniment.</strong>
-                        Fins que no ho feu, cada enllaç ha de portar-hi totes les dades i pot superar
+                        <strong>Encara no has creat la classe de l'esdeveniment.</strong>
+                        Fins que no ho facis, cada enllaç ha de portar-hi totes les dades i pot superar
                         el màxim de 1800 caràcters que admet Google, amb la qual cosa el passi no es desaria.
-                        Deseu la configuració i premeu el botó de sota.
+                        Desa la configuració i prem el botó de sota.
                     <?php endif; ?>
                 </span>
             </div>
@@ -178,12 +178,12 @@ $s = $settings;
         <div class="panel__head">
             <div>
                 <h2>Comprovar la configuració dels passis</h2>
-                <p>Prova l'Apple Wallet i el Google Wallet amb dades fictícies. Feu-ho abans d'obrir les inscripcions.</p>
+                <p>Prova l'Apple Wallet i el Google Wallet amb dades fictícies. Fes-ho abans d'obrir les inscripcions.</p>
             </div>
         </div>
         <div class="panel__body">
             <p style="margin:0 0 16px;color:var(--pdsh-muted);font-size:.92rem;">
-                Comprova que l'Apple Wallet pot signar passis amb els vostres certificats i que l'enllaç del
+                Comprova que l'Apple Wallet pot signar passis amb els teus certificats i que l'enllaç del
                 Google Wallet es genera i cap dins del límit de Google. No es crea cap entrada ni s'envia res.
             </p>
             <button type="submit" class="btn btn--light" data-loading="Comprovant…">
@@ -199,13 +199,13 @@ $s = $settings;
         <div class="panel__head">
             <div>
                 <h2>Classe de l'esdeveniment al Google Wallet</h2>
-                <p>Es crea una sola vegada. Torneu-hi si canvieu el nom, la data o el lloc de l'esdeveniment.</p>
+                <p>Es crea una sola vegada. Torna-hi si canvies el nom, la data o el lloc de l'esdeveniment.</p>
             </div>
         </div>
         <div class="panel__body">
             <p style="margin:0 0 16px;color:var(--pdsh-muted);font-size:.92rem;">
                 La classe conté les dades comunes a totes les entrades (nom de l'esdeveniment, data, lloc i colors).
-                Creant-la al vostre compte, l'enllaç de cada entrada només ha de portar les dades de la persona
+                Creant-la al teu compte, l'enllaç de cada entrada només ha de portar les dades de la persona
                 i queda ben per sota del límit que Google admet.
             </p>
             <button type="submit" class="btn btn--light" data-loading="Parlant amb Google…">

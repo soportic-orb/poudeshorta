@@ -147,7 +147,7 @@ final class TicketService
 
             $max = (int) $type['max_per_order'];
             if ($max > 0 && $qty > $max) {
-                throw new RuntimeException('Només podeu comprar un màxim de ' . $max . ' entrades de «' . $type['name'] . '» per comanda.');
+                throw new RuntimeException('Només pots comprar un màxim de ' . $max . ' entrades de «' . $type['name'] . '» per comanda.');
             }
             $min = (int) $type['min_per_order'];
             if ($min > 0 && $qty < $min) {
@@ -177,7 +177,7 @@ final class TicketService
 
         $globalMax = Settings::int('max_tickets_order', 10);
         if ($globalMax > 0 && $totalQty > $globalMax) {
-            throw new RuntimeException('Podeu comprar un màxim de ' . $globalMax . ' entrades per comanda.');
+            throw new RuntimeException('Pots comprar un màxim de ' . $globalMax . ' entrades per comanda.');
         }
 
         return ['items' => $items, 'subtotal' => $subtotal];
@@ -219,8 +219,8 @@ final class TicketService
                 $remaining = self::remaining($typeId);
                 if ($remaining !== null && (int) $item['quantity'] > $remaining) {
                     throw new RuntimeException($remaining > 0
-                        ? 'Mentre completàveu les dades algú s\'ha avançat: només queden ' . $remaining . ' places de «' . $item['type']['name'] . '».'
-                        : 'Mentre completàveu les dades s\'han exhaurit les places de «' . $item['type']['name'] . '».');
+                        ? 'Mentre completaves les dades algú s\'ha avançat: només queden ' . $remaining . ' places de «' . $item['type']['name'] . '».'
+                        : 'Mentre completaves les dades s\'han exhaurit les places de «' . $item['type']['name'] . '».');
                 }
             }
 

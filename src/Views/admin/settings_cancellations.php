@@ -25,7 +25,7 @@ $deadline = TicketService::cancellationDeadline();
                     <input type="checkbox" name="cancellation_enabled" value="1"<?= checkedIf($s['cancellation_enabled'] === '1') ?>>
                     <span><strong>Permetre l'anul·lació des del web públic</strong></span>
                 </label>
-                <span class="field__hint">Si ho desactiveu, només podreu anul·lar inscripcions des d'aquest panell.</span>
+                <span class="field__hint">Si ho desactives, només podràs anul·lar inscripcions des d'aquest panell.</span>
             </div>
 
             <div class="field">
@@ -46,7 +46,7 @@ $deadline = TicketService::cancellationDeadline();
                     <label for="cancellation_deadline_date">O bé una data límit fixa</label>
                     <input class="input" type="date" id="cancellation_deadline_date" name="cancellation_deadline_date"
                            value="<?= e($s['cancellation_deadline_date'] !== '' ? date('Y-m-d', (int) strtotime((string) $s['cancellation_deadline_date'])) : '') ?>">
-                    <span class="field__hint">Si l'ompliu, té prioritat sobre els dies.</span>
+                    <span class="field__hint">Si l'omples, té prioritat sobre els dies.</span>
                 </div>
             </div>
 
@@ -60,7 +60,7 @@ $deadline = TicketService::cancellationDeadline();
                 <div class="alert alert--warning">
                     <span aria-hidden="true">⚠️</span>
                     <span>Ara mateix no hi ha cap termini: es podrà anul·lar en qualsevol moment.
-                        Indiqueu una data límit o els dies previs (i la data exacta de l'esdeveniment).</span>
+                        Indica una data límit o els dies previs (i la data exacta de l'esdeveniment).</span>
                 </div>
             <?php endif; ?>
         </div>

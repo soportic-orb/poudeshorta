@@ -14,7 +14,7 @@ if (empty($walletApple) && empty($walletGoogle)) {
 
 $ticketCount = max(1, (int) ($ticketCount ?? 1));
 $peu = $ticketCount === 1
-    ? 'S\'hi afegirà la vostra entrada.'
+    ? 'S\'hi afegirà la teva entrada.'
     : 'S\'hi afegiran les ' . $ticketCount . ' entrades de cop.';
 ?>
 <div class="wallet-buttons">

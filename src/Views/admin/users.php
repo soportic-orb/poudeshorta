@@ -85,7 +85,7 @@ $roles = ['owner' => 'Propietari', 'admin' => 'Administrador', 'staff' => 'Perso
                         <input class="input" type="password" id="new_password_1" name="new_password" autocomplete="new-password" required>
                     </div>
                     <div class="field">
-                        <label for="new_password_2">Repetiu la contrasenya nova</label>
+                        <label for="new_password_2">Repeteix la contrasenya nova</label>
                         <input class="input" type="password" id="new_password_2" name="new_password_confirm" autocomplete="new-password" required>
                     </div>
                     <button type="submit" class="btn btn--light btn--block">Actualitzar la contrasenya</button>

@@ -66,12 +66,12 @@
     </div>
     <div class="panel__body">
         <p style="font-size:.92rem;">
-            <strong>Opció recomanada</strong> — afegiu aquesta ordre al cron de CloudPanel (cada 5 minuts):
+            <strong>Opció recomanada</strong> — afegeix aquesta ordre al cron de CloudPanel (cada 5 minuts):
         </p>
         <pre class="code-block">*/5 * * * * /usr/bin/php <?= e(APP_ROOT) ?>/bin/cron.php >> <?= e(APP_ROOT) ?>/storage/logs/cron.log 2>&1</pre>
 
         <p style="font-size:.92rem;margin-top:18px;">
-            <strong>Alternativa</strong> — si no teniu accés al cron, crideu aquesta URL des d'un servei extern:
+            <strong>Alternativa</strong> — si no tens accés al cron, crida aquesta URL des d'un servei extern:
         </p>
         <div class="copy-row">
             <input class="input" type="text" id="cron-url" value="<?= e($cronUrl) ?>" readonly>
@@ -81,8 +81,8 @@
         <p style="margin:14px 0 0;font-size:.88rem;color:var(--pdsh-muted);">
             Última execució: <strong><?= dt($lastCron) ?></strong>
             <?php if (trim((string) $lastCron) === ''): ?>
-                — encara no s'ha executat mai. Si no ho configureu, els comunicats només s'enviaran
-                quan premeu «Enviar el lot següent» al panell.
+                — encara no s'ha executat mai. Si no ho configures, els comunicats només s'enviaran
+                quan premis «Enviar el lot següent» al panell.
             <?php endif; ?>
         </p>
     </div>

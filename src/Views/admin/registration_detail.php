@@ -136,7 +136,7 @@ $valid = array_values(array_filter($tickets, static fn ($t) => $t['status'] === 
             <div class="panel__foot">
                 <button type="submit" class="btn btn--danger btn--sm">Anul·lar les seleccionades</button>
                 <span style="font-size:.85rem;color:var(--pdsh-muted);">
-                    Si no en seleccioneu cap, s'anul·laran totes les vàlides.
+                    Si no en selecciones cap, s'anul·laran totes les vàlides.
                     <?php if (\App\Core\Settings::bool('cancellation_refund', true)): ?>
                         La devolució es tramita automàticament a Stripe
                         <?php $fee = (float) Settings::get('cancellation_fee_percent', '0'); ?>

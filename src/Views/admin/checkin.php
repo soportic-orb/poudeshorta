@@ -5,7 +5,7 @@
         <span aria-hidden="true">⚠️</span>
         <span>El control d'accés està desactivat a
             <a href="<?= e(url('/admin/configuracio')) ?>">Configuració → Esdeveniment</a>.
-            Podeu validar entrades igualment des d'aquí.</span>
+            Pots validar entrades igualment des d'aquí.</span>
     </div>
 <?php endif; ?>
 
@@ -26,8 +26,8 @@
     <div class="panel__head">
         <div>
             <h2>Validar una entrada</h2>
-            <p>Obriu la càmera i apunteu al codi QR de l'entrada: serveix igual el PDF imprès,
-               la pantalla del mòbil o el passi del wallet. També podeu escriure'n el codi a mà.</p>
+            <p>Obre la càmera i apunta al codi QR de l'entrada: serveix igual el PDF imprès,
+               la pantalla del mòbil o el passi del wallet. També pots escriure'n el codi a mà.</p>
         </div>
     </div>
     <div class="panel__body">
@@ -40,7 +40,7 @@
         <p class="alert alert--info" id="scanner-no-disponible" hidden>
             <span aria-hidden="true">ℹ️</span>
             <span>Aquest navegador no pot obrir la càmera (cal una connexió segura amb HTTPS).
-                  Podeu validar les entrades escrivint-ne el codi aquí sota.</span>
+                  Pots validar les entrades escrivint-ne el codi aquí sota.</span>
         </p>
 
         <div class="scanner" id="scanner" hidden
@@ -57,7 +57,7 @@
             <?= Csrf::field() ?>
             <div class="field">
                 <label for="scan-code" style="font-size:.9rem;color:var(--pdsh-muted);font-weight:600;">
-                    O escriviu el codi de l'entrada
+                    O escriu el codi de l'entrada
                 </label>
                 <input class="input" type="text" id="scan-code" name="code"
                        placeholder="ABCD1234" autocomplete="off" autocapitalize="characters"

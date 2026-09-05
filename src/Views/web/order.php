@@ -123,7 +123,7 @@ $paid = in_array((string) $order['status'], ['paid', 'partially_refunded'], true
                         </div>
                         <?php if (($contact = (string) Settings::get('event_contact_email')) !== ''): ?>
                             <p style="margin:14px 0 0;color:var(--pdsh-muted);font-size:.92rem;">
-                                Si teniu qualsevol dubte, escriviu-nos a <a href="mailto:<?= e($contact) ?>"><?= e($contact) ?></a>.
+                                Si tens qualsevol dubte, escriu-nos a <a href="mailto:<?= e($contact) ?>"><?= e($contact) ?></a>.
                             </p>
                         <?php endif; ?>
                     <?php else: ?>
@@ -139,7 +139,7 @@ $paid = in_array((string) $order['status'], ['paid', 'partially_refunded'], true
                         </p>
 
                         <form method="post" action="<?= e($base . '/anullar') ?>"
-                              data-confirm="Segur que voleu anul·lar les entrades seleccionades? Aquesta acció no es pot desfer.">
+                              data-confirm="Segur que vols anul·lar les entrades seleccionades? Aquesta acció no es pot desfer.">
                             <?= Csrf::field() ?>
                             <input type="hidden" name="t" value="<?= e($token) ?>">
 
@@ -151,8 +151,8 @@ $paid = in_array((string) $order['status'], ['paid', 'partially_refunded'], true
                                 <fieldset>
                                     <legend style="font-size:.95rem;">
                                         <?= count($valid) === 1
-                                            ? 'Entrada que podeu anul·lar'
-                                            : 'Trieu quines entrades voleu anul·lar' ?>
+                                            ? 'Entrada que pots anul·lar'
+                                            : 'Tria quines entrades vols anul·lar' ?>
                                     </legend>
                                     <?php foreach ($valid as $ticket): ?>
                                         <label class="check" style="margin-bottom:9px;">
@@ -166,8 +166,8 @@ $paid = in_array((string) $order['status'], ['paid', 'partially_refunded'], true
                                     <?php endforeach; ?>
                                     <span class="field__hint">
                                         <?= count($valid) === 1
-                                            ? 'Si no la marqueu, s\'anul·larà igualment aquesta entrada.'
-                                            : 'Si no en marqueu cap, s\'anul·laran totes les que hi ha aquí.' ?>
+                                            ? 'Si no la marques, s\'anul·larà igualment aquesta entrada.'
+                                            : 'Si no en marques cap, s\'anul·laran totes les que hi ha aquí.' ?>
                                     </span>
                                 </fieldset>
                             <?php else: ?>

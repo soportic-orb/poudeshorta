@@ -4,8 +4,8 @@
             <span class="success-hero__icon" aria-hidden="true">⏳</span>
             <h1>Estem confirmant el pagament</h1>
             <p>
-                El vostre banc encara no ens ha confirmat l'operació. Sol trigar pocs segons.
-                Quan es confirmi, us enviarem les entrades automàticament a
+                El teu banc encara no ens ha confirmat l'operació. Sol trigar pocs segons.
+                Quan es confirmi, t'enviarem les entrades automàticament a
                 <strong><?= e($order['email']) ?></strong>.
             </p>
         </div>
@@ -17,7 +17,7 @@
                     <tr><th>Import</th><td><?= money((int) $order['total_cents']) ?></td></tr>
                 </table>
                 <p style="margin:18px 0 0;color:var(--pdsh-muted);font-size:.92rem;">
-                    No cal que torneu a pagar. Si al cap d'uns minuts no rebeu res, poseu-vos en contacte amb l'organització.
+                    No cal que tornis a pagar. Si al cap d'uns minuts no reps res, posa't en contacte amb l'organització.
                 </p>
             </div>
         </div>

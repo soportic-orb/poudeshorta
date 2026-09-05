@@ -68,7 +68,7 @@ final class UpdateController
         }
 
         if ((string) Request::post('confirm', '') !== 'ACTUALITZA') {
-            Flash::error('Escriviu ACTUALITZA a la casella de confirmació per continuar.');
+            Flash::error('Escriu ACTUALITZA a la casella de confirmació per continuar.');
             Response::redirect(Url::to('/admin/actualitzacions'));
         }
 
@@ -81,7 +81,7 @@ final class UpdateController
 
         $result['success']
             ? Flash::success('Actualització aplicada correctament. Versió actual: ' . $result['version'] . '.')
-            : Flash::error('L\'actualització ha fallat. Reviseu el registre; s\'ha restaurat la versió anterior.');
+            : Flash::error('L\'actualització ha fallat. Revisa el registre; s\'ha restaurat la versió anterior.');
 
         Logger::audit('actualitza_plataforma', $result['version'], ['ok' => $result['success']]);
         Response::redirect(Url::to('/admin/actualitzacions'));

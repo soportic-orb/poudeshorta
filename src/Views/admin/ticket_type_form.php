@@ -42,7 +42,7 @@ $price = old('price', $isNew ? '' : Money::toDecimal((int) $type['price_cents'])
                     <label for="price">Preu (€) *</label>
                     <input class="input <?= isset($errors['price']) ? 'has-error' : '' ?>" type="text" inputmode="decimal"
                            id="price" name="price" value="<?= e($price) ?>" placeholder="15,00">
-                    <span class="field__hint">Poseu 0 per a inscripcions gratuïtes (no passen per Stripe).</span>
+                    <span class="field__hint">Posa 0 per a inscripcions gratuïtes (no passen per Stripe).</span>
                     <?php if (isset($errors['price'])): ?><span class="field__error"><?= e($errors['price']) ?></span><?php endif; ?>
                 </div>
 
@@ -50,7 +50,7 @@ $price = old('price', $isNew ? '' : Money::toDecimal((int) $type['price_cents'])
                     <label for="quota">Places disponibles</label>
                     <input class="input <?= isset($errors['quota']) ? 'has-error' : '' ?>" type="number" min="0"
                            id="quota" name="quota" value="<?= old('quota', $type['quota']) ?>" placeholder="Sense límit">
-                    <span class="field__hint">Deixeu-ho buit si no hi ha límit.<?= isset($sold) ? ' Ja se n\'han venut ' . (int) $sold . '.' : '' ?></span>
+                    <span class="field__hint">Deixa-ho buit si no hi ha límit.<?= isset($sold) ? ' Ja se n\'han venut ' . (int) $sold . '.' : '' ?></span>
                     <?php if (isset($errors['quota'])): ?><span class="field__error"><?= e($errors['quota']) ?></span><?php endif; ?>
                 </div>
 
@@ -142,7 +142,7 @@ $price = old('price', $isNew ? '' : Money::toDecimal((int) $type['price_cents'])
                 <?php endforeach; ?>
             </div>
             <p style="color:var(--pdsh-muted);font-size:.86rem;margin:0;">
-                Els camps que esborreu d'aquesta llista deixaran d'aparèixer al formulari;
+                Els camps que esborris d'aquesta llista deixaran d'aparèixer al formulari;
                 les respostes ja recollides es conserven a cada entrada.
             </p>
         </div>

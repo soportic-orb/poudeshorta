@@ -75,7 +75,7 @@ final class Mailer
         $html = $this->wrap(
             'Prova de configuració SMTP',
             '<p>Aquest és un correu de prova enviat des del Panell de Gestió de <strong>' . htmlspecialchars((string) Settings::get('event_name')) . '</strong>.</p>'
-            . '<p>Si el llegiu, la configuració del servidor SMTP és correcta.</p>'
+            . '<p>Si el llegeixes, la configuració del servidor SMTP és correcta.</p>'
         );
         $ok = $this->send($toEmail, null, 'Prova SMTP · ' . Settings::get('event_name'), $html);
         return [$ok, $ok ? 'Correu de prova enviat correctament.' : ('Error: ' . ($this->lastError ?? 'desconegut'))];

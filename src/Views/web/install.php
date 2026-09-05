@@ -21,7 +21,7 @@ $errors = $errors ?? [];
 <?php if (!$ready): ?>
     <div class="alert alert--error">
         <span aria-hidden="true">⛔</span>
-        <span>Cal resoldre els punts marcats abans de continuar. Reviseu els permisos dels directoris
+        <span>Cal resoldre els punts marcats abans de continuar. Revisa els permisos dels directoris
               (<code>chmod 775</code>) i les extensions de PHP al panell de CloudPanel.</span>
     </div>
 <?php else: ?>
@@ -31,7 +31,7 @@ $errors = $errors ?? [];
 
     <h2 style="font-size:1.05rem;">2 · Base de dades MySQL</h2>
     <p style="color:var(--pdsh-muted);font-size:.9rem;">
-        Creeu la base de dades i l'usuari des de CloudPanel (Databases → Add Database) i escriviu-ne les dades aquí.
+        Crea la base de dades i l'usuari des de CloudPanel (Databases → Add Database) i escriu-ne les dades aquí.
     </p>
 
     <div class="field-row">
@@ -83,7 +83,7 @@ $errors = $errors ?? [];
             <?php if (isset($errors['admin_password'])): ?><span class="field__error"><?= e($errors['admin_password']) ?></span><?php endif; ?>
         </div>
         <div class="field">
-            <label for="admin_password_confirm">Repetiu la contrasenya</label>
+            <label for="admin_password_confirm">Repeteix la contrasenya</label>
             <input class="input <?= isset($errors['admin_password_confirm']) ? 'has-error' : '' ?>" type="password" id="admin_password_confirm" name="admin_password_confirm" autocomplete="new-password" required>
             <?php if (isset($errors['admin_password_confirm'])): ?><span class="field__error"><?= e($errors['admin_password_confirm']) ?></span><?php endif; ?>
         </div>

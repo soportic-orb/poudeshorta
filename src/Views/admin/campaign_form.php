@@ -16,7 +16,7 @@ $errors = $errors ?? [];
         <div class="panel__head">
             <div>
                 <h2>Redactar el comunicat</h2>
-                <p>Es desa com a esborrany; el podreu previsualitzar i provar abans d'enviar-lo.</p>
+                <p>Es desa com a esborrany; el podràs previsualitzar i provar abans d'enviar-lo.</p>
             </div>
         </div>
         <div class="panel__body">
@@ -50,9 +50,9 @@ $errors = $errors ?? [];
             <div class="field">
                 <label for="body">Missatge *</label>
                 <textarea class="textarea <?= isset($errors['body']) ? 'has-error' : '' ?>" id="body" name="body" rows="14"
-                          placeholder="Hola {{name}},&#10;&#10;Us escrivim per recordar-vos que…" required><?= old('body') ?></textarea>
+                          placeholder="Hola {{name}},&#10;&#10;T'escrivim per recordar-te que…" required><?= old('body') ?></textarea>
                 <span class="field__hint">
-                    Escriviu en text pla: els paràgrafs i els salts de línia es respecten i els enllaços es converteixen automàticament.
+                    Escriu en text pla: els paràgrafs i els salts de línia es respecten i els enllaços es converteixen automàticament.
                 </span>
                 <?php if (isset($errors['body'])): ?><span class="field__error"><?= e($errors['body']) ?></span><?php endif; ?>
             </div>

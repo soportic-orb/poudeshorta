@@ -110,9 +110,9 @@ final class GoogleWallet
 
         if ($desats === null) {
             throw new RuntimeException(
-                'No s\'han pogut desar les entrades al vostre compte de Google i l\'enllaç, que llavors '
+                'No s\'han pogut desar les entrades al teu compte de Google i l\'enllaç, que llavors '
                 . 'les ha de portar senceres, queda massa llarg (' . strlen($jwt) . ' caràcters de '
-                . self::MAX_JWT . ') per a ' . count($objectes) . ' entrades. Comproveu a Configuració → '
+                . self::MAX_JWT . ') per a ' . count($objectes) . ' entrades. Comprova a Configuració → '
                 . 'Wallet que el compte de servei té permís sobre l\'emissor.'
             );
         }
@@ -125,7 +125,7 @@ final class GoogleWallet
         if (strlen($jwt) > self::MAX_JWT) {
             throw new RuntimeException(
                 'Aquesta comanda té massa entrades (' . count($objectes) . ') per afegir-les totes amb un sol '
-                . 'enllaç del Google Wallet. Afegiu-les d\'una en una des de «Les meves entrades».'
+                . 'enllaç del Google Wallet. Afegeix-les d\'una en una des de «Les meves entrades».'
             );
         }
 
@@ -425,8 +425,8 @@ final class GoogleWallet
         if ($status >= 400 || empty($decoded['access_token'])) {
             $motiu = (string) ($decoded['error_description'] ?? $decoded['error'] ?? 'resposta inesperada');
             throw new RuntimeException(
-                'Google no ha acceptat el compte de servei (' . $motiu . '). Comproveu que el JSON és el correcte '
-                . 'i que teniu activada l\'API de Google Wallet al projecte de Google Cloud.'
+                'Google no ha acceptat el compte de servei (' . $motiu . '). Comprova que el JSON és el correcte '
+                . 'i que tens activada l\'API de Google Wallet al projecte de Google Cloud.'
             );
         }
 
@@ -469,8 +469,8 @@ final class GoogleWallet
         return match (true) {
             $status === 401 => 'Google ha rebutjat les credencials del compte de servei.',
             $status === 403 => 'El compte de servei no té permís sobre aquest emissor. A la Google Wallet Console, '
-                . 'aneu a «Users» i doneu-li accés a l\'adreça del compte de servei. (' . $detall . ')',
-            $status === 404 => 'Google no troba l\'emissor indicat. Reviseu l\'Issuer ID. (' . $detall . ')',
+                . 'vés a «Users» i dona-li accés a l\'adreça del compte de servei. (' . $detall . ')',
+            $status === 404 => 'Google no troba l\'emissor indicat. Revisa l\'Issuer ID. (' . $detall . ')',
             default         => 'Google ha respost amb el codi ' . $status . ': ' . $detall,
         };
     }
@@ -503,7 +503,7 @@ final class GoogleWallet
             'ok'      => true,
             'message' => 'Enllaç generat correctament i signat amb el compte de servei. Mida: '
                 . strlen($jwt) . ' de ' . self::MAX_JWT . ' caràcters permesos'
-                . (self::classRegistered() ? '.' : ' (creeu la classe per escurçar-lo).'),
+                . (self::classRegistered() ? '.' : ' (crea la classe per escurçar-lo).'),
         ];
     }
 
