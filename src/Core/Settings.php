@@ -83,6 +83,8 @@ final class Settings
         'smtp_from_name'  => 'Pou de s\'Horta',
         'smtp_reply_to'   => '',
         'smtp_batch_size' => '25',
+        'mail_last_error'    => '',
+        'mail_last_error_at' => '',
         'mail_footer'     => 'Reps aquest correu perquè t\'has inscrit a un esdeveniment del carrer Pou de s\'Horta.',
 
         // Correus transaccionals

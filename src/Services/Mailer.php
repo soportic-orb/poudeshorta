@@ -57,6 +57,7 @@ final class Mailer
             }
 
             $mail->send();
+            self::recordSuccess();
             return true;
         } catch (MailException $e) {
             $this->lastError = $e->getMessage();
@@ -66,7 +67,41 @@ final class Mailer
         }
 
         Logger::error('No s\'ha pogut enviar el correu', ['to' => $toEmail, 'error' => $this->lastError]);
+        self::recordFailure((string) $this->lastError);
+
         return false;
+    }
+
+    /**
+     * L'últim error d'enviament queda desat perquè el Panell de Gestió el
+     * pugui avisar. Sense això, un correu que falla només deixa rastre al
+     * registre del servidor i ningú se n'assabenta.
+     */
+    private static function recordFailure(string $error): void
+    {
+        try {
+            Settings::setMany([
+                'mail_last_error'    => Str::limit($error, 400),
+                'mail_last_error_at' => date('Y-m-d H:i:s'),
+            ]);
+            Settings::flush();
+        } catch (\Throwable $e) {
+            // Si no podem ni desar-ho, el registre ja en deixa constància.
+        }
+    }
+
+    /** Un enviament correcte esborra l'avís. */
+    private static function recordSuccess(): void
+    {
+        try {
+            if (trim((string) Settings::get('mail_last_error')) === '') {
+                return;
+            }
+            Settings::setMany(['mail_last_error' => '', 'mail_last_error_at' => '']);
+            Settings::flush();
+        } catch (\Throwable $e) {
+            // No és crític.
+        }
     }
 
     /** Envia un correu de prova a l'adreça indicada i retorna [èxit, missatge]. */

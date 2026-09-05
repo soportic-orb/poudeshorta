@@ -103,6 +103,25 @@ try {
             </div>
         <?php endif; ?>
 
+        <?php /* Un correu que falla només deixava rastre al registre del servidor:
+                 aquí s'avisa a totes les pantalles fins que se'n torni a enviar un bé. */ ?>
+        <?php if (($mailError = trim((string) Settings::get('mail_last_error'))) !== ''): ?>
+            <div class="alert alert--error">
+                <span aria-hidden="true">✉️</span>
+                <span>
+                    <strong>L'últim correu no s'ha pogut enviar</strong>
+                    <?php if (($quan = trim((string) Settings::get('mail_last_error_at'))) !== ''): ?>
+                        (<?= dt($quan, 'd/m/Y H:i') ?>)
+                    <?php endif; ?>.
+                    Mentre això passi, ni les entrades ni els enllaços de «Les meves entrades»
+                    arriben a ningú.
+                    <br><span style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.85rem;"><?= e($mailError) ?></span>
+                    <br>Revisa-ho a <a href="<?= e(url('/admin/configuracio/correu')) ?>">Configuració → Correu (SMTP)</a>;
+                    l'avís desapareix tot sol quan se n'enviï un de correcte.
+                </span>
+            </div>
+        <?php endif; ?>
+
         <?= View::partial('layouts/_flash') ?>
         <?= $content ?? '' ?>
     </div>

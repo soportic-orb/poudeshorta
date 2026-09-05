@@ -9,6 +9,23 @@ Actualitzacions i a la barra lateral.
 
 ---
 
+## [1.13.1] — 2026-09-05
+
+### Corregit
+
+- **Els correus que fallaven ho feien en silenci.** `Mailer::send()` retorna
+  `false` quan no pot enviar, però qui el cridava no en feia cas: a la pantalla
+  «Les meves entrades» el visitant llegia igualment que rebria el correu, i al
+  Panell de Gestió no hi havia cap senyal. L'única constància quedava al
+  registre del servidor, on gairebé ningú mira.
+- Ara **el Panell de Gestió avisa a totes les pantalles** quan l'últim
+  enviament ha fallat, amb l'error exacte que ha donat el servidor SMTP i
+  l'hora. L'avís desapareix tot sol quan se n'envia un de correcte.
+- Al visitant se li continua dient el mateix tant si l'adreça té inscripcions
+  com si no, per no revelar quines adreces estan inscrites.
+
+---
+
 ## [1.13.0] — 2026-09-05
 
 ### Canviat
