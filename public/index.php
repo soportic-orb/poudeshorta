@@ -96,9 +96,12 @@ $router->group([$csrf, [Auth::class, 'requireLogin']], static function (Router $
     $r->get('/admin/inscripcions',             [Admin\RegistrationController::class, 'index']);
     $r->get('/admin/inscripcions/pdf',         [Admin\RegistrationController::class, 'pdf']);
     $r->get('/admin/inscripcions/csv',         [Admin\RegistrationController::class, 'csv']);
+    $r->get('/admin/inscripcions/nova',        [Admin\RegistrationController::class, 'create']);
+    $r->post('/admin/inscripcions/nova',       [Admin\RegistrationController::class, 'store']);
     $r->post('/admin/inscripcions/esborrar',   [Admin\RegistrationController::class, 'destroy']);
     $r->get('/admin/inscripcions/{id:\d+}',    [Admin\RegistrationController::class, 'show']);
     $r->post('/admin/inscripcions/{id:\d+}/anullar',  [Admin\RegistrationController::class, 'cancel']);
+    $r->post('/admin/inscripcions/{id:\d+}/pagada',   [Admin\RegistrationController::class, 'markPaid']);
     $r->post('/admin/inscripcions/{id:\d+}/reenviar', [Admin\RegistrationController::class, 'resend']);
     $r->post('/admin/inscripcions/{id:\d+}/nota',     [Admin\RegistrationController::class, 'note']);
     $r->get('/admin/inscripcions/{id:\d+}/pdf',       [Admin\RegistrationController::class, 'ticketPdf']);

@@ -181,6 +181,29 @@ Al Panell de Gestió, seguiu la llista de comprovació del resum:
 
 ---
 
+## 10.1 Inscriure algú a mà
+
+A **Inscripcions → + Inscriure algú a mà** pots apuntar qui s'ha apuntat en
+paper, per telèfon o pagant en efectiu. La inscripció queda igual que les fetes
+pel web: amb el seu codi QR, el seu PDF i els passis de wallet.
+
+- S'omple **una fila per assistent**, amb el seu tipus d'inscripció i el seu
+  nom. El total es va actualitzant sol.
+- A diferència del web, **no s'apliquen els límits pensats per a la venda
+  pública** (la finestra de dates ni els màxims per comanda): si algú s'apunta
+  fora de termini, s'hi pot apuntar igualment.
+- **Les places sí que es respecten.** Si no en queden, ho diu i no deixa
+  continuar; per damunt hi ha la casella «Permetre passar de les places
+  disponibles», per quan saps que hi ha lloc tot i que el comptador digui que no.
+- Es pot crear **ja pagada** (efectiu, transferència o gratuïta) o **pendent de
+  pagament**. Mentre estigui pendent, **les seves entrades no passen el control
+  d'accés**: a la fitxa de la inscripció hi ha el botó **Marcar com a pagada**
+  per quan cobris.
+- Si el servidor SMTP està configurat, es poden enviar les entrades per correu
+  en el mateix moment.
+- A les notes de la inscripció hi queda constància de qui l'ha feta i quan, i
+  també a l'auditoria del sistema.
+
 ## 11. Passis de wallet (opcional)
 
 Els passis són una comoditat: l'entrada queda desada a l'aplicació Wallet del

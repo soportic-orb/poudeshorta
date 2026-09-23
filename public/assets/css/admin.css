@@ -316,3 +316,21 @@
 .bulk .btn { border-width: 2px; }
 .bulk .btn--danger { background: transparent; border-color: #F3A9A2; color: #F3A9A2; }
 .bulk .btn--danger:hover { background: var(--pdsh-danger); border-color: var(--pdsh-danger); color: #fff; }
+
+/* ---------------------------------------------- Inscripció manual */
+
+.manual-row {
+    border: 1px solid var(--pdsh-line); border-radius: 12px;
+    padding: 14px 16px; margin-bottom: 12px; background: #FCFAF6;
+}
+
+.manual-row__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.manual-row__num { font-weight: 800; font-size: .82rem; letter-spacing: .06em; text-transform: uppercase; color: var(--pdsh-muted); }
+
+.manual-row__del {
+    border: 0; background: transparent; cursor: pointer; line-height: 1;
+    font-size: 1.5rem; color: var(--pdsh-muted); padding: 0 4px; border-radius: 6px;
+}
+.manual-row__del:hover { color: var(--pdsh-danger); background: #FCEDEC; }
+
+.manual-row__extra { margin-top: 4px; }

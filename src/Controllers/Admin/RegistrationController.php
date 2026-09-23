@@ -10,6 +10,7 @@ use App\Core\Logger;
 use App\Core\Money;
 use App\Core\Request;
 use App\Core\Response;
+use App\Core\Settings;
 use App\Core\Url;
 use App\Core\View;
 use App\Services\RegistrationListPdf;
@@ -151,6 +152,149 @@ final class RegistrationController
         Response::download($csv, 'inscripcions-' . date('Ymd-Hi') . '.csv', 'text/csv; charset=utf-8');
     }
 
+    /** Formulari per inscriure algú a mà des del panell. */
+    public function create(): void
+    {
+        $this->renderNew();
+    }
+
+    /**
+     * Desa la inscripció feta a mà.
+     *
+     * Arriba una fila per assistent (tipus + nom + camps propis), que és com
+     * es pensa una inscripció de taulell: «la Marta i el seu fill, menú adult
+     * i menú infantil». D'aquí en surten les quantitats per tipus.
+     */
+    public function store(): void
+    {
+        $buyer = [
+            'email'   => mb_strtolower(trim((string) Request::post('email', ''))),
+            'name'    => trim((string) Request::post('name', '')),
+            'surname' => trim((string) Request::post('surname', '')),
+            'phone'   => trim((string) Request::post('phone', '')),
+        ];
+
+        $errors = [];
+        if ($buyer['name'] === '') {
+            $errors[] = 'Cal el nom de qui fa la inscripció.';
+        }
+        if (!filter_var($buyer['email'], FILTER_VALIDATE_EMAIL)) {
+            $errors[] = 'Cal una adreça electrònica vàlida: és on s\'enviaran les entrades.';
+        }
+
+        // Els camps propis es desen per etiqueta, igual que els que arriben
+        // del web públic, perquè es vegin igual a la fitxa i al PDF.
+        $etiquetes = [];
+        foreach (Db::all('SELECT `ticket_type_id`, `slug`, `label` FROM `form_fields`') as $field) {
+            $etiquetes[(int) $field['ticket_type_id']][(string) $field['slug']] = (string) $field['label'];
+        }
+
+        // Files del formulari → quantitats per tipus i dades de cada assistent.
+        $rows = [];
+        $quantities = [];
+        foreach ((array) Request::post('rows', []) as $row) {
+            $typeId = (int) ($row['type_id'] ?? 0);
+            if ($typeId <= 0) {
+                continue;
+            }
+
+            $extra = [];
+            foreach ((array) ($row['extra'] ?? []) as $slug => $value) {
+                $value = trim((string) (is_array($value) ? implode(', ', $value) : $value));
+                $label = $etiquetes[$typeId][(string) $slug] ?? null;
+                if ($value !== '' && $label !== null) {
+                    $extra[$label] = $value;
+                }
+            }
+
+            $rows[] = [
+                'type_id' => $typeId,
+                'name'    => trim((string) ($row['name'] ?? '')),
+                'extra'   => $extra,
+            ];
+            $quantities[$typeId] = ($quantities[$typeId] ?? 0) + 1;
+        }
+
+        if ($rows === []) {
+            $errors[] = 'Cal afegir almenys una entrada.';
+        }
+
+        if ($errors !== []) {
+            Flash::error(implode(' ', $errors));
+            $this->renderNew();
+            return;
+        }
+
+        $overbooking = Request::post('overbooking') === '1';
+        $paid = Request::post('payment') !== 'pending';
+
+        try {
+            $cart = TicketService::buildCart($quantities, true, $overbooking);
+        } catch (RuntimeException $e) {
+            Flash::error($e->getMessage());
+            $this->renderNew();
+            return;
+        }
+
+        $buyer['status'] = $paid ? 'paid' : 'pending';
+        $buyer['notes'] = $this->manualNote();
+
+        try {
+            $order = TicketService::createPendingOrder($buyer, $cart['items'], $rows, $overbooking);
+        } catch (RuntimeException $e) {
+            Flash::error($e->getMessage());
+            $this->renderNew();
+            return;
+        }
+
+        Logger::audit('inscripcio_manual', (string) $order['reference'], [
+            'entrades' => count($rows),
+            'import'   => (int) $order['total_cents'],
+            'estat'    => $buyer['status'],
+        ]);
+
+        $message = 'Inscripció ' . $order['reference'] . ' creada amb '
+            . count($rows) . (count($rows) === 1 ? ' entrada.' : ' entrades.');
+
+        if ($paid && Request::post('send_email') === '1') {
+            $message .= TicketService::sendConfirmationEmail($order)
+                ? ' S\'han enviat les entrades a ' . $order['email'] . '.'
+                : ' Ara bé, no s\'han pogut enviar les entrades per correu: mira l\'avís de dalt.';
+        }
+
+        Flash::success($message);
+        Response::redirect(Url::to('/admin/inscripcions/' . $order['id']));
+    }
+
+    /**
+     * Pinta el formulari. Quan ve d'un error, la vista recupera el que s'hi
+     * havia escrit amb old(), igual que la resta de formularis del panell.
+     */
+    private function renderNew(): void
+    {
+        if (Request::isPost()) {
+            Flash::setOld($_POST);
+        }
+
+        View::render('admin/registration_new', [
+            'title'  => 'Inscriure algú a mà',
+            'types'  => Db::all('SELECT * FROM `ticket_types` ORDER BY `sort_order`, `id`'),
+            'fields' => Db::all('SELECT * FROM `form_fields` ORDER BY `ticket_type_id`, `sort_order`, `id`'),
+            'smtp'   => trim((string) Settings::get('smtp_host')) !== '',
+        ], 'layouts/admin');
+    }
+
+    /** Deixa constància de qui ha fet la inscripció i quan. */
+    private function manualNote(): string
+    {
+        $qui = (string) (Auth::user()['name'] ?? Auth::user()['email'] ?? 'el panell');
+        $nota = 'Inscripció feta a mà des del panell per ' . $qui . ' el ' . date('d/m/Y H:i') . '.';
+
+        $extra = trim((string) Request::post('notes', ''));
+
+        return $extra !== '' ? $nota . "\n" . $extra : $nota;
+    }
+
     public function show(string $id): void
     {
         $order = $this->findOrder((int) $id);
@@ -190,6 +334,44 @@ final class RegistrationController
         }
 
         Logger::audit('anulla_inscripcio', (string) $order['reference'], $result);
+        Flash::success($message);
+        Response::redirect(Url::to('/admin/inscripcions/' . $order['id']));
+    }
+
+    /**
+     * Cobrar una inscripció pendent.
+     *
+     * Les inscripcions fetes a mà poden néixer pendents (qui paga el mateix
+     * dia); fins que no es marquen com a pagades, les seves entrades no passen
+     * el control d'accés.
+     */
+    public function markPaid(string $id): void
+    {
+        $order = $this->findOrder((int) $id);
+
+        if ((string) $order['status'] !== 'pending') {
+            Flash::warning('Aquesta inscripció no està pendent de pagament.');
+            Response::redirect(Url::to('/admin/inscripcions/' . $order['id']));
+        }
+
+        if (!TicketService::markPaid((int) $order['id'])) {
+            Flash::error('No s\'ha pogut marcar com a pagada.');
+            Response::redirect(Url::to('/admin/inscripcions/' . $order['id']));
+        }
+
+        Logger::audit('cobrament_manual', (string) $order['reference'], [
+            'import' => (int) $order['total_cents'],
+        ]);
+
+        $message = 'Inscripció ' . $order['reference'] . ' marcada com a pagada.';
+
+        if (Request::post('send_email') === '1') {
+            $fresca = Db::first('SELECT * FROM `orders` WHERE `id` = :id', ['id' => $order['id']]) ?? $order;
+            $message .= TicketService::sendConfirmationEmail($fresca)
+                ? ' S\'han enviat les entrades a ' . $order['email'] . '.'
+                : ' Ara bé, no s\'han pogut enviar les entrades per correu: mira l\'avís de dalt.';
+        }
+
         Flash::success($message);
         Response::redirect(Url::to('/admin/inscripcions/' . $order['id']));
     }

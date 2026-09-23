@@ -135,5 +135,8 @@ try {
 <?php if (str_starts_with($path, '/admin/inscripcions')): ?>
     <script src="<?= e(asset('js/bulk.js')) ?>" defer></script>
 <?php endif; ?>
+<?php if ($path === '/admin/inscripcions/nova'): ?>
+    <script src="<?= e(asset('js/manual.js')) ?>" defer></script>
+<?php endif; ?>
 </body>
 </html>

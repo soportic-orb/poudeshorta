@@ -14,6 +14,7 @@ $exportQuery = $query === [] ? '' : '?' . http_build_query($query);
             <p>Combina'ls per acotar el llistat; les exportacions respecten el filtre actiu.</p>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a class="btn btn--primary btn--sm" href="<?= e(url('/admin/inscripcions/nova')) ?>">+ Inscriure algú a mà</a>
             <a class="btn btn--dark btn--sm" href="<?= e(url('/admin/inscripcions/pdf') . $exportQuery) ?>">Imprimir en PDF</a>
             <a class="btn btn--light btn--sm" href="<?= e(url('/admin/inscripcions/csv') . $exportQuery) ?>">Exportar CSV</a>
         </div>

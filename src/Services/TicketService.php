@@ -119,7 +119,14 @@ final class TicketService
      * @return array{items: array<int, array>, subtotal: int}
      * @throws RuntimeException si la selecció no és vàlida.
      */
-    public static function buildCart(array $quantities): array
+    /**
+     * @param bool $admin       Des del panell no s'apliquen els límits pensats
+     *                          per a la venda pública (finestra de venda i
+     *                          màxims per comanda): qui inscriu a mà ja sap
+     *                          el que fa.
+     * @param bool $overbooking Permet passar de les places disponibles.
+     */
+    public static function buildCart(array $quantities, bool $admin = false, bool $overbooking = false): array
     {
         $types = self::ticketTypesById();
         $items = [];
@@ -138,24 +145,24 @@ final class TicketService
             }
 
             $now = date('Y-m-d H:i:s');
-            if (!empty($type['sales_start']) && $type['sales_start'] > $now) {
+            if (!$admin && !empty($type['sales_start']) && $type['sales_start'] > $now) {
                 throw new RuntimeException('Encara no s\'ha obert la venda de «' . $type['name'] . '».');
             }
-            if (!empty($type['sales_end']) && $type['sales_end'] < $now) {
+            if (!$admin && !empty($type['sales_end']) && $type['sales_end'] < $now) {
                 throw new RuntimeException('La venda de «' . $type['name'] . '» ja s\'ha tancat.');
             }
 
             $max = (int) $type['max_per_order'];
-            if ($max > 0 && $qty > $max) {
+            if (!$admin && $max > 0 && $qty > $max) {
                 throw new RuntimeException('Només pots comprar un màxim de ' . $max . ' entrades de «' . $type['name'] . '» per comanda.');
             }
             $min = (int) $type['min_per_order'];
-            if ($min > 0 && $qty < $min) {
+            if (!$admin && $min > 0 && $qty < $min) {
                 throw new RuntimeException('Cal comprar com a mínim ' . $min . ' entrades de «' . $type['name'] . '».');
             }
 
             $remaining = self::remaining($typeId);
-            if ($remaining !== null && $qty > $remaining) {
+            if (!$overbooking && $remaining !== null && $qty > $remaining) {
                 throw new RuntimeException($remaining > 0
                     ? 'Només queden ' . $remaining . ' places de «' . $type['name'] . '».'
                     : 'Les places de «' . $type['name'] . '» s\'han exhaurit.');
@@ -176,7 +183,7 @@ final class TicketService
         }
 
         $globalMax = Settings::int('max_tickets_order', 10);
-        if ($globalMax > 0 && $totalQty > $globalMax) {
+        if (!$admin && $globalMax > 0 && $totalQty > $globalMax) {
             throw new RuntimeException('Pots comprar un màxim de ' . $globalMax . ' entrades per comanda.');
         }
 
@@ -190,9 +197,13 @@ final class TicketService
      * @param array<int, array> $items       Sortida de buildCart()['items'].
      * @param array<int, array> $attendees   Dades per entrada: [['type_id'=>, 'name'=>, 'extra'=>[]], ...]
      */
-    public static function createPendingOrder(array $buyer, array $items, array $attendees = []): array
-    {
-        return Db::transaction(static function () use ($buyer, $items, $attendees) {
+    public static function createPendingOrder(
+        array $buyer,
+        array $items,
+        array $attendees = [],
+        bool $overbooking = false
+    ): array {
+        return Db::transaction(static function () use ($buyer, $items, $attendees, $overbooking) {
             // Bloquegem les files dels tipus implicats: així dues compres
             // simultànies del mateix tipus es processen una darrere l'altra i
             // no es poden vendre més places de les que hi ha.
@@ -217,7 +228,7 @@ final class TicketService
             foreach ($items as $item) {
                 $typeId = (int) $item['type']['id'];
                 $remaining = self::remaining($typeId);
-                if ($remaining !== null && (int) $item['quantity'] > $remaining) {
+                if (!$overbooking && $remaining !== null && (int) $item['quantity'] > $remaining) {
                     throw new RuntimeException($remaining > 0
                         ? 'Mentre completaves les dades algú s\'ha avançat: només queden ' . $remaining . ' places de «' . $item['type']['name'] . '».'
                         : 'Mentre completaves les dades s\'han exhaurit les places de «' . $item['type']['name'] . '».');
@@ -235,13 +246,17 @@ final class TicketService
                 'name'           => trim($buyer['name']),
                 'surname'        => trim((string) ($buyer['surname'] ?? '')) ?: null,
                 'phone'          => trim((string) ($buyer['phone'] ?? '')) ?: null,
-                'status'         => 'pending',
+                'status'         => in_array((string) ($buyer['status'] ?? ''), ['pending', 'paid'], true)
+                    ? (string) $buyer['status']
+                    : 'pending',
                 'subtotal_cents' => $subtotal,
                 'total_cents'    => $subtotal,
                 'currency'       => (string) Settings::get('currency', 'EUR'),
                 'manage_token'   => Str::token(32),
                 'ip'             => $buyer['ip'] ?? null,
                 'user_agent'     => $buyer['user_agent'] ?? null,
+                'notes'          => trim((string) ($buyer['notes'] ?? '')) ?: null,
+                'paid_at'        => ($buyer['status'] ?? '') === 'paid' ? date('Y-m-d H:i:s') : null,
             ]);
 
             // Repartim les dades d'assistent introduïdes entre les entrades del seu tipus.

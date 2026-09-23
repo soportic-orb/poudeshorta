@@ -47,6 +47,23 @@ $valid = array_values(array_filter($tickets, static fn ($t) => $t['status'] === 
             </dl>
         </div>
         <div class="panel__foot">
+            <?php if ((string) $order['status'] === 'pending'): ?>
+                <?php /* Sense això, una inscripció feta a mà com a pendent no es
+                         podria acabar mai de cobrar. Fins que no ho estigui, les
+                         seves entrades no passen el control d'accés. */ ?>
+                <form method="post" action="<?= e(url('/admin/inscripcions/' . $order['id'] . '/pagada')) ?>"
+                      data-confirm="Marcar la inscripció <?= e($order['reference']) ?> com a pagada?">
+                    <?= Csrf::field() ?>
+                    <?php if (trim((string) Settings::get('smtp_host')) !== ''): ?>
+                        <label class="check" style="margin:0 12px 0 0;">
+                            <input type="checkbox" name="send_email" value="1" checked>
+                            <span>i enviar-li les entrades</span>
+                        </label>
+                    <?php endif; ?>
+                    <button type="submit" class="btn btn--primary btn--sm">Marcar com a pagada</button>
+                </form>
+            <?php endif; ?>
+
             <?php if (in_array((string) $order['status'], ['paid', 'partially_refunded'], true) && $valid !== []): ?>
                 <a class="btn btn--light btn--sm" href="<?= e(url('/admin/inscripcions/' . $order['id'] . '/pdf')) ?>" target="_blank" rel="noopener">
                     Veure les entrades

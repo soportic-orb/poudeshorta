@@ -9,6 +9,33 @@ Actualitzacions i a la barra lateral.
 
 ---
 
+## [1.14.0] — 2026-09-23
+
+### Afegit
+
+- **Inscriure assistents a mà des del Panell de Gestió**, per a qui s'apunta en
+  paper, per telèfon o pagant en efectiu. A *Inscripcions → + Inscriure algú a
+  mà*.
+  - S'omple una fila per assistent, amb el seu tipus i el seu nom, i el total
+    es va actualitzant sol. Els camps propis de cada tipus (al·lèrgies i
+    companyia de taula) surten només a les files del tipus que els té.
+  - La inscripció que en surt és **igual que una feta pel web**: mateix codi
+    QR, mateix PDF, mateixos passis de wallet i mateixa pàgina de gestió per a
+    qui s'inscriu.
+  - No s'hi apliquen els límits pensats per a la venda pública (finestra de
+    dates i màxims per comanda), però **les places sí que es respecten**, amb
+    una casella per superar-les expressament quan calgui.
+  - Es pot crear ja pagada o pendent de pagament, i enviar-li les entrades per
+    correu en el mateix moment.
+  - Queda constància de qui l'ha feta i quan, a les notes de la inscripció i a
+    l'auditoria.
+- **Botó «Marcar com a pagada»** a la fitxa de la inscripció, per a les que
+  estan pendents de pagament. Fins ara una inscripció pendent no es podia
+  acabar de cobrar des del panell, i les seves entrades no passen el control
+  d'accés mentre no ho estigui.
+
+---
+
 ## [1.13.1] — 2026-09-05
 
 ### Corregit
